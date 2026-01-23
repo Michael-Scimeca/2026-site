@@ -10,7 +10,7 @@ const MOCK_DATA = {
   headline: "Creative Developer & Designer",
   subHeadline: "Building polished digital experiences with a focus on motion and interaction.",
   heroImage: {
-    src: "/hero-portrait.jpg",
+    src: "/hero-portrait-v2.png",
     alt: "Michael Scimeca Portrait"
   },
   about: [
