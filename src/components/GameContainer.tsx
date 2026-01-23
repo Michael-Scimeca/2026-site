@@ -113,9 +113,19 @@ export function GameContainer() {
 
                     {/* Game component - without its own blur container */}
                     {activeGame === 'tictactoe' ? (
-                        <TicTacToe isOpen={true} onToggle={() => { }} hideCloseButton={true} onWin={handleWin} />
+                        <TicTacToe
+                            isOpen={true}
+                            onToggle={() => setIsOpen(false)}
+                            hideCloseButton={true}
+                            onWin={handleWin}
+                        />
                     ) : (
-                        <Pong isOpen={true} onToggle={() => { }} hideCloseButton={true} onWin={handleWin} />
+                        <Pong
+                            isOpen={true}
+                            onToggle={() => setIsOpen(false)}
+                            hideCloseButton={true}
+                            onWin={handleWin}
+                        />
                     )}
                 </div>
             )}

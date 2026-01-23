@@ -96,7 +96,7 @@ export function CurveLoader() {
             <svg className="w-full h-full fill-white">
                 <path
                     ref={path}
-                    d="M0 0 L2000 0 L2000 3000 L0 3000 Z"
+                    d="M0 0 L12000 0 L12000 13000 L0 13000 Z"
                 />
             </svg>
             <div className="absolute top-0 left-0 w-full h-screen flex items-center justify-center pointer-events-none">

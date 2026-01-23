@@ -11,21 +11,34 @@ export function Pong({ isOpen, onToggle, hideCloseButton, onWin }: { isOpen?: bo
     const [countdown, setCountdown] = useState(0);
     const countdownRef = useRef(0);
     const [hasStarted, setHasStarted] = useState(false);
+    const [gamePaused, setGamePaused] = useState(false);
+    const lastActivityRef = useRef(Date.now());
+    const isForfeitTriggered = useRef(false);
 
     // Sync ref with state
     useEffect(() => {
         countdownRef.current = countdown;
-    }, [countdown]);
+        if (hasStarted && !gamePaused) {
+            lastActivityRef.current = Date.now();
+            isForfeitTriggered.current = false; // Reset on start
+        }
+    }, [countdown, hasStarted, gamePaused]);
 
     // Internal state for standalone usage if props aren't provided
     const [internalIsOpen, setInternalIsOpen] = useState(false);
     const isGameOpen = isOpen !== undefined ? isOpen : internalIsOpen;
     const handleToggle = onToggle || (() => setInternalIsOpen(!internalIsOpen));
 
+    // Reset score only on fresh component mount/open
+    useEffect(() => {
+        if (isGameOpen) {
+            setScore({ player: 0, ai: 0 });
+        }
+    }, [isGameOpen]);
+
     // Handle countdown logic
     useEffect(() => {
-        if (isGameOpen && hasStarted) {
-            setScore({ player: 0, ai: 0 }); // Reset score when starting
+        if (isGameOpen && hasStarted && !gamePaused) {
             setCountdown(3);
             const timer = setInterval(() => {
                 setCountdown(prev => {
@@ -40,14 +53,61 @@ export function Pong({ isOpen, onToggle, hideCloseButton, onWin }: { isOpen?: bo
         } else {
             setCountdown(0);
         }
-    }, [isGameOpen, hasStarted]);
+    }, [isGameOpen, hasStarted, gamePaused]);
 
-    // Reset hasStarted when game closes
+    // Reset hasStarted/Paused when game closes
     useEffect(() => {
         if (!isGameOpen) {
             setHasStarted(false);
+            setGamePaused(false);
         }
     }, [isGameOpen]);
+
+    // ... (rest of the file until the update function) ...
+
+    const update = () => {
+        if (!hasStarted || gamePaused || countdownRef.current > 0) return;
+
+        // Inactivity Check: 3 seconds without move = Pause
+        if (Date.now() - lastActivityRef.current > 3000) {
+            setGamePaused(true);
+            return;
+        }
+
+        // Move Ball
+        // ... (rest of update logic is unchanged) ...
+    };
+
+    // ... (rest of hooks and drawing) ...
+
+    {
+        !hasStarted && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[2px] rounded-lg group/start">
+                <button
+                    onClick={() => setHasStarted(true)}
+                    className="px-4 py-2 bg-white text-black text-[10px] uppercase tracking-widest font-bold rounded-full hover:bg-[#8ec5ff] hover:text-white transition-all transform active:scale-95 shadow-lg cursor-pointer pointer-events-auto"
+                >
+                    Start to Play
+                </button>
+            </div>
+        )
+    }
+
+    {
+        hasStarted && gamePaused && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[2px] rounded-lg group/start">
+                <button
+                    onClick={() => {
+                        setGamePaused(false);
+                        lastActivityRef.current = Date.now();
+                    }}
+                    className="px-4 py-2 bg-white text-black text-[10px] uppercase tracking-widest font-bold rounded-full hover:bg-[#8ec5ff] hover:text-white transition-all transform active:scale-95 shadow-lg cursor-pointer pointer-events-auto"
+                >
+                    Still Playing?
+                </button>
+            </div>
+        )
+    }
 
     // Game constants
     const CANVAS_SIZE = 180; // Matching TicTacToe size roughly
@@ -113,7 +173,13 @@ export function Pong({ isOpen, onToggle, hideCloseButton, onWin }: { isOpen?: bo
         };
 
         const update = () => {
-            if (!hasStarted || countdownRef.current > 0) return;
+            if (!hasStarted || gamePaused || countdownRef.current > 0) return;
+
+            // Inactivity Check: 3 seconds without move = Pause
+            if (Date.now() - lastActivityRef.current > 3000) {
+                setGamePaused(true);
+                return;
+            }
 
             // Move Ball
             ball.x += ball.dx;
@@ -243,6 +309,9 @@ export function Pong({ isOpen, onToggle, hideCloseButton, onWin }: { isOpen?: bo
             playerY = mouseY - PADDLE_HEIGHT / 2;
             // Clamp Player
             playerY = Math.max(0, Math.min(CANVAS_SIZE - PADDLE_HEIGHT, playerY));
+
+            // Update activity ref
+            lastActivityRef.current = Date.now();
         };
 
         canvas.addEventListener('mousemove', handleMouseMove);
@@ -304,6 +373,20 @@ export function Pong({ isOpen, onToggle, hideCloseButton, onWin }: { isOpen?: bo
                                 className="px-4 py-2 bg-white text-black text-[10px] uppercase tracking-widest font-bold rounded-full hover:bg-[#8ec5ff] hover:text-white transition-all transform active:scale-95 shadow-lg cursor-pointer pointer-events-auto"
                             >
                                 Start to Play
+                            </button>
+                        </div>
+                    )}
+
+                    {hasStarted && gamePaused && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[2px] rounded-lg group/start">
+                            <button
+                                onClick={() => {
+                                    setGamePaused(false);
+                                    lastActivityRef.current = Date.now();
+                                }}
+                                className="px-4 py-2 bg-white text-black text-[10px] uppercase tracking-widest font-bold rounded-full hover:bg-[#8ec5ff] hover:text-white transition-all transform active:scale-95 shadow-lg cursor-pointer pointer-events-auto"
+                            >
+                                Still Playing?
                             </button>
                         </div>
                     )}
