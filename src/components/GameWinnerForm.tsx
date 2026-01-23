@@ -23,7 +23,8 @@ export function GameWinnerForm({ onClose, game = 'tictactoe' }: GameWinnerFormPr
                     winner: 'human',
                     name,
                     email,
-                    game
+                    game,
+                    skipStatsUpdate: true
                 })
             });
             if (!res.ok) throw new Error('Failed to submit');

@@ -123,8 +123,8 @@ export function Pong({ isOpen, onToggle, hideCloseButton, onWin }: { isOpen?: bo
         fetch('/api/game-stats')
             .then(res => res.json())
             .then(data => {
-                if (data.totalAiWins !== undefined) setAiWins(data.totalAiWins);
-                if (data.totalHumanWins !== undefined) setHumanWins(data.totalHumanWins);
+                if (data.pongAiWins !== undefined) setAiWins(data.pongAiWins);
+                if (data.pongHumanWins !== undefined) setHumanWins(data.pongHumanWins);
             })
             .catch(err => console.error(err));
     }, []);
@@ -134,11 +134,11 @@ export function Pong({ isOpen, onToggle, hideCloseButton, onWin }: { isOpen?: bo
             const res = await fetch('/api/game-stats', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ winner })
+                body: JSON.stringify({ winner, game: 'pong' })
             });
             const data = await res.json();
-            if (data.totalAiWins !== undefined) setAiWins(data.totalAiWins);
-            if (data.totalHumanWins !== undefined) setHumanWins(data.totalHumanWins);
+            if (data.pongAiWins !== undefined) setAiWins(data.pongAiWins);
+            if (data.pongHumanWins !== undefined) setHumanWins(data.pongHumanWins);
         } catch (error) {
             console.error(error);
         }

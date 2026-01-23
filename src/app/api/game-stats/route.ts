@@ -35,21 +35,50 @@ export async function POST(request: Request) {
             });
         }
 
-        // 3. Increment the counter
-        const patch = serverClient.patch(doc._id)
-            .setIfMissing({ totalAiWins: 0, totalHumanWins: 0 });
+        // 3. Increment the counter unless skipped
+        if (!body.skipStatsUpdate) {
+            const patch = serverClient.patch(doc._id)
+                .setIfMissing({
+                    totalAiWins: 0,
+                    totalHumanWins: 0,
+                    tictactoeAiWins: 0,
+                    tictactoeHumanWins: 0,
+                    pongAiWins: 0,
+                    pongHumanWins: 0
+                });
 
-        if (isHumanWin) {
-            patch.inc({ totalHumanWins: 1 });
-        } else {
-            patch.inc({ totalAiWins: 1 });
+            const gameType = game || 'tictactoe';
+
+            if (isHumanWin) {
+                patch.inc({ totalHumanWins: 1 });
+                if (gameType === 'tictactoe') patch.inc({ tictactoeHumanWins: 1 });
+                if (gameType === 'pong') patch.inc({ pongHumanWins: 1 });
+            } else {
+                patch.inc({ totalAiWins: 1 });
+                if (gameType === 'tictactoe') patch.inc({ tictactoeAiWins: 1 });
+                if (gameType === 'pong') patch.inc({ pongAiWins: 1 });
+            }
+
+            const updatedDoc = await patch.commit();
+
+            return NextResponse.json({
+                totalAiWins: updatedDoc.totalAiWins,
+                totalHumanWins: updatedDoc.totalHumanWins,
+                tictactoeAiWins: updatedDoc.tictactoeAiWins,
+                tictactoeHumanWins: updatedDoc.tictactoeHumanWins,
+                pongAiWins: updatedDoc.pongAiWins,
+                pongHumanWins: updatedDoc.pongHumanWins
+            });
         }
 
-        const updatedDoc = await patch.commit();
-
+        // Return current stats without update if skipped
         return NextResponse.json({
-            totalAiWins: updatedDoc.totalAiWins,
-            totalHumanWins: updatedDoc.totalHumanWins
+            totalAiWins: doc.totalAiWins,
+            totalHumanWins: doc.totalHumanWins,
+            tictactoeAiWins: doc.tictactoeAiWins,
+            tictactoeHumanWins: doc.tictactoeHumanWins,
+            pongAiWins: doc.pongAiWins,
+            pongHumanWins: doc.pongHumanWins
         });
     } catch (error) {
         console.error("Error updating game stats:", error);
@@ -59,11 +88,15 @@ export async function POST(request: Request) {
 
 export async function GET() {
     try {
-        const query = `*[_type == "gameStats"][0] { totalAiWins, totalHumanWins }`;
+        const query = `*[_type == "gameStats"][0]`;
         const data = await serverClient.fetch(query);
         return NextResponse.json({
             totalAiWins: data?.totalAiWins || 0,
-            totalHumanWins: data?.totalHumanWins || 0
+            totalHumanWins: data?.totalHumanWins || 0,
+            tictactoeAiWins: data?.tictactoeAiWins || 0,
+            tictactoeHumanWins: data?.tictactoeHumanWins || 0,
+            pongAiWins: data?.pongAiWins || 0,
+            pongHumanWins: data?.pongHumanWins || 0
         });
     } catch (error) {
         console.error("Error fetching game stats:", error);

@@ -65,11 +65,11 @@ export function TicTacToe({ isOpen, onToggle, hideCloseButton, onWin }: { isOpen
             const res = await fetch('/api/game-stats', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ winner })
+                body: JSON.stringify({ winner, game: 'tictactoe' })
             });
             const data = await res.json();
-            if (data.totalAiWins !== undefined) setLosses(data.totalAiWins);
-            if (data.totalHumanWins !== undefined) setHumanWins(data.totalHumanWins);
+            if (data.tictactoeAiWins !== undefined) setLosses(data.tictactoeAiWins);
+            if (data.tictactoeHumanWins !== undefined) setHumanWins(data.tictactoeHumanWins);
         } catch (error) {
             console.error(error);
         }
@@ -102,8 +102,8 @@ export function TicTacToe({ isOpen, onToggle, hideCloseButton, onWin }: { isOpen
         fetch('/api/game-stats')
             .then(res => res.json())
             .then(data => {
-                if (data.totalAiWins !== undefined) setLosses(data.totalAiWins);
-                if (data.totalHumanWins !== undefined) setHumanWins(data.totalHumanWins);
+                if (data.tictactoeAiWins !== undefined) setLosses(data.tictactoeAiWins);
+                if (data.tictactoeHumanWins !== undefined) setHumanWins(data.tictactoeHumanWins);
             })
             .catch(err => console.error(err));
     }, []);
