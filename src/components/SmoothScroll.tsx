@@ -9,6 +9,10 @@ export default function SmoothScroll() {
             autoRaf: true, // Use automatic standard RAF
         });
 
+        // Force scroll to top on load
+        window.scrollTo(0, 0);
+        lenis.scrollTo(0, { immediate: true });
+
         return () => {
             lenis.destroy();
         };

@@ -15,6 +15,7 @@ const MOCK_DATA = {
   },
   about: [
     {
+      _key: "block1",
       _type: "block",
       children: [
         {
@@ -24,6 +25,7 @@ const MOCK_DATA = {
       ]
     },
     {
+      _key: "block2",
       _type: "block",
       children: [
         {
@@ -140,14 +142,14 @@ const MOCK_DATA = {
 
 export default function Home() {
   return (
-    <main className="flex flex-col min-h-screen bg-white selection:bg-blue-500/30">
+    <main className="flex flex-col min-h-screen bg-white selection:bg-blue-500/30 overflow-hidden">
       <Hero
         title={MOCK_DATA.title}
-        // @ts-expect-error - Mock image format differs slightly from Sanity source
         heroImage={MOCK_DATA.heroImage}
         headline={MOCK_DATA.headline}
         subHeadline={MOCK_DATA.subHeadline}
       />
+
       <About description={MOCK_DATA.about} />
       <Experience items={MOCK_DATA.experience} />
       <Timeline items={MOCK_DATA.timeline} />
@@ -156,6 +158,7 @@ export default function Home() {
         location={MOCK_DATA.footer?.location}
         socialHandle={MOCK_DATA.footer?.socialHandle}
       />
+
     </main>
   );
 }

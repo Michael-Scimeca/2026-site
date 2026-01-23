@@ -13,16 +13,20 @@ export function StatusBadge() {
     } | null>(null);
 
     const getQuote = (temp: number) => {
-        if (temp < 20) return "Frozen solid, but my code is still hot.";
-        if (temp < 33) return "Perfect day for a cup of coffee and some debugging.";
-        if (temp < 46) return "Chilly vibes in Chicago today.";
-        if (temp < 56) return "Sweater weather is better weather.";
-        if (temp < 66) return "Spring is in the air (maybe).";
-        if (temp < 76) return "The ideal temperature for productivity.";
-        if (temp < 86) return "Feeling the sun, feeling the code.";
-        if (temp < 96) return "It's getting warm, time for some fresh air.";
-        if (temp < 106) return "Stay hydrated and keep the CPU cool.";
-        return "Melting away, but the pixels are sharp.";
+        const ranges = [
+            { max: 20, quotes: ["Freezing cold, my CPU loves it.", "Sub-zero hero.", "Chicago style: deep dish and frostbite.", "Actually too cold to function.", "Hibernation mode: ACTIVATED."] },
+            { max: 32, quotes: ["Snow boots required.", "Winter is coming... oh wait, it's here.", "Ice ice baby.", "Frosty air, sharp mind.", "Checking logs by the fireplace."] },
+            { max: 45, quotes: ["Chilly, but logic is crisp.", "Sweater weather engaged.", "Coffee is mandatory today.", "Cool breeze, clean code.", "Nature's air conditioning."] },
+            { max: 55, quotes: ["Zip-up hoodie season.", "Brisk and productive.", "Perfect for some focused deep work.", "Not too hot, not too cold.", "Fresh air, fresh ideas."] },
+            { max: 65, quotes: ["Actually pleasant outside?", "Spring vibes loading...", "Light jacket, heavy commit history.", "Sun's out, bugs (in code) out.", "Optimal operating temperature."] },
+            { max: 75, quotes: ["Absolutely perfect weather.", "Patio coding session?", "Golden hour all day.", "Chicago showing off today.", "Vitamin D levels rising."] },
+            { max: 85, quotes: ["Warm and sunny.", "Summer mode.", "Don't forget the sunscreen.", "Hot code, cool temper.", "Beautiful day to build something."] },
+            { max: 95, quotes: ["It's heating up!", "Server room is the place to be.", "Hydration check.", "Melting point approaching.", "Spicy weather outside."] },
+            { max: 120, quotes: ["Literally on fire.", "Too hot. Send ice cream.", "Code is fluid, like my brain.", "Error 404: Cold air not found.", "Why is it this hot?"] }
+        ];
+
+        const range = ranges.find(r => temp < r.max) || ranges[ranges.length - 1];
+        return range.quotes[Math.floor(Math.random() * range.quotes.length)];
     };
 
     useEffect(() => {
@@ -63,7 +67,7 @@ export function StatusBadge() {
             const ampm = hours >= 12 ? "PM" : "AM";
             const displayHoursStr = displayHours.toString().padStart(2, "0");
 
-            const timeString = `${displayHoursStr} ${displayMinutes} ${ampm}`;
+            const timeString = `${displayHoursStr}:${displayMinutes} ${ampm}`;
 
             setTimeParams({ timeString, isActive });
         };
@@ -83,7 +87,7 @@ export function StatusBadge() {
     if (!timeParams) return null;
 
     return (
-        <div className="flex items-center gap-3 bg-white py-2 px-[11px] md:px-4 shadow-xl">
+        <div className="flex items-center gap-3 bg-white py-2 px-[11px] md:px-4 shadow-xl rounded-[20px]">
             <div className="relative flex items-center justify-center w-3 h-3">
                 <span
                     className={`absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping ${timeParams.isActive ? "bg-green-400" : "bg-red-400"

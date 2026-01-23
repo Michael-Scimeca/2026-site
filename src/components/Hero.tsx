@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
 import Marquee from 'react-fast-marquee';
 import { StatusBadge } from './StatusBadge';
+import { GameContainer } from './GameContainer';
 import { urlFor } from '@/sanity/lib/image';
 import { type SanityImageSource } from "@sanity/image-url/lib/types/types";
 import { gsap } from 'gsap';
@@ -20,11 +21,29 @@ interface HeroProps {
 }
 
 export function Hero({ title, heroImage, headline, subHeadline }: HeroProps) {
+    const [timeToReach, setTimeToReach] = useState<string | null>(null);
+    const [isTextVisible, setIsTextVisible] = useState(false);
+
+    useEffect(() => {
+        if (timeToReach) {
+            setIsTextVisible(true);
+            const timer = setTimeout(() => {
+                setIsTextVisible(false);
+            }, 10000); // Fade out after 10 seconds
+            return () => clearTimeout(timer);
+        }
+    }, [timeToReach]);
+    const startTimeRef = useRef<number>(0);
     const containerRef = useRef<HTMLDivElement>(null);
+
     const bgRef = useRef<HTMLDivElement>(null);
     const portraitRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
     const marqueeRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        startTimeRef.current = performance.now();
+    }, []);
 
     useGSAP(() => {
         if (!containerRef.current) return;
@@ -80,26 +99,29 @@ export function Hero({ title, heroImage, headline, subHeadline }: HeroProps) {
     }, { scope: containerRef });
 
     return (
-        <section ref={containerRef} className="relative h-screen w-full bg-white md:p-[15px] overflow-hidden">
-            <div className="relative h-full w-full overflow-hidden rounded-sm md:rounded-lg bg-[#656766]">
+        <section ref={containerRef} className="hero relative h-screen w-full overflow-hidden p-[15px] bg-white">
+            <div className="relative h-full w-full overflow-hidden rounded-sm md:rounded-lg md:p-[15px] bg-[#656766]">
                 {/* Title - Top Left (20px/20px) */}
                 <h1 className="absolute top-[20px] left-[20px] z-50 text-lg md:text-xl font-medium tracking-tight text-white">
                     {title || 'Michael Scimeca'}
                 </h1>
 
-                {/* Status Badge - Top Right */}
-                <div className="absolute top-[20px] right-[20px] z-50">
+                {/* Status Badge & Games - Top Right */}
+                <div className="absolute top-[20px] right-[20px] z-50 flex flex-col items-end pointer-events-auto gap-3">
                     <StatusBadge />
+                    <div className="hidden md:flex items-start">
+                        <GameContainer />
+                    </div>
                 </div>
 
                 {/* Background Texture Layer - Increased height for parallax bleed */}
-                <div ref={bgRef} className="absolute -top-[20%] inset-x-0 h-[140%] z-0">
+                <div ref={bgRef} className="absolute -top-[20%] inset-x-0 h-[140%] z-0 opacity-0 animate-fade-in">
                     <Image
                         src="/hero-background.jpg"
                         alt="Background Texture"
                         fill
                         className="object-cover pointer-events-none"
-                        style={{ filter: 'blur(19px)' }}
+                        style={{ filter: 'blur(9px)' }}
                         priority
                         quality={100}
                         sizes="100vw"
@@ -140,21 +162,35 @@ export function Hero({ title, heroImage, headline, subHeadline }: HeroProps) {
                                 design, and AI automation
                             </span>
 
-                            <div className="mt-7 group relative inline-flex items-center p-[10px] bg-white/20 rounded-full pointer-events-auto backdrop-blur-sm shadow-sm">
-                                <button className="flex items-center gap-6 pl-10 pr-8 py-5 bg-white transition-all rounded-full cursor-pointer">
-                                    <span className="text-black font-semibold tracking-tight text-[clamp(18px,2vw,26px)]">Build Something Together</span>
-                                    <div className="flex items-center justify-center">
-                                        <svg
-                                            width="30"
-                                            height="30"
-                                            viewBox="0 0 24 24"
-                                            fill="currentColor"
-                                            className="text-black"
-                                        >
-                                            <path d="M21 3L3 10.53v.98l6.84 2.65L12.48 21h.98L21 3z" />
-                                        </svg>
-                                    </div>
-                                </button>
+                            <span className={`text-white/50 text-[10px] ml-10 mt-4 block transition-opacity duration-1000 ${isTextVisible ? 'opacity-100' : 'opacity-0'}`}>
+                                {timeToReach || "0.00"} Seconds to reach Call To Action
+                            </span>
+                            <div className="flex items-center gap-12 mt-2">
+                                <div className="group relative inline-flex items-center p-[10px] bg-white/20 rounded-full pointer-events-auto backdrop-blur-sm shadow-sm">
+                                    <a
+                                        href="mailto:mikeyscimeca@gmail.com"
+                                        onMouseEnter={() => {
+                                            if (!timeToReach) {
+                                                const elapsed = (performance.now() - startTimeRef.current) / 1000;
+                                                setTimeToReach(elapsed.toFixed(2));
+                                            }
+                                        }}
+                                        className="flex items-center gap-6 px-5 py-2.5 bg-white transition-all rounded-full cursor-pointer hover:bg-white/90"
+                                    >
+                                        <span className="text-black font-semibold tracking-tight text-[clamp(18px,2vw,26px)]">Build Something Together</span>
+                                        <div className="flex items-center justify-center">
+                                            <svg
+                                                width="30"
+                                                height="30"
+                                                viewBox="0 0 24 24"
+                                                fill="currentColor"
+                                                className="text-black"
+                                            >
+                                                <path d="M21 3L3 10.53v.98l6.84 2.65L12.48 21h.98L21 3z" />
+                                            </svg>
+                                        </div>
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>

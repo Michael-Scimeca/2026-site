@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import SmoothScroll from "@/components/SmoothScroll";
 import CustomCursor from "@/components/CustomCursor";
 import { CurveLoader } from "@/components/CurveLoader";
+import DynamicFavicon from "@/components/DynamicFavicon";
 import "./globals.css";
 
 const inter = Inter({
@@ -23,12 +24,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} antialiased bg-white text-zinc-900`}
+        className={`${inter.variable} antialiased bg-[#656766] text-zinc-900`}
         suppressHydrationWarning
       >
         <CurveLoader />
         <SmoothScroll />
         <CustomCursor />
+        <DynamicFavicon />
         {children}
       </body>
     </html>

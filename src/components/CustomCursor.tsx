@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
+import { gsap } from "gsap";
 
 export default function CustomCursor() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const mouse = useRef({ x: 0, y: 0 });
-    const pos = useRef({ x: 0, y: 0 });
+    const pos = useRef({ x: 0, y: 0, size: 6 });
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -21,6 +22,19 @@ export default function CustomCursor() {
         const onMouseMove = (e: MouseEvent) => {
             mouse.current.x = e.clientX;
             mouse.current.y = e.clientY;
+
+            // Check if hovering over clickable element
+            const target = e.target as HTMLElement;
+            const isTicTacToe = target.closest('.tic-tac-toe-board');
+            const isPointer = !isTicTacToe && (window.getComputedStyle(target).cursor === 'pointer' ||
+                target.tagName === 'BUTTON' ||
+                target.tagName === 'A');
+
+            gsap.to(pos.current, {
+                size: isPointer ? 24 : 6,
+                duration: 0.3,
+                overwrite: true
+            });
         };
 
         window.addEventListener("resize", setupCanvas);
@@ -28,6 +42,7 @@ export default function CustomCursor() {
         setupCanvas();
 
         let animationFrameId: number;
+        pos.current = { x: 0, y: 0, size: 6 };
 
         const render = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -39,9 +54,16 @@ export default function CustomCursor() {
 
             // Draw dot
             ctx.beginPath();
-            ctx.arc(pos.current.x, pos.current.y, 6, 0, Math.PI * 2);
+            ctx.arc(pos.current.x, pos.current.y, pos.current.size, 0, Math.PI * 2);
             ctx.fillStyle = "#BBDEFB"; // Baby blue
             ctx.fill();
+
+            // Add a subtle border when expanded
+            if (pos.current.size > 10) {
+                ctx.strokeStyle = "rgba(187, 222, 251, 0.5)";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
 
             animationFrameId = window.requestAnimationFrame(render);
         };
