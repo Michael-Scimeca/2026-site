@@ -1,4 +1,4 @@
-import {defineField, defineType} from 'sanity'
+import { defineField, defineType } from 'sanity'
 
 export const experience = defineType({
   name: 'experience',
@@ -24,8 +24,17 @@ export const experience = defineType({
     defineField({
       name: 'description',
       title: 'Description',
-      type: 'array', 
-      of: [{type: 'block'}], 
+      type: 'array',
+      of: [{ type: 'block' }],
+    }),
+    defineField({
+      name: 'tools',
+      title: 'Tools / Technologies',
+      type: 'array',
+      of: [{ type: 'string' }],
+      options: {
+        layout: 'tags'
+      }
     }),
   ],
 })

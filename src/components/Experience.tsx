@@ -13,6 +13,7 @@ interface ExperienceItem {
     creditLabel?: string;
     creditLinks?: string;
     thumbnail?: string;
+    tools?: string[];
 }
 
 interface ExperienceProps {
@@ -42,8 +43,8 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
             onMouseLeave={handleMouseLeave}
         >
             <Container>
-                <div className=" grid grid-cols-1 md:grid-cols-12 gap-y-6 md:gap-x-6 items-center">
-                    {/* Column 1: Company & Role */}
+                <div className="grid grid-cols-1 md:grid-cols-16 gap-y-6 md:gap-x-6 items-center">
+                    {/* Column 1: Company & Role (3 cols) */}
                     <div className="md:col-span-3 flex flex-col gap-1">
                         <h3 className="font-bold text-lg md:text-xl tracking-tight">
                             {item.company}
@@ -53,7 +54,23 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
                         </p>
                     </div>
 
-                    {/* Column 2: Credits / Description */}
+                    {/* Column 2: Tools (4 cols) */}
+                    <div className="md:col-span-4 flex flex-col gap-2">
+                        {item.tools && item.tools.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                                {item.tools.map((tool) => (
+                                    <span
+                                        key={tool}
+                                        className="px-3 py-1 bg-black text-white text-[10px] uppercase font-bold tracking-wider rounded-full shadow-sm whitespace-nowrap"
+                                    >
+                                        {tool}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Column 3: Credits / Description (3 cols) */}
                     <div className="md:col-span-3 flex flex-col gap-1">
                         {item.creditLabel && (
                             <h4 className="font-bold text-base md:text-lg">
@@ -72,7 +89,7 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
                         )}
                     </div>
 
-                    {/* Column 3: Thumbnail */}
+                    {/* Column 4: Thumbnail (6 cols) */}
                     <div className="md:col-span-6 w-full">
                         <div className="relative aspect-video bg-zinc-100 overflow-hidden shadow-sm">
                             {item.thumbnail && (
@@ -106,6 +123,8 @@ export function Experience({ items }: ExperienceProps) {
     return (
         <section className="bg-white text-zinc-900">
             <div className="flex flex-col">
+
+
                 {items.map((item) => (
                     <ExperienceRow key={item._key} item={item} />
                 ))}

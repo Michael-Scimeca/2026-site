@@ -1,0 +1,229 @@
+
+import { createClient } from 'next-sanity'
+import fs from 'fs'
+import path from 'path'
+
+const client = createClient({
+    projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+    dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
+    token: process.env.SANITY_API_TOKEN,
+    apiVersion: '2024-01-01',
+    useCdn: false,
+})
+
+const MOCK_DATA = {
+    title: "Michael Scimeca",
+    headline: "Creative Developer & Designer",
+    subHeadline: "Building polished digital experiences with a focus on motion and interaction.",
+    heroImage: "hero-portrait.png", // In public
+    about: [
+        {
+            _key: "block1",
+            _type: "block",
+            children: [
+                {
+                    _type: "span",
+                    text: "I am a multidisciplinary developer based in San Francisco, specializing in Next.js, React, and creative coding. With a background in design, I bridge the gap between aesthetics and engineering to build products that feel as good as they look."
+                }
+            ]
+        },
+        {
+            _key: "block2",
+            _type: "block",
+            children: [
+                {
+                    _type: "span",
+                    text: "Currently open for new opportunities and collaborations."
+                }
+            ]
+        }
+    ],
+    experience: [
+        {
+            _key: "1",
+            company: "Meta Reality Labs",
+            role: "Lead Product Designer",
+            dateRange: "22' — 24'",
+            creditLabel: "Meta Credits",
+            creditLinks: "Meta, Mixed Reality News, Road to VR",
+            thumbnail: "clips/patreon.mp4",
+            description: []
+        },
+        {
+            _key: "2",
+            company: "Spotify",
+            role: "Senior Product Designer",
+            dateRange: "21' — 21'",
+            creditLabel: "Record a Podcast",
+            creditLinks: "Tech Crunch",
+            thumbnail: "clips/twix.mp4",
+            description: []
+        },
+        {
+            _key: "3",
+            company: "Apple",
+            role: "Senior Product Designer",
+            dateRange: "20' — 21'",
+            creditLabel: "International HI Media Services",
+            creditLinks: "Apple Music, Apple Maps",
+            thumbnail: "clips/kovitz.mp4",
+            description: []
+        }
+    ],
+    timeline: [
+        {
+            company: "LogicGate",
+            date: "2022 - Present",
+            roles: [
+                {
+                    title: "Frontend Developer III",
+                    description: [
+                        "I lead feature development on a team by analyzing requirements, designing solutions, and assist in evolving the frontend chapter of our organization."
+                    ]
+                },
+                {
+                    title: "Frontend Developer II",
+                    description: [
+                        "I joined LogicGate and immediately took charge of feature development on my team while also assisting other frontend developers in the organization."
+                    ]
+                }
+            ]
+        },
+        {
+            company: "Cognizant",
+            date: "2019 - 2021",
+            roles: [
+                {
+                    title: "Senior Fullstack Developer",
+                    description: [
+                        "I designed and developed full-stack RESTful microservices using Netflix OSS, Java, Spring Boot, SQL, Angular, React, and Vue.",
+                        "I led development teams, utilizing extreme programming principles such as agile, test-driven development, and paired programming.",
+                        "I spearheaded the information architecture and developed a reusable UI component library for healthcare clients.",
+                        "I led over 650 developers through a monthly enablement process, training them for client work on the Digital Engineering stack."
+                    ]
+                }
+            ]
+        },
+        {
+            company: "projekt202",
+            date: "2018 - 2019",
+            roles: [
+                {
+                    title: "UI Developer",
+                    description: [
+                        "I assisted in developing a reusable UI component library and worked closely with a multi-million dollar airline client to gather requirements.",
+                        "My responsibility included developing solutions for enterprise clients worth millions of dollars, using Angular 7 for the frontend."
+                    ]
+                }
+            ]
+        },
+        {
+            company: "Major 4 Apps",
+            date: "2018 - 2019",
+            roles: [
+                {
+                    title: "Founder & Developer",
+                    description: [
+                        "I developed custom applications for clients, designed, developed, tested, and supported mobile applications on iOS and Android platforms.",
+                        "My mobile game ranked among the top 200 on the Amazon App Store."
+                    ]
+                }
+            ]
+        }
+    ],
+    footer: {
+        email: "mikeyscimeca@gmail.com",
+        location: "San Francisco, CA",
+        socialHandle: "@mikeyscimeca"
+    }
+};
+
+async function uploadAsset(filePath: string, type: 'image' | 'file' = 'image') {
+    const absolutePath = path.join(process.cwd(), 'public', filePath)
+    if (!fs.existsSync(absolutePath)) {
+        console.warn(`File not found: ${absolutePath}`)
+        return null
+    }
+    const buffer = fs.readFileSync(absolutePath)
+    console.log(`Uploading ${filePath}...`)
+    return client.assets.upload(type, buffer, { filename: path.basename(filePath) })
+}
+
+async function seed() {
+    console.log('Seeding data...')
+
+    // Upload hero image
+    const heroAsset = await uploadAsset(MOCK_DATA.heroImage, 'image')
+
+    // Upload experience thumbnails
+    const experienceWithAssets = await Promise.all(MOCK_DATA.experience.map(async (item) => {
+        // Determine type based on extension
+        const isVideo = item.thumbnail.endsWith('.mp4')
+        const assetType = isVideo ? 'file' : 'image'
+
+        const asset = await uploadAsset(item.thumbnail, assetType)
+        return {
+            _type: 'experience',
+            _key: item._key,
+            company: item.company,
+            role: item.role,
+            dateRange: item.dateRange,
+            creditLabel: item.creditLabel,
+            creditLinks: item.creditLinks,
+            thumbnail: asset ? {
+                _type: isVideo ? 'file' : 'image',
+                asset: {
+                    _type: "reference",
+                    _ref: asset._id
+                }
+            } : undefined,
+            description: item.description
+        }
+    }))
+
+    const timelineItems = MOCK_DATA.timeline.map((item, idx) => ({
+        _type: 'timelineItem',
+        _key: `timeline-${idx}`,
+        company: item.company,
+        date: item.date,
+        roles: item.roles.map((r, rIdx) => ({
+            _key: `role-${rIdx}`,
+            title: r.title,
+            description: r.description
+        }))
+    }))
+
+    const doc = {
+        _type: 'homePage',
+        title: MOCK_DATA.title,
+        headline: MOCK_DATA.headline,
+        subHeadline: MOCK_DATA.subHeadline,
+        heroImage: heroAsset ? {
+            _type: 'image',
+            asset: {
+                _type: "reference",
+                _ref: heroAsset._id
+            },
+            alt: "Michael Scimeca Portrait"
+        } : undefined,
+        about: MOCK_DATA.about,
+        experience: experienceWithAssets,
+        timeline: timelineItems,
+        footer: MOCK_DATA.footer
+    }
+
+    const existing = await client.fetch(`*[_type == "homePage"][0]`)
+    if (existing) {
+        console.log('Home Page data exists. Updating...', existing._id)
+        await client.patch(existing._id).set(doc).commit()
+        console.log('Updated Home Page document:', existing._id)
+    } else {
+        const res = await client.create(doc)
+        console.log('Created Home Page document:', res._id)
+    }
+}
+
+seed().catch((err) => {
+    console.error(err)
+    process.exit(1)
+})

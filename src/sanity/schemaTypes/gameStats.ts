@@ -41,5 +41,29 @@ export const gameStats = defineType({
             type: "number",
             initialValue: 0,
         }),
+        defineField({
+            name: "checkersAiWins",
+            title: "Checkers AI Wins",
+            type: "number",
+            initialValue: 0,
+        }),
+        defineField({
+            name: "checkersHumanWins",
+            title: "Checkers Human Wins",
+            type: "number",
+            initialValue: 0,
+        }),
+        defineField({
+            name: "spaceInvadersAiWins",
+            title: "Space Invaders AI Wins",
+            type: "number",
+            initialValue: 0,
+        }),
+        defineField({
+            name: "spaceInvadersHumanWins",
+            title: "Space Invaders Human Wins",
+            type: "number",
+            initialValue: 0,
+        }),
     ],
 });

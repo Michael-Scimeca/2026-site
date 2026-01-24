@@ -43,8 +43,11 @@ export async function POST(request: Request) {
                     totalHumanWins: 0,
                     tictactoeAiWins: 0,
                     tictactoeHumanWins: 0,
-                    pongAiWins: 0,
-                    pongHumanWins: 0
+                    pongHumanWins: 0,
+                    checkersAiWins: 0,
+                    checkersHumanWins: 0,
+                    spaceInvadersAiWins: 0,
+                    spaceInvadersHumanWins: 0
                 });
 
             const gameType = game || 'tictactoe';
@@ -53,10 +56,16 @@ export async function POST(request: Request) {
                 patch.inc({ totalHumanWins: 1 });
                 if (gameType === 'tictactoe') patch.inc({ tictactoeHumanWins: 1 });
                 if (gameType === 'pong') patch.inc({ pongHumanWins: 1 });
+
+                if (gameType === 'checkers') patch.inc({ checkersHumanWins: 1 });
+                if (gameType === 'spaceinvaders') patch.inc({ spaceInvadersHumanWins: 1 });
             } else {
                 patch.inc({ totalAiWins: 1 });
                 if (gameType === 'tictactoe') patch.inc({ tictactoeAiWins: 1 });
                 if (gameType === 'pong') patch.inc({ pongAiWins: 1 });
+
+                if (gameType === 'checkers') patch.inc({ checkersAiWins: 1 });
+                if (gameType === 'spaceinvaders') patch.inc({ spaceInvadersAiWins: 1 });
             }
 
             const updatedDoc = await patch.commit();
@@ -67,7 +76,12 @@ export async function POST(request: Request) {
                 tictactoeAiWins: updatedDoc.tictactoeAiWins,
                 tictactoeHumanWins: updatedDoc.tictactoeHumanWins,
                 pongAiWins: updatedDoc.pongAiWins,
-                pongHumanWins: updatedDoc.pongHumanWins
+                pongHumanWins: updatedDoc.pongHumanWins,
+                checkersAiWins: updatedDoc.checkersAiWins,
+
+                checkersHumanWins: updatedDoc.checkersHumanWins,
+                spaceInvadersAiWins: updatedDoc.spaceInvadersAiWins,
+                spaceInvadersHumanWins: updatedDoc.spaceInvadersHumanWins
             });
         }
 
@@ -78,7 +92,12 @@ export async function POST(request: Request) {
             tictactoeAiWins: doc.tictactoeAiWins,
             tictactoeHumanWins: doc.tictactoeHumanWins,
             pongAiWins: doc.pongAiWins,
-            pongHumanWins: doc.pongHumanWins
+            pongHumanWins: doc.pongHumanWins,
+            checkersAiWins: doc.checkersAiWins,
+
+            checkersHumanWins: doc.checkersHumanWins,
+            spaceInvadersAiWins: doc.spaceInvadersAiWins,
+            spaceInvadersHumanWins: doc.spaceInvadersHumanWins
         });
     } catch (error) {
         console.error("Error updating game stats:", error);
@@ -96,7 +115,12 @@ export async function GET() {
             tictactoeAiWins: data?.tictactoeAiWins || 0,
             tictactoeHumanWins: data?.tictactoeHumanWins || 0,
             pongAiWins: data?.pongAiWins || 0,
-            pongHumanWins: data?.pongHumanWins || 0
+            pongHumanWins: data?.pongHumanWins || 0,
+            checkersAiWins: data?.checkersAiWins || 0,
+
+            checkersHumanWins: data?.checkersHumanWins || 0,
+            spaceInvadersAiWins: data?.spaceInvadersAiWins || 0,
+            spaceInvadersHumanWins: data?.spaceInvadersHumanWins || 0
         });
     } catch (error) {
         console.error("Error fetching game stats:", error);

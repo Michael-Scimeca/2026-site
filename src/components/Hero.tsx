@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Marquee from 'react-fast-marquee';
 import { StatusBadge } from './StatusBadge';
 import { GameContainer } from './GameContainer';
+import { GradientBolt } from './GradientBolt';
 import { urlFor } from '@/sanity/lib/image';
 import { type SanityImageSource } from "@sanity/image-url/lib/types/types";
 import { gsap } from 'gsap';
@@ -100,7 +101,7 @@ export function Hero({ title, heroImage, headline, subHeadline }: HeroProps) {
 
     return (
         <section ref={containerRef} className="hero relative h-screen w-full overflow-hidden p-[15px] bg-white">
-            <div className="relative h-full w-full overflow-hidden rounded-sm md:rounded-lg md:p-[15px] bg-[#656766]">
+            <div className="relative h-full w-full overflow-hidden rounded-sm md:rounded-lg  bg-[#656766]">
                 {/* Title - Top Left (20px/20px) */}
                 <h1 className="absolute top-[20px] left-[20px] z-50 text-lg md:text-xl font-medium tracking-tight text-white">
                     {title || 'Michael Scimeca'}
@@ -117,6 +118,7 @@ export function Hero({ title, heroImage, headline, subHeadline }: HeroProps) {
                 {/* Background Texture Layer - Increased height for parallax bleed */}
                 <div ref={bgRef} className="absolute -top-[20%] inset-x-0 h-[140%] z-0 opacity-0 animate-fade-in">
                     <Image
+
                         src="/hero-background.jpg"
                         alt="Background Texture"
                         fill
@@ -128,14 +130,15 @@ export function Hero({ title, heroImage, headline, subHeadline }: HeroProps) {
                     />
                 </div>
 
+
                 {/* Scrolling Marquee Layer */}
                 <div ref={marqueeRef} className="absolute bottom-0 w-full z-20 md:z-0 overflow-hidden pointer-events-none pb-0">
                     <Marquee speed={80} direction="left" autoFill>
                         <span
-                            className="font-medium font-sans text-white leading-[1.2] px-4"
+                            className="font-medium font-sans text-white leading-[1.2] px-4 flex items-center"
                             style={{ fontSize: 'clamp(50px, 15vw, 250px)' }}
                         >
-                            <span className="text-blue-300">⌁</span>Web Developer<span className="mx-[0.1em] text-blue-300">⌁</span>Designer<span className="mx-[0.1em] text-blue-300">⌁</span>AI Automation Engineer
+                            <GradientBolt />Web Developer<GradientBolt />Designer<GradientBolt />AI Automation Engineer
                         </span>
                     </Marquee>
                 </div>
@@ -155,18 +158,18 @@ export function Hero({ title, heroImage, headline, subHeadline }: HeroProps) {
                             sizes="(max-width: 768px) 100vw, 80vw"
                         />
 
-                        <div ref={contentRef} className="absolute top-[35%] right-[5%] md:right-[5%] lg:right-[10%] z-20 flex flex-col items-start gap-1 md:translate-x-[clamp(0px,calc(20vw-180px),210px)] max-w-[90vw] md:max-w-4xl">
+                        <div ref={contentRef} className="absolute top-[35%] right-[5%] md:right-[5%] lg:right-[10%] z-20 flex flex-col items-start gap-1 md:translate-x-[clamp(0px,calc(20vw-180px),210px)] max-w-[90vw] md:max-w-4xl [transform:translate3d(0px,-0.0002%,0px)_rotate(-2.00003deg)] md:transform md:-rotate-2">
                             <span className="text-[clamp(25px,3.1vw,44px)] font-medium font-sans text-white leading-[1.2] tracking-tight whitespace-nowrap md:whitespace-normal">
                                 Building delightful digital<br />
                                 experiences with code,<br />
                                 design, and AI automation
                             </span>
 
-                            <span className={`text-white/50 text-[10px] ml-10 mt-4 block transition-opacity duration-1000 ${isTextVisible ? 'opacity-100' : 'opacity-0'}`}>
-                                {timeToReach || "0.00"} Seconds to reach Call To Action
+                            <span className={`text-white/50 text-[10px] ml-10 mt-1 block transition-opacity duration-1000 ${isTextVisible ? 'opacity-100' : 'opacity-0'}`}>
+                                {timeToReach || "0.00"} Seconds to reach Call To Action storing data...
                             </span>
-                            <div className="flex items-center gap-12 mt-2">
-                                <div className="group relative inline-flex items-center p-[10px] bg-white/20 rounded-full pointer-events-auto backdrop-blur-sm shadow-sm">
+                            <div className="flex items-center gap-12">
+                                <div className="group relative inline-flex items-center p-2 bg-white/20 rounded-full pointer-events-auto backdrop-blur-sm shadow-sm">
                                     <a
                                         href="mailto:mikeyscimeca@gmail.com"
                                         onMouseEnter={() => {
@@ -177,7 +180,7 @@ export function Hero({ title, heroImage, headline, subHeadline }: HeroProps) {
                                         }}
                                         className="flex items-center gap-6 px-5 py-2.5 bg-white transition-all rounded-full cursor-pointer hover:bg-white/90"
                                     >
-                                        <span className="text-black font-semibold tracking-tight text-[clamp(18px,2vw,26px)]">Build Something Together</span>
+                                        <span className="text-black font-semibold tracking-tight text-[clamp(18px,2vw,26px)]">Let's Build Something Together</span>
                                         <div className="flex items-center justify-center">
                                             <svg
                                                 width="30"
@@ -193,6 +196,7 @@ export function Hero({ title, heroImage, headline, subHeadline }: HeroProps) {
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>

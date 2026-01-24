@@ -46,9 +46,15 @@ export const homePage = defineType({
         }),
         defineField({
             name: 'experience',
-            title: 'Experience Timeline',
+            title: 'Featured Projects (Video Cards)',
             type: 'array',
             of: [{ type: 'experience' }],
+        }),
+        defineField({
+            name: 'timeline',
+            title: 'Resume Timeline',
+            type: 'array',
+            of: [{ type: 'timelineItem' }],
         }),
         defineField({
             name: 'footer',

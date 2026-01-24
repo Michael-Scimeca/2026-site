@@ -4,6 +4,8 @@ import { experience } from './experience'
 import { gameStats } from './gameStats'
 import { winnerSubmission } from './winnerSubmission'
 
+import { timelineItem } from './timelineItem'
+
 export const schema: { types: SchemaTypeDefinition[] } = {
-  types: [homePage, experience, gameStats, winnerSubmission],
+  types: [homePage, experience, timelineItem, gameStats, winnerSubmission],
 }
