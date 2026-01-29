@@ -6,7 +6,7 @@ import { gsap } from "gsap";
 export default function CustomCursor() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const mouse = useRef({ x: 0, y: 0 });
-    const pos = useRef({ x: 0, y: 0, size: 6 });
+    const pos = useRef({ x: 0, y: 0, size: 4 });
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -31,7 +31,7 @@ export default function CustomCursor() {
                 target.tagName === 'A');
 
             gsap.to(pos.current, {
-                size: isPointer ? 24 : 6,
+                size: isPointer ? 22 : 4,
                 duration: 0.3,
                 overwrite: true
             });
@@ -42,7 +42,7 @@ export default function CustomCursor() {
         setupCanvas();
 
         let animationFrameId: number;
-        pos.current = { x: 0, y: 0, size: 6 };
+        pos.current = { x: 0, y: 0, size: 4 };
 
         const render = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -55,12 +55,12 @@ export default function CustomCursor() {
             // Draw dot
             ctx.beginPath();
             ctx.arc(pos.current.x, pos.current.y, pos.current.size, 0, Math.PI * 2);
-            ctx.fillStyle = "#BBDEFB"; // Baby blue
+            ctx.fillStyle = "#0158ff";
             ctx.fill();
 
             // Add a subtle border when expanded
-            if (pos.current.size > 10) {
-                ctx.strokeStyle = "rgba(187, 222, 251, 0.5)";
+            if (pos.current.size > 5) {
+                ctx.strokeStyle = "rgba(1, 88, 255, 0.5)";
                 ctx.lineWidth = 2;
                 ctx.stroke();
             }

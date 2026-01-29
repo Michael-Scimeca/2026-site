@@ -171,7 +171,7 @@ export function Hero({ title, heroImage, headline, subHeadline }: HeroProps) {
                             <div className="flex items-center gap-12">
                                 <div className="group relative inline-flex items-center p-2 bg-white/20 rounded-full pointer-events-auto backdrop-blur-sm shadow-sm">
                                     <a
-                                        href="mailto:mikeyscimeca@gmail.com"
+                                        href="mailto:mikeyscimeca.dev@gmail.com"
                                         onMouseEnter={() => {
                                             if (!timeToReach) {
                                                 const elapsed = (performance.now() - startTimeRef.current) / 1000;

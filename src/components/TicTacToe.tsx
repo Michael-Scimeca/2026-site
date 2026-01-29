@@ -3,11 +3,11 @@
 import React, { useState, useEffect } from "react";
 import { gsap } from "gsap";
 
-export function TicTacToe({ isOpen, onToggle, hideCloseButton, onWin }: { isOpen?: boolean, onToggle?: () => void, hideCloseButton?: boolean, onWin?: () => void }) {
+export function TicTacToe({ isOpen, onToggle, hideCloseButton, onWin, initialHumanWins = 0, initialAiWins = 228 }: { isOpen?: boolean, onToggle?: () => void, hideCloseButton?: boolean, onWin?: () => void, initialHumanWins?: number, initialAiWins?: number }) {
     const [board, setBoard] = useState<(string | null)[]>(Array(9).fill(null));
     const [isXNext, setIsXNext] = useState(true);
     const [winner, setWinner] = useState<string | null>(null);
-    const [losses, setLosses] = useState(228);
+    const [losses, setLosses] = useState(initialAiWins);
 
     // Internal state for standalone usage if props aren't provided
     const [internalIsOpen, setInternalIsOpen] = useState(false);
@@ -58,7 +58,7 @@ export function TicTacToe({ isOpen, onToggle, hideCloseButton, onWin }: { isOpen
         return emptyCells[Math.floor(Math.random() * emptyCells.length)];
     };
 
-    const [humanWins, setHumanWins] = useState(0);
+    const [humanWins, setHumanWins] = useState(initialHumanWins);
 
     const trackWin = async (winner: 'human' | 'ai') => {
         try {

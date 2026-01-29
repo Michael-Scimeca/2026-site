@@ -1,7 +1,9 @@
-
 import { createClient } from 'next-sanity'
 import fs from 'fs'
 import path from 'path'
+import dotenv from 'dotenv'
+
+dotenv.config({ path: '.env.local' })
 
 const client = createClient({
     projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
@@ -66,7 +68,30 @@ const MOCK_DATA = {
             dateRange: "20' — 21'",
             creditLabel: "International HI Media Services",
             creditLinks: "Apple Music, Apple Maps",
+            thumbnail: "clips/longview.mp4",
+            tools: ["React Native", "Expo", "Redux", "Styled Components", "Firebase", "Jest", "Git", "Jira"],
+            description: []
+        },
+        {
+            _key: "4",
+            company: "Kovitz",
+            role: "Frontend Developer",
+            dateRange: "18' — 19'",
+            creditLabel: "Wealth Management",
+            creditLinks: "Kovitz, Financial Tools",
             thumbnail: "clips/kovitz.mp4",
+            tools: ["Angular", "Spring Boot", "SQL", "Java", "Netflix OSS"],
+            description: []
+        },
+        {
+            _key: "5",
+            company: "Longview Innovation",
+            role: "Creative Developer",
+            dateRange: "24' — Present",
+            creditLabel: "Collaboration is our capital",
+            creditLinks: "Harnessing the power of engineered macrophages",
+            thumbnail: "clips/longview.mp4",
+            tools: ["Next.js", "GSAP", "Three.js", "Tailwind CSS", "Sanity"],
             description: []
         }
     ],
@@ -132,7 +157,7 @@ const MOCK_DATA = {
         }
     ],
     footer: {
-        email: "mikeyscimeca@gmail.com",
+        email: "mikeyscimeca.dev@gmail.com",
         location: "San Francisco, CA",
         socialHandle: "@mikeyscimeca"
     }
@@ -171,13 +196,14 @@ async function seed() {
             creditLabel: item.creditLabel,
             creditLinks: item.creditLinks,
             thumbnail: asset ? {
-                _type: isVideo ? 'file' : 'image',
+                _type: 'file',
                 asset: {
                     _type: "reference",
                     _ref: asset._id
                 }
             } : undefined,
-            description: item.description
+            description: item.description,
+            tools: (item as any).tools || []
         }
     }))
 

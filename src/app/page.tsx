@@ -1,8 +1,9 @@
 import { Hero } from "@/components/Hero";
 import { About } from "@/components/About";
 import { Experience } from "@/components/Experience";
-import { Timeline } from "@/components/Timeline";
+import { Setup } from "@/components/Setup";
 import { Footer } from "@/components/Footer";
+import { PrivacyModal } from "@/components/PrivacyModal";
 import { client } from "@/sanity/lib/client";
 
 export default async function Home() {
@@ -56,17 +57,21 @@ export default async function Home() {
   }));
 
   return (
-    <main className="flex flex-col min-h-screen bg-white selection:bg-blue-500/30 overflow-hidden">
-      <Hero
-        title={data.title}
-        heroImage={data.heroImage}
-        headline={data.headline}
-        subHeadline={data.subHeadline}
-      />
+    <main className="flex flex-col selection:bg-blue-500/30">
+      <PrivacyModal />
+      <div className="relative z-20 bg-white mb-[100vh] shadow-xl">
+        <Hero
+          title={data.title}
+          heroImage={data.heroImage}
+          headline={data.headline}
+          subHeadline={data.subHeadline}
+        />
 
-      {data.about && <About description={data.about} />}
-      {experienceWithTools && <Experience items={experienceWithTools} />}
-      {data.timeline && <Timeline items={data.timeline} />}
+        {data.about && <About description={data.about} />}
+        {experienceWithTools && <Experience items={experienceWithTools} />}
+        <Setup />
+      </div>
+
       <Footer
         email={data.footer?.email}
         location={data.footer?.location}

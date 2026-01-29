@@ -99,3 +99,33 @@ body {
   background-size: 200% 200%;
   animation: gradient-x 4s ease infinite;
 }
+
+/* Custom Scrollbar */
+html {
+  scrollbar-width: auto;
+  scrollbar-color: #0158ff #ffffff;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0158ff;
+  border-radius: 6px;
+  border: 3px solid #ffffff;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0046cc;
+}
+
+/* Ensure body doesn't override */
+body::-webkit-scrollbar {
+  width: 12px;
+}

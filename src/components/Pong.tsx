@@ -2,12 +2,12 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 
-export function Pong({ isOpen, onToggle, hideCloseButton, onWin }: { isOpen?: boolean, onToggle?: () => void, hideCloseButton?: boolean, onWin?: () => void }) {
+export function Pong({ isOpen, onToggle, hideCloseButton, onWin, initialHumanWins = 0, initialAiWins = 228 }: { isOpen?: boolean, onToggle?: () => void, hideCloseButton?: boolean, onWin?: () => void, initialHumanWins?: number, initialAiWins?: number }) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [score, setScore] = useState({ player: 0, ai: 0 });
     const [gameStarted, setGameStarted] = useState(false);
-    const [humanWins, setHumanWins] = useState(0);
-    const [aiWins, setAiWins] = useState(228); // Matches TicTacToe default
+    const [humanWins, setHumanWins] = useState(initialHumanWins);
+    const [aiWins, setAiWins] = useState(initialAiWins); // Matches TicTacToe default
     const [countdown, setCountdown] = useState(0);
     const countdownRef = useRef(0);
     const [hasStarted, setHasStarted] = useState(false);
