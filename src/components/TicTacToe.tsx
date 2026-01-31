@@ -193,13 +193,13 @@ export function TicTacToe({ isOpen, onToggle, hideCloseButton, onWin, initialHum
                                 className={`
                   relative flex items-center justify-center
                   border-white/20 transition-colors
-                  ${isXNext ? "hover:bg-[#BBDEFB]/10" : "hover:bg-black/20"}
+                  ${isXNext ? "hover:bg-white/10" : "hover:bg-black/20"}
                   ${i < 6 ? "border-b" : ""}
                   ${i % 3 < 2 ? "border-r" : ""}
                 `}
                             >
                                 {cell === "X" && (
-                                    <svg className="w-[60%] h-[60%]" viewBox="0 0 24 24" fill="none" stroke="#8ec5ff" strokeWidth="1.5">
+                                    <svg className="w-[60%] h-[60%]" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5">
                                         <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" />
                                     </svg>
                                 )}

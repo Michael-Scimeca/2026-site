@@ -131,17 +131,18 @@ export function Hero(props: HeroProps) {
                 {/* Background Texture Layer - Increased height for parallax bleed */}
                 <div ref={bgRef} className="absolute -top-[20%] inset-x-0 h-[140%] z-0 opacity-100">
                     <Image
-
-                        src="/hero-background.jpg"
+                        src="/hero-background.jpg?v=new"
                         alt="Background Texture"
                         fill
-                        className="object-cover pointer-events-none"
-                        style={{ filter: 'blur(9px)' }}
+                        className="object-cover pointer-events-none scale-110"
                         priority
+                        unoptimized
                         quality={100}
                         sizes="100vw"
                     />
                 </div>
+
+
 
 
                 {/* Scrolling Marquee Layer */}
@@ -160,7 +161,7 @@ export function Hero(props: HeroProps) {
                 <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
                     <div ref={portraitRef} className="relative w-full h-[110%] top-[10%] max-w-4xl flex items-end">
                         <Image
-                            src="/hero-portrait.png?v=3"
+                            src="/hero-portrait.png"
                             alt="Michael Scimeca"
                             fill
                             className="object-contain object-bottom"
@@ -211,6 +212,7 @@ export function Hero(props: HeroProps) {
 
                     </div>
                 </div>
+
             </div>
         </section>
     );

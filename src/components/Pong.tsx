@@ -85,7 +85,7 @@ export function Pong({ isOpen, onToggle, hideCloseButton, onWin, initialHumanWin
             <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[2px] rounded-lg group/start">
                 <button
                     onClick={() => setHasStarted(true)}
-                    className="px-4 py-2 bg-white text-black text-[10px] uppercase tracking-widest font-bold rounded-full hover:bg-[#8ec5ff] hover:text-white transition-all transform active:scale-95 shadow-lg cursor-pointer pointer-events-auto"
+                    className="px-4 py-2 bg-white text-black text-[10px] uppercase tracking-widest font-bold rounded-full hover:bg-[#0158ff] hover:text-white transition-all transform active:scale-95 shadow-lg cursor-pointer pointer-events-auto"
                 >
                     Start to Play
                 </button>
@@ -101,7 +101,7 @@ export function Pong({ isOpen, onToggle, hideCloseButton, onWin, initialHumanWin
                         setGamePaused(false);
                         lastActivityRef.current = Date.now();
                     }}
-                    className="px-4 py-2 bg-white text-black text-[10px] uppercase tracking-widest font-bold rounded-full hover:bg-[#8ec5ff] hover:text-white transition-all transform active:scale-95 shadow-lg cursor-pointer pointer-events-auto"
+                    className="px-4 py-2 bg-white text-black text-[10px] uppercase tracking-widest font-bold rounded-full hover:bg-[#0158ff] hover:text-white transition-all transform active:scale-95 shadow-lg cursor-pointer pointer-events-auto"
                 >
                     Still Playing?
                 </button>
@@ -264,7 +264,7 @@ export function Pong({ isOpen, onToggle, hideCloseButton, onWin, initialHumanWin
             ctx.fillStyle = 'white';
 
             // Draw Paddles (Pill shape)
-            ctx.fillStyle = '#8ec5ff';
+            ctx.fillStyle = 'white';
             drawRoundedRect(10, playerY, PADDLE_WIDTH, PADDLE_HEIGHT, PADDLE_WIDTH / 2); // Left (Player)
 
             ctx.fillStyle = 'white';
@@ -370,7 +370,7 @@ export function Pong({ isOpen, onToggle, hideCloseButton, onWin, initialHumanWin
                         <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[2px] rounded-lg group/start">
                             <button
                                 onClick={() => setHasStarted(true)}
-                                className="px-4 py-2 bg-white text-black text-[10px] uppercase tracking-widest font-bold rounded-full hover:bg-[#8ec5ff] hover:text-white transition-all transform active:scale-95 shadow-lg cursor-pointer pointer-events-auto"
+                                className="px-4 py-2 bg-white text-black text-[10px] uppercase tracking-widest font-bold rounded-full hover:bg-[#0158ff] hover:text-white transition-all transform active:scale-95 shadow-lg cursor-pointer pointer-events-auto"
                             >
                                 Start to Play
                             </button>
@@ -384,7 +384,7 @@ export function Pong({ isOpen, onToggle, hideCloseButton, onWin, initialHumanWin
                                     setGamePaused(false);
                                     lastActivityRef.current = Date.now();
                                 }}
-                                className="px-4 py-2 bg-white text-black text-[10px] uppercase tracking-widest font-bold rounded-full hover:bg-[#8ec5ff] hover:text-white transition-all transform active:scale-95 shadow-lg cursor-pointer pointer-events-auto"
+                                className="px-4 py-2 bg-white text-black text-[10px] uppercase tracking-widest font-bold rounded-full hover:bg-[#0158ff] hover:text-white transition-all transform active:scale-95 shadow-lg cursor-pointer pointer-events-auto"
                             >
                                 Still Playing?
                             </button>

@@ -288,7 +288,7 @@ export function Checkers({ isOpen, onToggle, hideCloseButton, onWin, initialHuma
                                             <div
                                                 className={`
                                                     w-[80%] h-[80%] rounded-full shadow-md
-                                                    ${cell.player === 'red' ? 'bg-[#8EC5FF] border-2 border-[#4185c4]' : 'bg-gray-900 border-2 border-black'}
+                                                    ${cell.player === 'red' ? 'bg-[#0158ff] border-2 border-[#0046cc]' : 'bg-gray-900 border-2 border-black'}
                                                     ${cell.isKing ? 'ring-2 ring-yellow-400 after:content-["K"] after:text-white after:font-bold after:text-[10px] after:flex after:items-center after:justify-center' : ''}
                                                 `}
                                             />

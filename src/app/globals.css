@@ -1,131 +1,127 @@
 @import "tailwindcss";
 
 :root {
-  --background: #000000;
-  --foreground: #ffffff;
-  color-scheme: dark;
+    --background: #000000;
+    --foreground: #ffffff;
+    color-scheme: dark;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter);
-  --animate-blink: blink 0.7s step-end infinite;
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --font-sans: var(--font-inter);
+    --animate-blink: blink 0.7s step-end infinite;
 
+    @keyframes blink {
 
+        from,
+        to {
+            opacity: 1;
+        }
 
-  @keyframes blink {
-
-    from,
-    to {
-      opacity: 1;
+        50% {
+            opacity: 0;
+        }
     }
 
-    50% {
-      opacity: 0;
-    }
-  }
+    --animate-fade-in: fade-in 0.5s ease-out forwards;
 
-  --animate-fade-in: fade-in 0.5s ease-out forwards;
+    @keyframes fade-in {
+        from {
+            opacity: 0;
+            transform: scale(0.95);
+        }
 
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-      transform: scale(0.95);
-    }
-
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  /* Added Gradient Animation */
-  --animate-gradient-x: gradient-x 15s ease infinite;
-
-  @keyframes gradient-x {
-
-    0%,
-    100% {
-      background-position: 0% 50%;
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
     }
 
-    50% {
-      background-position: 100% 50%;
+    /* Added Gradient Animation */
+    --animate-gradient-x: gradient-x 15s ease infinite;
+
+    @keyframes gradient-x {
+
+        0%,
+        100% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
     }
-  }
 }
 
-
-
 html {
-  background: var(--background);
+    background: var(--background);
 }
 
 * {
-  cursor: none;
+    cursor: none;
 }
 
 button,
 a,
 .cursor-pointer,
 [role="button"] {
-  cursor: pointer !important;
+    cursor: pointer !important;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  margin: 0;
-  min-height: 100vh;
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans), sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    min-height: 100vh;
 }
 
 @media (min-width: 768px) {
-  body {
-    position: relative;
-  }
+    body {
+        position: relative;
+    }
 }
 
 @utility container-custom {
-  margin-inline: auto;
-  padding-inline: 1rem;
-  max-width: 1440px;
+    margin-inline: auto;
+    padding-inline: 1rem;
+    max-width: 1440px;
 }
 
 @utility animate-gradient-text {
-  background-size: 200% 200%;
-  animation: gradient-x 4s ease infinite;
+    background-size: 200% 200%;
+    animation: gradient-x 4s ease infinite;
 }
 
 /* Custom Scrollbar */
 html {
-  scrollbar-width: auto;
-  scrollbar-color: #0158ff #000000;
+    scrollbar-width: auto;
+    scrollbar-color: #0158ff #000000;
 }
 
 /* Webkit browsers (Chrome, Safari, Edge) */
 ::-webkit-scrollbar {
-  width: 12px;
+    width: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #000000;
+    background: #000000;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #0158ff;
-  border-radius: 6px;
-  border: 3px solid #000000;
+    background: #0158ff;
+    border-radius: 6px;
+    border: 3px solid #000000;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #0046cc;
+    background: #0046cc;
 }
 
 /* Ensure body doesn't override */
 body::-webkit-scrollbar {
-  width: 12px;
+    width: 12px;
 }

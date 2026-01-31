@@ -108,8 +108,19 @@ export function CurveLoader() {
                     d="M0 0 L12000 0 L12000 13000 L0 13000 Z"
                 />
             </svg>
-            <div className="absolute top-0 left-0 w-full h-screen flex items-center justify-center pointer-events-none">
-                <div className="text-white text-4xl md:text-6xl font-medium tracking-tight text-center relative">
+            <div className="absolute top-0 left-0 w-full h-screen overflow-hidden flex items-center justify-center pointer-events-none">
+                {/* Video Background */}
+                <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none z-0 opacity-90"
+                >
+                    <source src="/video/404-bg.mp4" type="video/mp4" />
+                </video>
+
+                <div className="relative z-10 text-white text-4xl md:text-6xl font-medium tracking-tight text-center">
                     <span>{displayText}</span>
                     <span className="inline-block w-[2px] h-[0.8em] bg-white ml-1 animate-blink align-middle"></span>
                 </div>

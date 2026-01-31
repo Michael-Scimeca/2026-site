@@ -385,10 +385,10 @@ export function SpaceInvaders({ isOpen, onToggle, hideCloseButton = false, onWin
                     }}
                 >
                     <svg width="40" height="25" viewBox="0 0 17 10" fill="none" shapeRendering="crispEdges">
-                        <path d="M8 0h1v1H8zM7 1h3v1H7zM7 2h1v4H7zM9 2h1v4H9zM3 4h1v5H3zM13 4h1v5h-1zM4 4h3v3H4zM10 4h3v3H10zM3 7h2v1H3zM12 7h2v1h-2z" fill="#8EC5FF" />
-                        <path d="M1 5h2v4H1zM0 6h1v3H0zM14 5h2v4h-2zM16 6h1v3h-1z" fill="#8EC5FF" />
-                        <rect x="8" y="4" width="1" height="2" fill="#5b9fe0" />
-                        <path d="M4 8h9v1H4zM3 9h11v1H3z" fill="#5b9fe0" opacity="0.8" />
+                        <path d="M8 0h1v1H8zM7 1h3v1H7zM7 2h1v4H7zM9 2h1v4H9zM3 4h1v5H3zM13 4h1v5h-1zM4 4h3v3H4zM10 4h3v3H10zM3 7h2v1H3zM12 7h2v1h-2z" fill="#0158ff" />
+                        <path d="M1 5h2v4H1zM0 6h1v3H0zM14 5h2v4h-2zM16 6h1v3h-1z" fill="#0158ff" />
+                        <rect x="8" y="4" width="1" height="2" fill="#0046cc" />
+                        <path d="M4 8h9v1H4zM3 9h11v1H3z" fill="#0046cc" opacity="0.8" />
                     </svg>
                 </div>
 

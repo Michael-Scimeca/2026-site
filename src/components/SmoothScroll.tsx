@@ -5,12 +5,16 @@ import Lenis from "lenis";
 
 export default function SmoothScroll() {
     useEffect(() => {
+        // Force scroll to top on load/refresh
+        if ('scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+
         const lenis = new Lenis({
-            autoRaf: true, // Use automatic standard RAF
+            autoRaf: true,
         });
 
-        // Force scroll to top on load
-        window.scrollTo(0, 0);
         lenis.scrollTo(0, { immediate: true });
 
         // Check if scroll should be initially stopped

@@ -3,6 +3,9 @@
 import React, { useRef, useState } from "react";
 import { Container } from "@/components/Container";
 import Image from "next/image";
+import { gsap } from "gsap";
+
+import { PortableText } from "@portabletext/react";
 
 interface ExperienceItem {
     _key: string;
@@ -24,7 +27,7 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const progressCircleRef = useRef<SVGCircleElement>(null);
     const [isPlaying, setIsPlaying] = useState(false);
-    const gsapTickerRef = useRef<() => void>(null);
+    const gsapTickerRef = useRef<gsap.TickerCallback | null>(null);
 
     React.useEffect(() => {
         const isMobile = window.innerWidth < 768;
@@ -35,8 +38,7 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
         // Cleanup function to ensure loop is removed
         return () => {
             if (gsapTickerRef.current) {
-                const ticker = gsapTickerRef.current;
-                import('gsap').then(m => m.gsap.ticker.remove(ticker));
+                gsap.ticker.remove(gsapTickerRef.current);
             }
         };
     }, [item.thumbnail]);
@@ -58,7 +60,7 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
                     progressCircleRef.current.style.strokeDashoffset = offset.toString();
                 }
             };
-            import('gsap').then(m => m.gsap.ticker.add(gsapTickerRef.current!));
+            gsap.ticker.add(gsapTickerRef.current);
         }
     };
 
@@ -67,7 +69,7 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
             videoRef.current.pause();
             setIsPlaying(false);
             if (gsapTickerRef.current) {
-                import('gsap').then(m => m.gsap.ticker.remove(gsapTickerRef.current!));
+                gsap.ticker.remove(gsapTickerRef.current);
             }
         }
     };
@@ -79,47 +81,47 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
             onMouseLeave={handleMouseLeave}
         >
             <Container className="!pr-0">
-                <div className="grid grid-cols-1 md:grid-cols-16 gap-y-6 md:gap-x-6 items-center">
-                    <div className="md:col-span-3 flex flex-col gap-1">
-                        <h3 className="font-bold text-lg md:text-xl tracking-tight">
-                            {item.company}
-                        </h3>
-                        <p className="text-zinc-400 font-medium">
-                            {item.role}
-                        </p>
-                    </div>
-
-                    {/* Column 2: Tools (4 cols) */}
-                    <div className="md:col-span-4 flex flex-col gap-2">
-                        {item.tools && item.tools.length > 0 && (
-                            <div className="flex flex-wrap gap-2">
-                                {item.tools.map((tool) => (
-                                    <span
-                                        key={tool}
-                                        className="px-3 py-1 bg-white text-black text-[10px] uppercase font-bold tracking-wider rounded-full shadow-sm whitespace-nowrap"
-                                    >
-                                        {tool}
-                                    </span>
-                                ))}
+                <div className="grid grid-cols-1 md:grid-cols-16   items-center ">
+                    <div className="md:col-span-10 flex flex-col gap-6">
+                        <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-1">
+                                <h3 className="font-bold text-lg md:text-xl tracking-tight">
+                                    {item.company}
+                                </h3>
+                                <p className="text-zinc-400 font-medium">
+                                    {item.role}
+                                </p>
                             </div>
-                        )}
-                    </div>
-
-                    {/* Column 3: Credits / Description (3 cols) */}
-                    <div className="md:col-span-3 flex flex-col gap-1">
-                        {item.creditLabel && (
-                            <h4 className="font-bold text-base md:text-lg">
-                                {item.creditLabel}
+                            <h4 className="text-white text-[10px] uppercase font-bold tracking-[0.2em] opacity-40">
+                                Project Overview
                             </h4>
-                        )}
-                        {item.creditLinks && (
-                            <p className="text-zinc-400 underline decoration-zinc-600 underline-offset-4 leading-relaxed">
-                                {item.creditLinks}
-                            </p>
-                        )}
-                        {!item.creditLabel && !item.creditLinks && (
-                            <div className="text-zinc-500">
-                                <span className="italic text-sm">See details below</span>
+                            <div className="text-zinc-400 text-xs leading-relaxed font-medium max-w-2xl">
+                                <p className="mb-3">
+                                    Leading the technical direction and architectural design for high-scale digital platforms.
+                                    Focused on creating seamless user experiences through performant.
+                                </p>
+                                <p>
+                                    Collaborated with cross-functional teams to deliver award-winning products.
+                                </p>
+                            </div>
+                        </div>
+
+                        {item.tools && item.tools.length > 0 && (
+                            <div className="flex flex-wrap items-center">
+                                {item.tools.map((tool, index) => (
+                                    <React.Fragment key={tool}>
+                                        {index !== 0 && (
+                                            <span className="text-[#0158ff] pr-[5px] text-[10px] font-bold">
+                                                ⌁
+                                            </span>
+                                        )}
+                                        <span
+                                            className="pl-0 pr-[5px] py-1 text-white/60 text-[10px] uppercase font-bold tracking-wider rounded-full whitespace-nowrap"
+                                        >
+                                            {tool}
+                                        </span>
+                                    </React.Fragment>
+                                ))}
                             </div>
                         )}
                     </div>
@@ -136,20 +138,20 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
                                         loop
                                         muted
                                         playsInline
-                                        className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
+                                        className="object-cover w-full h-full"
                                     />
                                 ) : (
                                     <Image
                                         src={item.thumbnail}
                                         alt={`${item.company} Thumbnail`}
                                         fill
-                                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                                        className="object-cover"
                                     />
                                 )
                             )}
                         </div>
 
-                        {/* Controls Container - Moved outside and positioned bottom-left */}
+                        {/* Controls Container - Positioned bottom-left relative to thumbnail */}
                         {item.thumbnail && (item.thumbnail.endsWith('.mp4') || item.thumbnail.endsWith('.webm')) && (
                             <div className="absolute bottom-0 -left-20 hidden md:flex items-center z-20 opacity-100">
                                 {/* Replay Button */}
@@ -161,7 +163,7 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
                                             videoRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
                                         }
                                     }}
-                                    className={`p-1.5 text-white rounded-full backdrop-blur-sm transition-all transform hover:scale-110 active:scale-95 ${isPlaying ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+                                    className={`p-1.5 text-white rounded-full backdrop-blur-sm transition-all transform active:scale-95 ${isPlaying ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
                                     aria-label="Replay video"
                                     title="Replay"
                                 >
@@ -200,6 +202,7 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
                                 </div>
                             </div>
                         )}
+
                     </div>
                 </div>
             </Container>

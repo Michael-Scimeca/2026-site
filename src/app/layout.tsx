@@ -4,7 +4,7 @@ import SmoothScroll from "@/components/SmoothScroll";
 import CustomCursor from "@/components/CustomCursor";
 import { CurveLoader } from "@/components/CurveLoader";
 import DynamicFavicon from "@/components/DynamicFavicon";
-import "./globals.css";
+import "./globals.css"; // Global styles
 
 const inter = Inter({
   subsets: ["latin"],
