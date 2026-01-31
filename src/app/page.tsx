@@ -51,6 +51,17 @@ export default async function Home() {
     ["Node.js", "Express", "MongoDB", "Mongoose", "AWS", "Docker", "Redis", "CircleCI"]
   ];
 
+  const PROJECT_COLORS = [
+    '#0158ff', // Blue
+    '#a855f7', // Purple
+    '#ef4444', // Red
+    '#10b981', // Emerald
+    '#f59e0b', // Amber
+    '#3b82f6', // Bright Blue
+    '#ec4899', // Pink
+    '#06b6d4', // Cyan
+  ];
+
   const experienceWithTools = [
     {
       _key: 'outleadership',
@@ -59,10 +70,12 @@ export default async function Home() {
       tools: ["React", "Next.js", "TypeScript", "GSAP", "Tailwind CSS", "Sanity"],
       thumbnail: '/clips/outleadership.mp4?v=1',
       dateRange: '2023 - 2024',
+      themeColor: PROJECT_COLORS[0]
     },
     ...(data.experience?.map((item: any, index: number) => ({
       ...item,
-      tools: item.tools?.length > 0 ? item.tools : mockToolSets[index % mockToolSets.length]
+      tools: item.tools?.length > 0 ? item.tools : mockToolSets[index % mockToolSets.length],
+      themeColor: PROJECT_COLORS[(index + 1) % PROJECT_COLORS.length]
     })) || [])
   ];
 

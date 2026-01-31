@@ -1,7 +1,11 @@
 "use client";
 
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Container } from './Container';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface FooterProps {
     email?: string;
@@ -12,27 +16,60 @@ interface FooterProps {
 export function Footer({ email, location, socialHandle }: FooterProps) {
     const defaultEmail = email || "mikeyscimeca.dev@gmail.com";
     const videoRef = useRef<HTMLVideoElement>(null);
+    const emailRef = useRef<HTMLDivElement>(null);
+    const footerRef = useRef<HTMLElement>(null);
+
+
+
+    useEffect(() => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!emailRef.current || !videoRef.current) return;
+
+            const rect = emailRef.current.getBoundingClientRect();
+            const emailX = rect.left + rect.width / 2;
+            const emailY = rect.top + rect.height / 2;
+
+            const distance = Math.sqrt(
+                Math.pow(e.clientX - emailX, 2) + Math.pow(e.clientY - emailY, 2)
+            );
+
+            const radius = 250;
+            if (distance < radius) {
+                const duration = videoRef.current.duration;
+                if (!duration) return;
+
+                // progress is 0 at radius, 1 at center
+                const progress = 1 - (distance / radius);
+
+                // Scrub the video based on distance
+                videoRef.current.currentTime = progress * duration;
+            } else if (videoRef.current.currentTime !== 0) {
+                videoRef.current.currentTime = 0;
+            }
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
 
 
 
     return (
-        <footer className="fixed bottom-0 left-0 w-full bg-black text-white h-screen flex flex-col z-10">
+        <footer ref={footerRef} className="fixed bottom-0 left-0 w-full bg-black text-white h-screen flex flex-col z-10">
             <Container className="flex-1 flex flex-col justify-between pt-6 md:pt-12 relative z-10">
                 {/* Absolute Video - Now inside Container for alignment */}
-                <a
-                    href={`mailto:${defaultEmail}`}
-                    className="absolute bottom-12 right-0 w-full lg:w-[43%] h-[40vh] lg:h-[60vh] z-0 opacity-80 lg:opacity-100 cursor-pointer hidden lg:block hover:opacity-90 transition-opacity rounded-lg overflow-hidden"
+                <div
+                    className="absolute bottom-12 right-0 w-full lg:w-[43%] h-[40vh] lg:h-[60vh] z-0 opacity-80 lg:opacity-100 hidden lg:block rounded-[10px] overflow-hidden pointer-events-none"
                 >
+                    <div className="grain-overlay rounded-[10px]" />
                     <video
                         ref={videoRef}
                         src="/video/footer-video.mp4"
-                        autoPlay
                         muted
-                        loop
                         playsInline
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover rounded-[10px]"
                     />
-                </a>
+                </div>
 
                 <div className="relative z-10 w-full">
                     {/* Top Header Row */}
@@ -49,7 +86,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                         {/* Left Side: Text and Links (Now takes full width of its half) */}
                         <div className="flex flex-col gap-12">
                             <div className="flex flex-col gap-8">
-                                <p className="text-zinc-500 text-lg md:text-xl leading-relaxed max-w-xl">
+                                <p className="text-zinc-500 text-lg md:text-xl leading-relaxed">
                                     Ready to build something exceptional?
                                     Whether it's an intelligent application, an AI-powered platform, a custom web solution, or an innovative concept that needs technical execution, let's talk. We'll architect it, engineer it, and deploy it together.
 
@@ -60,7 +97,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                             </div>
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
-                                <div className="flex flex-col gap-2">
+                                <div className="flex flex-col gap-2" ref={emailRef}>
                                     <span className="font-bold text-white text-sm uppercase tracking-wider">Let's Work Together</span>
                                     <a href={`mailto:${defaultEmail}`} className="text-zinc-500 hover:text-white transition-colors text-lg">
                                         {defaultEmail}
