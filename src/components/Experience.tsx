@@ -116,7 +116,7 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
 
     return (
         <div
-            className={`group w-full transition-colors relative border-zinc-800 pb-8 desktop:py-0 ${isFirst ? 'border-t' : ''} ${!isLast ? 'border-b' : ''}`}
+            className={`group w-full transition-colors relative border-zinc-800 py-8 ${item.thumbnail ? 'desktop:py-0' : 'desktop:py-8'} ${isFirst ? 'border-t' : ''} ${!isLast ? 'border-b' : ''}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
@@ -125,6 +125,15 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                 className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none"
                 style={{
                     background: `radial-gradient(circle at center, ${item.themeColor || '#0158ff'} 0%, transparent 70%)`
+                }}
+            />
+
+            {/* Vertical Accent Glow Border */}
+            <div
+                className="absolute left-0 top-0 bottom-0 w-[3px] opacity-0 group-hover:opacity-100 transition-all duration-500 scale-y-90 group-hover:scale-y-100 origin-center"
+                style={{
+                    backgroundColor: item.themeColor || '#0158ff',
+                    boxShadow: `0 0 20px 2px ${item.themeColor || '#0158ff'}80`
                 }}
             />
 
@@ -137,24 +146,62 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                                     <span className="font-bold text-lg desktop:text-xl tracking-tight">
                                         {item.company}
                                     </span>
-                                    <span className="text-zinc-400 font-medium text-sm desktop:text-base">
-                                        — {item.role}
-                                    </span>
+                                    {item.role && item.role.length <= 50 && (
+                                        <span className="text-zinc-400 font-medium text-sm desktop:text-base">
+                                            — {item.role}
+                                        </span>
+                                    )}
                                 </div>
 
-                                <div className="text-zinc-400 text-xs leading-relaxed font-medium">
-                                    <p className="mb-3">
-                                        Leading the technical direction and architectural design for high-scale digital platforms.
-                                        Focused on creating seamless user experiences through performant.
-                                    </p>
-                                    <p>
-                                        Collaborated with cross-functional teams to deliver award-winning products.
-                                    </p>
+                                <div className="text-zinc-400 text-xs desktop:text-sm leading-relaxed font-medium max-w-2xl">
+                                    {(() => {
+                                        const renderTextWithThemedPunctuation = (text: string) => {
+                                            const isNYCPride = item.company === 'NYC Pride' || item._key === 'nycpride';
+                                            return text.split(/([.,])/).map((part, index) => {
+                                                if (part === '.' || part === ',') {
+                                                    const colorIndex = Math.floor(index / 2);
+                                                    return (
+                                                        <span key={index} style={{
+                                                            color: isNYCPride
+                                                                ? ['#ef4444', '#3b82f6', '#a855f7'][colorIndex % 3]
+                                                                : (item.themeColor || '#0158ff')
+                                                        }}>{part}</span>
+                                                    );
+                                                }
+                                                return <React.Fragment key={index}>{part}</React.Fragment>;
+                                            });
+                                        };
+
+                                        if (Array.isArray(item.description) && item.description.length > 0) {
+                                            if (typeof item.description[0] === 'string') {
+                                                return item.description.map((p, i) => (
+                                                    <p key={i} className={i !== 0 ? "mt-3" : ""}>
+                                                        {renderTextWithThemedPunctuation(p)}
+                                                    </p>
+                                                ));
+                                            }
+                                            return <PortableText value={item.description} />;
+                                        }
+
+                                        if (typeof item.description === 'string') {
+                                            return <p>{renderTextWithThemedPunctuation(item.description)}</p>;
+                                        }
+
+                                        if (item.role.length > 50) {
+                                            return <p>{renderTextWithThemedPunctuation(item.role)}</p>;
+                                        }
+
+                                        return (
+                                            <p>
+                                                {renderTextWithThemedPunctuation("Leading the technical direction and architectural design for high-scale digital platforms, focusing on creating seamless user experiences through performant, polished code.")}
+                                            </p>
+                                        );
+                                    })()}
                                 </div>
                             </div>
 
                             {item.tools && item.tools.length > 0 && (
-                                <div className="flex flex-wrap items-center mt-4 md:mt-0 ">
+                                <div className="flex flex-wrap items-center mt-8 desktop:mt-3">
                                     {item.tools.map((tool, index) => (
                                         <React.Fragment key={tool}>
                                             {index !== 0 && (

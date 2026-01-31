@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Container } from "@/components/Container";
 import Image from "next/image";
 
@@ -16,71 +17,71 @@ const setupItems: SetupItem[] = [
     {
         id: "optimum-nutrition",
         company: "Optimum Nutrition",
-        description: "Engineered for performance. Partnering on technical innovation and global digital expansion.",
+        description: "I contributed to the development of the Optimum Nutrition website (optimumnutrition.com), teaming up with We Can’t Stop Thinking to implement front-end features, responsive layouts, and interactive enhancements. My work helped bring design concepts to life while ensuring the site performed reliably across devices and reflected Optimum Nutrition’s strong, performance-driven brand presence.",
         logo: "/logos/on.png",
-        tools: ["Next.js", "GSAP", "Three.js", "Tailwind CSS", "Sanity"],
+        tools: ["Photoshop", "Custom CMS", "Browserstack", "Foundation Framework"],
         themeColor: "#0158ff" // Blue
     },
     {
         id: "68ventures",
         company: "68 Ventures",
-        description: "Leading the next wave of strategic investments in high-growth technology sectors.",
+        description: "I handled the front-end development for the 68 Ventures website, translating the design into a fully responsive, polished online experience. My work focused on implementing clean structure, interactive elements, and performance-oriented code to support the firm’s dynamic brand presence and clearly communicate their investment focus.",
         logo: "/logos/78venatures.png",
-        tools: ["React", "TypeScript", "Framer Motion", "Node.js"],
-        themeColor: "#a855f7" // Purple
+        tools: ["Wordpress", "Browserstack", "Foundation Framework"],
+        themeColor: "#ef4444" // Red
     },
     {
         id: "flipboard",
         company: "Flipboard",
-        description: "Katy Perry, Nas, and Jason Derulo are investing big in a Spotify rival.",
+        description: "I provided front-end development and animation implementation for Flipboard’s website, supporting a responsive, engaging online presence.",
         logo: "/logos/flipboard-logo.png",
-        tools: ["Native iOS", "Swift", "Core Animation"],
+        tools: ["Custom SCSS", "Foundation Framework", "Javascript Interactions", "Browserstack"],
         themeColor: "#ef4444" // Red
     },
     {
         id: "snickers",
         company: "Snickers",
-        description: "Defining a new era of consumer engagement through innovative digital-first campaigns.",
+        description: "One Million SNICKERS was a campaign website created to celebrate the brand in an exciting, playful, and highly interactive way. Snickers came to us with the challenge of building a digital experience that felt fun, bold, and instantly engaging. I contributed to the website development and interactive execution, helping bring the concept to life through dynamic visuals, responsive layouts, and engaging interactions that reinforced Snickers’ energetic, irreverent brand personality.",
         logo: "/logos/snickers.png",
-        tools: ["Vue.js", "Web Audio API", "Canvas"],
-        themeColor: "#10b981" // Emerald
+        tools: ["Wordpress", "Browserstack", "Foundation Framework", "Gsap"],
+        themeColor: "#f59e0b" // Amber
     },
     {
         id: "nycpride",
         company: "NYC Pride",
-        description: "TinyFish AI agent raises $47 million.",
+        description: "I worked as part of RSQ on building the NYC Pride website, contributing to development and implementation to ensure the site launched successfully in time for Pride Day. The work focused on delivering a responsive, accessible, and visually engaging experience under a fixed deadline, supporting one of New York City’s most high-profile annual events and its large, diverse audience.",
         logo: "/logos/nycpride.png",
-        tools: ["Next.js", "AI Agents", "Python"],
+        tools: ["Wordpress", "Browserstack", "Foundation Framework", "Gsap"],
         themeColor: "#f59e0b" // Amber
     },
     {
         id: "seiu",
         company: "SEIU",
-        description: "NeoReach helps 10,000+ creators earn more than $50 million.",
+        description: "Service Employees International Union (SEIU) is one of North America’s largest labor unions, representing millions of workers across healthcare, public services, and property services. I contributed development support on SEIU.org, working on site updates that helped clearly present the organization’s goals, mission, and key initiatives, ensuring core messaging was accessible, well-structured, and aligned with SEIU’s advocacy efforts.",
         logo: "/logos/seiu.png",
-        tools: ["React", "GraphQL", "Ruby on Rails"],
-        themeColor: "#3b82f6" // Bright Blue
+        tools: ["Wordpress", "Browserstack", "Foundation Framework"],
+        themeColor: "#a855f7" // Purple
     },
     {
         id: "foo",
         company: "Foosackly's",
-        description: "Everest emerges from stealth mode with a landmark $140 million funding.",
+        description: "Foosackly’s is a fast-growing restaurant brand with a strong, recognizable personality. For this project, the goal was to modernize the website’s visual direction while ensuring the work could be cleanly handed off to another developer for full implementation.\n\n We developed a new website theme entirely through CSS, using it as both a visual system and technical guide for the future site build. Rather than rebuilding the website end- to - end, the focus was on creating a flexible, well - structured theme layer that another developer could easily pick up and extend.",
         logo: "/logos/foo.png",
-        tools: ["Svelte", "PostgreSQL", "Cloudflare"],
-        themeColor: "#06b6d4" // Cyan
+        tools: ["Photoshop", "Custom SCSS Guide"],
+        themeColor: "#4f46e5" // Indigo
     },
     {
         id: "gabbanelli",
         company: "Gabbanelli",
-        description: "A legendary legacy in craftsmanship, redefining luxury and tradition through music.",
+        description: "Gabbanelli is a heritage brand known for handcrafted silver, jewelry, and premium gifts. I collaborated with the agency We Can’t Stop Thinking to support the Gabbanelli.com website, handling visual asset preparation and contributing to the overall website design.\n\n Similar to my work on Optimo, this project focused on cutting and isolating product imagery, refining visual assets for web use, and designing layouts that highlighted craftsmanship and material detail. Assets were carefully prepared and organized to ensure consistency across the site and allow for a smooth transition between designers as the project evolved.",
         logo: "/logos/gab.png",
-        tools: ["E-Commerce", "Shopify", "Liquid"],
+        tools: ["Photoshop"],
         themeColor: "#8b5cf6" // Violet
     },
     {
         id: "nether-realm",
         company: "Nether Realm",
-        description: "Pushing the boundaries of immersive digital experiences and interactive storytelling.",
+        description: "NetherRealm Studios, creators of the iconic Mortal Kombat franchise, are known for bold visuals, cinematic intensity, and unmistakable atmosphere. I collaborated with the agency We Can’t Stop Thinking to design a 6-page website and blog experience, with the goal of staying as close as possible to the essence of Mortal Kombat.\n\nThe design focused on immediate recognition — creating an experience where the moment you land on the site, you feel Mortal Kombat. Dark, high-contrast visuals, dramatic typography, and cinematic pacing were used to echo the franchise’s intensity, lore, and legacy, while still supporting a clear, modern web experience.",
         logo: "/logos/nether.png",
         tools: ["Photoshop"],
         themeColor: "#ec4899" // Pink
@@ -88,7 +89,7 @@ const setupItems: SetupItem[] = [
     {
         id: "optimo",
         company: "Optimo",
-        description: "Strategic creative development and visual identity for contemporary lifestyle brands.",
+        description: "Optimo is a premium hat brand known for exceptional craftsmanship and timeless design. I teamed up with the agency We Can’t Stop Thinking to support the Shop Optimo e-commerce experience, creating and organizing digital assets while ensuring a seamless handoff to additional designers as the project evolved.",
         logo: "/logos/logo-hat.png",
         tools: ["Photoshop"],
         themeColor: "#14b8a6" // Teal
@@ -97,12 +98,21 @@ const setupItems: SetupItem[] = [
 
 function SetupRow({ item }: { item: SetupItem }) {
     return (
-        <div className="group border-b border-zinc-800 w-full transition-colors relative py-8 desktop:py-0 overflow-hidden">
+        <div className="group border-b border-zinc-800 w-full transition-colors relative py-8 desktop:py-8 overflow-hidden">
             {/* Dynamic Background Hover Glow */}
             <div
                 className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none"
                 style={{
                     background: `radial-gradient(circle at center, ${item.themeColor || '#0158ff'} 0%, transparent 70%)`
+                }}
+            />
+
+            {/* Vertical Accent Glow Border */}
+            <div
+                className="absolute left-0 top-0 bottom-0 w-[3px] opacity-0 group-hover:opacity-100 transition-all duration-500 scale-y-90 group-hover:scale-y-100 origin-center"
+                style={{
+                    backgroundColor: item.themeColor || '#0158ff',
+                    boxShadow: `0 0 20px 2px ${item.themeColor || '#0158ff'}80`
                 }}
             />
 
@@ -123,19 +133,37 @@ function SetupRow({ item }: { item: SetupItem }) {
                     </div>
 
                     {/* Right: Description & Tools */}
-                    <div className="flex flex-col justify-center md:col-span-3">
-                        <p className="text-zinc-400 text-lg md:text-xl font-medium leading-relaxed mb-2">
-                            {item.description}
-                        </p>
+                    <div className="flex flex-col justify-center md:col-span-3 gap-6">
+                        {item.description.split('\n\n').map((paragraph, i) => (
+                            <p key={i} className="text-zinc-400 text-lg md:text-xl font-medium leading-relaxed">
+                                {paragraph.split(/([.,])/).map((part, index) => {
+                                    if (part === '.' || part === ',') {
+                                        const colorIndex = Math.floor(index / 2);
+                                        return (
+                                            <span key={index} style={{
+                                                color: item.id === 'nycpride'
+                                                    ? ['#ef4444', '#3b82f6', '#a855f7'][colorIndex % 3]
+                                                    : (item.themeColor || '#0158ff')
+                                            }}>{part}</span>
+                                        );
+                                    }
+                                    return <React.Fragment key={index}>{part}</React.Fragment>;
+                                })}
+                            </p>
+                        ))}
 
                         {item.tools && item.tools.length > 0 && (
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mt-4">
                                 {item.tools.map((tool, index) => (
                                     <div key={tool} className="flex items-center gap-x-3">
                                         {index !== 0 && (
                                             <span
                                                 className="text-[10px] font-bold"
-                                                style={{ color: item.themeColor || '#0158ff' }}
+                                                style={{
+                                                    color: item.id === 'nycpride'
+                                                        ? ['#ef4444', '#3b82f6', '#a855f7'][(index - 1) % 3]
+                                                        : (item.themeColor || '#0158ff')
+                                                }}
                                             >
                                                 ⌁
                                             </span>

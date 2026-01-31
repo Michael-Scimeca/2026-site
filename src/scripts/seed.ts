@@ -43,35 +43,22 @@ const MOCK_DATA = {
     experience: [
         {
             _key: "1",
-            company: "Meta Reality Labs",
-            role: "Lead Product Designer",
-            dateRange: "22' — 24'",
-            creditLabel: "Meta Credits",
-            creditLinks: "Meta, Mixed Reality News, Road to VR",
+            company: "Patreon",
+            role: "For Halloween 2021, I led the animation strategy, development, and implementation for Trick-or-True Crime, an interactive microsite created with Patreon to celebrate the thrill of true crime content. The experience invited visitors to explore eerie, crime-filled streets where each door revealed either a chilling surprise or an enticing prize, balancing suspense with playful discovery. Using immersive Lottie animations and horizontal scrolling, the site blended cinematic storytelling and interactive technology to deliver a dark, memorable Halloween experience.",
             thumbnail: "clips/patreon.mp4",
             description: []
         },
         {
             _key: "2",
-            company: "Spotify",
-            role: "Senior Product Designer",
+            company: "Twix NFT",
+            role: "Working at RSQ, I contributed to the strategy and implementation of a campaign site developed in collaboration with Mars, Inc. and their PR agency to launch #NFTwix — TWIX’s first-ever NFT drop. Partnering with artist YEAHYEAHCHLOE and hosted on MakersPlace, the experience transformed the iconic candy rivalry into a digital art moment featuring two visually identical yet provably unique NFTs on the blockchain. To amplify the campaign, we built a sleek split-screen website where fans could choose their side and compete for exclusive prizes, blending strategic thinking with interactive web execution.",
             dateRange: "21' — 21'",
             creditLabel: "Record a Podcast",
             creditLinks: "Tech Crunch",
             thumbnail: "clips/twix.mp4",
             description: []
         },
-        {
-            _key: "3",
-            company: "Apple",
-            role: "Senior Product Designer",
-            dateRange: "20' — 21'",
-            creditLabel: "International HI Media Services",
-            creditLinks: "Apple Music, Apple Maps",
-            thumbnail: "clips/longview.mp4",
-            tools: ["React Native", "Expo", "Redux", "Styled Components", "Firebase", "Jest", "Git", "Jira"],
-            description: []
-        },
+
         {
             _key: "4",
             company: "Kovitz",

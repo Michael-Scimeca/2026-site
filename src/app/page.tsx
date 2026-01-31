@@ -3,7 +3,7 @@ import { About } from "@/components/About";
 import { Experience } from "@/components/Experience";
 import { Setup } from "@/components/Setup";
 import { Footer } from "@/components/Footer";
-import { PrivacyModal } from "@/components/PrivacyModal";
+
 import { client } from "@/sanity/lib/client";
 
 export default async function Home() {
@@ -66,13 +66,57 @@ export default async function Home() {
     {
       _key: 'outleadership',
       company: 'Out Leadership',
-      role: 'Technical Lead',
-      tools: ["React", "Next.js", "TypeScript", "GSAP", "Tailwind CSS", "Sanity"],
+      role: 'Creative Developer',
+      description: "Out Leadership is a global platform for LGBTQ+ business leaders. I led the technical development of their digital presence, focusing on the animation strategy and front-end implementation to create a high-performance, cinematic experience that celebrates the community and their mission.",
+      tools: ["Wordpress", "Browserstack", "Lottie", "GSAP - Scroll Trigger"],
       thumbnail: '/clips/outleadership.mp4?v=1',
-      dateRange: '2023 - 2024',
-      themeColor: PROJECT_COLORS[0]
+      themeColor: '#35687e'
     },
-    ...(data.experience?.map((item: any, index: number) => ({
+    {
+      _key: 'patreon',
+      company: 'Patreon',
+      role: 'Creative Developer',
+      description: "For Halloween 2021, I led the animation strategy and implementation for Trick-or-True Crime, an interactive microsite created with Patreon. Using immersive Lottie animations and horizontal scrolling, the experience blended cinematic storytelling with playful interactivity to deliver a dark, memorable Halloween experience.",
+      tools: ["SPA", "Browserstack", "Lottie", "Sanity CMS", "GSAP"],
+      thumbnail: '/clips/patreon.mp4',
+      themeColor: '#e45253'
+    },
+    {
+      _key: 'twix',
+      company: 'Twix NFT',
+      description: "Working at RSQ, I contributed to the strategy and implementation of #NFTwix, TWIX’s first-ever NFT drop, developed with Mars, Inc. Partnering with artist YEAHYEAHCHLOE and hosted on MakersPlace, the campaign featured a split-screen interactive site where fans chose sides and competed for exclusive prizes.",
+      role: 'Creative Developer',
+      tools: ["Wordpress", "Browserstack", "GSAP", 'Lenis', 'Barba.js'],
+      thumbnail: '/clips/twix.mp4',
+      themeColor: '#f59e0b'
+    },
+    {
+      _key: 'kovitz',
+      company: 'Kovitz',
+      role: 'Creative Developer',
+      description: "Working at Kovitz, I focused on building and optimizing financial tools and wealth management platforms. My role involved developing complex frontend interfaces using Angular and integrating with a Java/Spring Boot backend to deliver secure, data-rich applications for high-net-worth clients.",
+      tools: ["Wordpress", "Browserstack", "GSAP", 'locomotive'],
+      thumbnail: '/clips/kovitz.mp4',
+      themeColor: '#76817a'
+    },
+    {
+      _key: 'longview',
+      company: 'Longview Innovation',
+      role: 'Creative Developer',
+      description: "I handled the development and animation implementation for the Longview Innovation website, using interactive motion and thoughtful transitions to support a modern, engaging digital experience.",
+      tools: ["SPA", "Wordpress", "Browserstack", "GSAP", 'locomotive', 'Highway.js'],
+      thumbnail: '/clips/longview.mp4',
+      themeColor: '#1d63c2'
+    },
+    ...(data.experience?.filter((item: any) =>
+      item.company !== 'Apple' &&
+      item.company !== 'Meta Reality Labs' &&
+      item.company !== 'Patreon' &&
+      item.company !== 'Spotify' &&
+      item.company !== 'Twix NFT' &&
+      item.company !== 'Kovitz' &&
+      item.company !== 'Longview Innovation'
+    ).map((item: any, index: number) => ({
       ...item,
       tools: item.tools?.length > 0 ? item.tools : mockToolSets[index % mockToolSets.length],
       themeColor: PROJECT_COLORS[(index + 1) % PROJECT_COLORS.length]
@@ -81,7 +125,7 @@ export default async function Home() {
 
   return (
     <main className="flex flex-col selection:bg-blue-500/30">
-      <PrivacyModal />
+
       <div
         className="relative z-20 bg-black mb-[100vh]"
         style={{ boxShadow: '-9px -2px 52px 19px rgb(0 0 0 / 80%)' }}
