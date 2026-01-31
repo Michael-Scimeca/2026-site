@@ -15,7 +15,7 @@ const setupItems: SetupItem[] = [
         id: "optimum-nutrition",
         company: "Optimum Nutrition",
         description: "Engineered for performance. Partnering on technical innovation and global digital expansion.",
-        logo: "/logos/on-logo-white.svg"
+        logo: "/logos/on.png"
     },
     {
         id: "optimo",
