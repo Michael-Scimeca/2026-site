@@ -15,9 +15,9 @@ export function About({ description }: AboutProps) {
     if (!description) return null;
 
     return (
-        <section className="py-24 bg-white">
+        <section className="py-24 bg-black">
             <Container>
-                <div className="max-w-4xl mx-auto text-xl md:text-3xl leading-relaxed text-zinc-900 font-light tracking-wide">
+                <div className="max-w-4xl mx-auto text-xl md:text-3xl leading-relaxed text-white font-light tracking-wide">
                     <PortableText value={description} />
                 </div>
             </Container>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useLayoutEffect, useEffect, useRef, useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 export function CurveLoader() {
     const loader = useRef<HTMLDivElement>(null);
@@ -34,10 +35,12 @@ export function CurveLoader() {
     useLayoutEffect(() => {
         // Lock scroll while loader is active
         document.body.style.overflow = 'hidden';
+        window.dispatchEvent(new Event('lenis-stop'));
         setPath(initialCurve);
 
         return () => {
             document.body.style.overflow = '';
+            window.dispatchEvent(new Event('lenis-start'));
         };
     }, []);
 
@@ -59,6 +62,7 @@ export function CurveLoader() {
         } else {
             setIsVisible(false);
             document.body.style.overflow = '';
+            window.dispatchEvent(new Event('lenis-start'));
         }
     };
 
@@ -85,7 +89,12 @@ export function CurveLoader() {
         }
     };
 
+    const pathname = usePathname();
+
     if (!isVisible) return null;
+
+    // Disable loader on 404 page (any path that isn't root or studio)
+    if (pathname !== '/' && !pathname?.startsWith('/studio')) return null;
 
     return (
         <div
@@ -93,16 +102,16 @@ export function CurveLoader() {
             className="fixed top-0 left-0 w-screen z-[9999] bg-transparent pointer-events-none"
             style={{ height: 'calc(100vh + 700px)' }}
         >
-            <svg className="w-full h-full fill-white">
+            <svg className="w-full h-full fill-black">
                 <path
                     ref={path}
                     d="M0 0 L12000 0 L12000 13000 L0 13000 Z"
                 />
             </svg>
             <div className="absolute top-0 left-0 w-full h-screen flex items-center justify-center pointer-events-none">
-                <div className="text-zinc-900 text-4xl md:text-6xl font-medium tracking-tight text-center relative">
+                <div className="text-white text-4xl md:text-6xl font-medium tracking-tight text-center relative">
                     <span>{displayText}</span>
-                    <span className="inline-block w-[2px] h-[0.8em] bg-zinc-900 ml-1 animate-blink align-middle"></span>
+                    <span className="inline-block w-[2px] h-[0.8em] bg-white ml-1 animate-blink align-middle"></span>
                 </div>
             </div>
         </div>

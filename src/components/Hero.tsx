@@ -19,9 +19,11 @@ interface HeroProps {
     heroImage?: SanityImageSource & { alt?: string };
     headline?: string;
     subHeadline?: string;
+    isTransitionOverlay?: boolean;
 }
 
-export function Hero({ title, heroImage, headline, subHeadline }: HeroProps) {
+export function Hero(props: HeroProps) {
+    const { title, heroImage, headline, subHeadline, isTransitionOverlay } = props || {};
     const [timeToReach, setTimeToReach] = useState<string | null>(null);
     const [isTextVisible, setIsTextVisible] = useState(false);
 
@@ -61,9 +63,21 @@ export function Hero({ title, heroImage, headline, subHeadline }: HeroProps) {
             }
         });
 
+        // Background opacity fade out (starts at top, ends halfway through)
+        gsap.to(bgRef.current, {
+            opacity: 0,
+            ease: "none",
+            scrollTrigger: {
+                trigger: containerRef.current,
+                start: "top top",
+                end: "center top",
+                scrub: true
+            }
+        });
+
         // Portrait moves down slightly (appears deeper than text but in front of BG)
         gsap.to(portraitRef.current, {
-            y: "8%",
+            y: "16%",
             ease: "none",
             scrollTrigger: {
                 trigger: containerRef.current,
@@ -73,10 +87,9 @@ export function Hero({ title, heroImage, headline, subHeadline }: HeroProps) {
             }
         });
 
-        // Content moves up and scales down (appears to recede/shrink)
+        // Content moves up (appears to recede)
         gsap.to(contentRef.current, {
             y: "-20%",
-            scale: 0.8,
             ease: "none",
             scrollTrigger: {
                 trigger: containerRef.current,
@@ -100,8 +113,8 @@ export function Hero({ title, heroImage, headline, subHeadline }: HeroProps) {
     }, { scope: containerRef });
 
     return (
-        <section ref={containerRef} className="hero relative h-screen w-full overflow-hidden p-[15px] bg-white">
-            <div className="relative h-full w-full overflow-hidden rounded-sm md:rounded-lg  bg-[#656766]">
+        <section ref={containerRef} className="hero relative h-screen w-full overflow-hidden bg-black">
+            <div className="relative h-full w-full overflow-hidden bg-black">
                 {/* Title - Top Left (20px/20px) */}
                 <h1 className="absolute top-[20px] left-[20px] z-50 text-lg md:text-xl font-medium tracking-tight text-white">
                     {title || 'Michael Scimeca'}
@@ -116,7 +129,7 @@ export function Hero({ title, heroImage, headline, subHeadline }: HeroProps) {
                 </div>
 
                 {/* Background Texture Layer - Increased height for parallax bleed */}
-                <div ref={bgRef} className="absolute -top-[20%] inset-x-0 h-[140%] z-0 opacity-0 animate-fade-in">
+                <div ref={bgRef} className="absolute -top-[20%] inset-x-0 h-[140%] z-0 opacity-100">
                     <Image
 
                         src="/hero-background.jpg"
@@ -147,13 +160,12 @@ export function Hero({ title, heroImage, headline, subHeadline }: HeroProps) {
                 <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
                     <div ref={portraitRef} className="relative w-full h-[110%] top-[10%] max-w-4xl flex items-end">
                         <Image
-                            src={heroImage && !('src' in heroImage)
-                                ? urlFor(heroImage).url()
-                                : ((heroImage as any)?.src || "/hero-portrait-v2.png")}
-                            alt={(heroImage as any)?.alt || "Michael Scimeca"}
+                            src="/hero-portrait.png?v=3"
+                            alt="Michael Scimeca"
                             fill
                             className="object-contain object-bottom"
                             priority
+                            unoptimized
                             quality={100}
                             sizes="(max-width: 768px) 100vw, 80vw"
                         />

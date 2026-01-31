@@ -59,7 +59,7 @@ export default async function Home() {
   return (
     <main className="flex flex-col selection:bg-blue-500/30">
       <PrivacyModal />
-      <div className="relative z-20 bg-white mb-[100vh] shadow-xl">
+      <div className="relative z-20 bg-black mb-[100vh] shadow-xl">
         <Hero
           title={data.title}
           heroImage={data.heroImage}

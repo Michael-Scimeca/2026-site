@@ -53,19 +53,19 @@ const setupItems: SetupItem[] = [
 
 function SetupRow({ item }: { item: SetupItem }) {
     return (
-        <div className="group border-b border-zinc-200 w-full transition-colors hover:bg-zinc-50/50 py-8 md:py-10">
+        <div className="group border-b border-zinc-800 w-full transition-colors hover:bg-zinc-900 py-8 md:py-10">
             <Container>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-y-4 md:gap-x-12 items-center">
                     {/* Left: Company Name (Logo placeholder) */}
                     <div className="flex items-center">
-                        <h3 className="font-extrabold text-xl md:text-2xl tracking-tight text-zinc-900">
+                        <h3 className="font-extrabold text-xl md:text-2xl tracking-tight text-white">
                             {item.company}
                         </h3>
                     </div>
 
                     {/* Right: Description */}
                     <div className="flex items-center">
-                        <p className="text-zinc-600 text-base md:text-lg font-medium leading-relaxed">
+                        <p className="text-zinc-400 text-base md:text-lg font-medium leading-relaxed">
                             {item.description}
                         </p>
                     </div>
@@ -77,7 +77,7 @@ function SetupRow({ item }: { item: SetupItem }) {
 
 export function Setup() {
     return (
-        <section className="bg-zinc-100/50 text-zinc-900 border-t border-zinc-200">
+        <section className="bg-black text-white border-t border-zinc-800">
             <div className="flex flex-col">
                 {setupItems.map((item) => (
                     <SetupRow key={item.id} item={item} />
