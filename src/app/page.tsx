@@ -51,10 +51,20 @@ export default async function Home() {
     ["Node.js", "Express", "MongoDB", "Mongoose", "AWS", "Docker", "Redis", "CircleCI"]
   ];
 
-  const experienceWithTools = data.experience?.map((item: any, index: number) => ({
-    ...item,
-    tools: item.tools?.length > 0 ? item.tools : mockToolSets[index % mockToolSets.length]
-  }));
+  const experienceWithTools = [
+    {
+      _key: 'outleadership',
+      company: 'Out Leadership',
+      role: 'Technical Lead',
+      tools: ["React", "Next.js", "TypeScript", "GSAP", "Tailwind CSS", "Sanity"],
+      thumbnail: '/clips/outleadership.mp4?v=1',
+      dateRange: '2023 - 2024',
+    },
+    ...(data.experience?.map((item: any, index: number) => ({
+      ...item,
+      tools: item.tools?.length > 0 ? item.tools : mockToolSets[index % mockToolSets.length]
+    })) || [])
+  ];
 
   return (
     <main className="flex flex-col selection:bg-blue-500/30">

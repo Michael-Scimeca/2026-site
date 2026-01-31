@@ -130,7 +130,7 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
                     <div className="md:col-span-6 w-full flex flex-col relative">
                         <div className="relative aspect-video overflow-hidden shadow-sm">
                             {item.thumbnail && (
-                                (item.thumbnail.endsWith('.mp4') || item.thumbnail.endsWith('.webm')) ? (
+                                (/\.(mp4|webm)($|\?)/i.test(item.thumbnail)) ? (
                                     <video
                                         key={item.thumbnail}
                                         ref={videoRef}
@@ -152,7 +152,7 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
                         </div>
 
                         {/* Controls Container - Positioned bottom-left relative to thumbnail */}
-                        {item.thumbnail && (item.thumbnail.endsWith('.mp4') || item.thumbnail.endsWith('.webm')) && (
+                        {item.thumbnail && (/\.(mp4|webm)($|\?)/i.test(item.thumbnail)) && (
                             <div className="absolute bottom-0 -left-20 hidden md:flex items-center z-20 opacity-100">
                                 {/* Replay Button */}
                                 <button
