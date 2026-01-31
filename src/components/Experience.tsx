@@ -30,7 +30,7 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
     const gsapTickerRef = useRef<gsap.TickerCallback | null>(null);
 
     React.useEffect(() => {
-        const isMobile = window.innerWidth < 768;
+        const isMobile = window.innerWidth <= 1000;
         if (isMobile && videoRef.current) {
             videoRef.current.play().then(() => setIsPlaying(true)).catch((e) => console.log("Mobile autoplay error:", e));
         }
@@ -76,25 +76,23 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
 
     return (
         <div
-            className="group w-full transition-colors hover:bg-zinc-900 border-zinc-800 max-md:border-b max-md:py-4 md:border-t"
+            className="group w-full transition-colors hover:bg-zinc-900 border-zinc-800 max-desktop:border-b max-desktop:py-4 desktop:border-t"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
             <Container className="!pr-0">
-                <div className="grid grid-cols-1 md:grid-cols-16   items-center ">
-                    <div className="md:col-span-10 flex flex-col gap-6">
+                <div className="grid grid-cols-1 desktop:grid-cols-16 items-center ">
+                    <div className="desktop:col-span-10 flex flex-col gap-6 py-2 pr-2">
                         <div className="flex flex-col gap-4">
-                            <div className="flex flex-col gap-1">
-                                <h3 className="font-bold text-lg md:text-xl tracking-tight">
+                            <div className="flex items-baseline gap-2">
+                                <span className="font-bold text-lg desktop:text-xl tracking-tight">
                                     {item.company}
-                                </h3>
-                                <p className="text-zinc-400 font-medium">
-                                    {item.role}
-                                </p>
+                                </span>
+                                <span className="text-zinc-400 font-medium text-sm desktop:text-base">
+                                    — {item.role}
+                                </span>
                             </div>
-                            <h4 className="text-white text-[10px] uppercase font-bold tracking-[0.2em] opacity-40">
-                                Project Overview
-                            </h4>
+
                             <div className="text-zinc-400 text-xs leading-relaxed font-medium max-w-2xl">
                                 <p className="mb-3">
                                     Leading the technical direction and architectural design for high-scale digital platforms.
@@ -127,7 +125,7 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
                     </div>
 
                     {/* Column 4: Thumbnail (6 cols) */}
-                    <div className="md:col-span-6 w-full flex flex-col relative">
+                    <div className="desktop:col-span-6 w-full flex flex-col relative">
                         <div className="relative aspect-video overflow-hidden shadow-sm">
                             {item.thumbnail && (
                                 (/\.(mp4|webm)($|\?)/i.test(item.thumbnail)) ? (
@@ -153,7 +151,7 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
 
                         {/* Controls Container - Positioned bottom-left relative to thumbnail */}
                         {item.thumbnail && (/\.(mp4|webm)($|\?)/i.test(item.thumbnail)) && (
-                            <div className="absolute bottom-0 -left-20 hidden md:flex items-center z-20 opacity-100">
+                            <div className="absolute bottom-0 -left-20 hidden desktop:flex items-center z-20 opacity-100">
                                 {/* Replay Button */}
                                 <button
                                     onClick={(e) => {
@@ -205,22 +203,21 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
 
                     </div>
                 </div>
-            </Container>
-        </div>
+            </Container >
+        </div >
     );
 }
 
 export function Experience({ items }: ExperienceProps) {
     return (
-        <section className="bg-black text-white">
+        <section className="bg-black text-white ">
+
             <div className="flex flex-col">
-
-
                 {items.map((item) => (
                     <ExperienceRow key={item._key} item={item} />
                 ))}
                 {/* Bottom border for the last item */}
-                <div className="border-t border-zinc-800 w-full max-md:hidden" />
+                <div className="border-t border-zinc-800 w-full max-desktop:hidden" />
             </div>
         </section>
     );

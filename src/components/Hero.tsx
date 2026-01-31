@@ -115,18 +115,21 @@ export function Hero(props: HeroProps) {
     return (
         <section ref={containerRef} className="hero relative h-screen w-full overflow-hidden bg-black">
             <div className="relative h-full w-full overflow-hidden bg-black">
-                {/* Title - Top Left (20px/20px) */}
-                <h1 className="absolute top-[20px] left-[20px] z-50 text-lg md:text-xl font-medium tracking-tight text-white">
-                    {title || 'Michael Scimeca'}
-                </h1>
+                {/* Semantic Header for Top Elements */}
+                <header>
+                    {/* Title - Top Left (20px/20px) */}
+                    <h1 className="absolute top-[20px] left-[20px] z-50 text-lg md:text-xl font-medium tracking-tight text-white">
+                        {title || 'Michael Scimeca'}
+                    </h1>
 
-                {/* Status Badge & Games - Top Right */}
-                <div className="absolute top-[20px] right-[20px] z-50 flex flex-col items-end pointer-events-auto gap-3">
-                    <StatusBadge />
-                    <div className="hidden md:flex items-start">
-                        <GameContainer />
+                    {/* Status Badge & Games - Top Right */}
+                    <div className="absolute top-[20px] right-[20px] z-50 flex flex-col items-end pointer-events-auto gap-3">
+                        <StatusBadge />
+                        <div className="hidden md:flex items-start">
+                            <GameContainer />
+                        </div>
                     </div>
-                </div>
+                </header>
 
                 {/* Background Texture Layer - Increased height for parallax bleed */}
                 <div ref={bgRef} className="absolute -top-[20%] inset-x-0 h-[140%] z-0 opacity-100">

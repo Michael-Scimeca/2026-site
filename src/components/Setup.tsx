@@ -12,6 +12,18 @@ interface SetupItem {
 
 const setupItems: SetupItem[] = [
     {
+        id: "on",
+        company: "On",
+        description: "Engineered for performance. Partnering on technical innovation and global digital expansion.",
+        logo: "/logos/on-logo-white.svg"
+    },
+    {
+        id: "optimo",
+        company: "Optimo",
+        description: "Strategic creative development and visual identity for contemporary lifestyle brands.",
+        logo: "/logos/logo-hat.png"
+    },
+    {
         id: "78ventures",
         company: "78 Ventures",
         description: "Leading the next wave of strategic investments in high-growth technology sectors.",
@@ -83,11 +95,11 @@ function SetupRow({ item }: { item: SetupItem }) {
                     {/* Left: Logo & Company Name */}
                     <div className="flex items-center gap-6">
                         {item.logo && (
-                            <div className="relative w-20 h-20 flex-shrink-0 flex items-center justify-center">
+                            <div className="relative w-28 h-28 flex-shrink-0 flex items-center justify-center">
                                 <img
                                     src={`${item.logo}?v=2`}
                                     alt={`${item.company} Logo`}
-                                    className="w-20 h-20 object-contain brightness-0 invert opacity-60 group-hover:opacity-100 transition-opacity duration-500"
+                                    className="w-28 h-28 object-contain brightness-0 invert opacity-60 group-hover:opacity-100 transition-opacity duration-500"
                                 />
                             </div>
                         )}
@@ -110,7 +122,7 @@ function SetupRow({ item }: { item: SetupItem }) {
 
 export function Setup() {
     return (
-        <section className="bg-black text-white border-t border-zinc-800">
+        <section className="bg-black text-white  border-t border-zinc-800">
             <div className="flex flex-col">
                 {setupItems.map((item) => (
                     <SetupRow key={item.id} item={item} />

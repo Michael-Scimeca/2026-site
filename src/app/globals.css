@@ -38,8 +38,9 @@
         }
     }
 
-    /* Added Gradient Animation */
     --animate-gradient-x: gradient-x 15s ease infinite;
+
+    --breakpoint-desktop: 1001px;
 
     @keyframes gradient-x {
 
