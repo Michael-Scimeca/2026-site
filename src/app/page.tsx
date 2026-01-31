@@ -3,6 +3,7 @@ import { About } from "@/components/About";
 import { Experience } from "@/components/Experience";
 import { Setup } from "@/components/Setup";
 import { Footer } from "@/components/Footer";
+import { FloatingMenu } from "@/components/FloatingMenu";
 
 import { client } from "@/sanity/lib/client";
 
@@ -141,6 +142,8 @@ export default async function Home() {
         {experienceWithTools && <Experience items={experienceWithTools} />}
         <Setup />
       </div>
+
+      <FloatingMenu />
 
       <Footer
         email={data.footer?.email}

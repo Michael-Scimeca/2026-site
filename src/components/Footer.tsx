@@ -114,21 +114,21 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
                                 <div className="flex flex-col gap-2" ref={emailRef}>
                                     <span className="font-bold text-white text-sm uppercase tracking-wider">Let's Work Together</span>
-                                    <a href={`mailto:${defaultEmail}`} className="text-zinc-500 hover:text-white transition-colors text-lg">
+                                    <a href={`mailto:${defaultEmail}`} className="text-zinc-500 hover:text-white transition-colors text-lg w-fit">
                                         {defaultEmail}
                                     </a>
                                 </div>
 
                                 <div className="flex flex-col gap-2">
                                     <span className="font-bold text-white text-sm uppercase tracking-wider">Hit Me Up on Discord</span>
-                                    <a href="https://discord.com/users/michael_scimeca" className="text-zinc-500 hover:text-white transition-colors text-lg">
+                                    <a href="https://discord.com/users/michael_scimeca" className="text-zinc-500 hover:text-white transition-colors text-lg w-fit">
                                         michaelscimeca
                                     </a>
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <a
                                         href="https://www.linkedin.com/in/mikey-scimeca/"
-                                        className="text-zinc-500 hover:text-white transition-colors"
+                                        className="text-zinc-500 hover:text-white transition-colors w-fit"
                                         aria-label="LinkedIn Profile"
                                     >
                                         <svg

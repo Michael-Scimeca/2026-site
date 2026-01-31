@@ -60,15 +60,9 @@ html {
 }
 
 * {
-    cursor: none;
+    cursor: none !important;
 }
 
-button,
-a,
-.cursor-pointer,
-[role="button"] {
-    cursor: pointer !important;
-}
 
 body {
     background: var(--background);

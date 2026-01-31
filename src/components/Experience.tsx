@@ -132,8 +132,12 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
             <div
                 className="absolute left-0 top-0 bottom-0 w-[3px] opacity-0 group-hover:opacity-100 transition-all duration-500 scale-y-90 group-hover:scale-y-100 origin-center"
                 style={{
-                    backgroundColor: item.themeColor || '#0158ff',
-                    boxShadow: `0 0 20px 2px ${item.themeColor || '#0158ff'}80`
+                    background: (item.company === 'NYC Pride' || item._key === 'nycpride')
+                        ? 'linear-gradient(to bottom, #ef4444, #3b82f6, #a855f7)'
+                        : (item.themeColor || '#0158ff'),
+                    boxShadow: (item.company === 'NYC Pride' || item._key === 'nycpride')
+                        ? `0 0 20px 2px #3b82f680`
+                        : `0 0 20px 2px ${item.themeColor || '#0158ff'}80`
                 }}
             />
 

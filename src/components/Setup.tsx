@@ -20,7 +20,7 @@ const setupItems: SetupItem[] = [
         description: "I contributed to the development of the Optimum Nutrition website (optimumnutrition.com), teaming up with We Can’t Stop Thinking to implement front-end features, responsive layouts, and interactive enhancements. My work helped bring design concepts to life while ensuring the site performed reliably across devices and reflected Optimum Nutrition’s strong, performance-driven brand presence.",
         logo: "/logos/on.png",
         tools: ["Photoshop", "Custom CMS", "Browserstack", "Foundation Framework"],
-        themeColor: "#0158ff" // Blue
+        themeColor: "#3c468c" // Blue
     },
     {
         id: "68ventures",
@@ -76,7 +76,7 @@ const setupItems: SetupItem[] = [
         description: "Gabbanelli is a heritage brand known for handcrafted silver, jewelry, and premium gifts. I collaborated with the agency We Can’t Stop Thinking to support the Gabbanelli.com website, handling visual asset preparation and contributing to the overall website design.\n\n Similar to my work on Optimo, this project focused on cutting and isolating product imagery, refining visual assets for web use, and designing layouts that highlighted craftsmanship and material detail. Assets were carefully prepared and organized to ensure consistency across the site and allow for a smooth transition between designers as the project evolved.",
         logo: "/logos/gab.png",
         tools: ["Photoshop"],
-        themeColor: "#8b5cf6" // Violet
+        themeColor: "#c11427" // Deep Red (Gabbanelli theme)
     },
     {
         id: "nether-realm",
@@ -84,7 +84,7 @@ const setupItems: SetupItem[] = [
         description: "NetherRealm Studios, creators of the iconic Mortal Kombat franchise, are known for bold visuals, cinematic intensity, and unmistakable atmosphere. I collaborated with the agency We Can’t Stop Thinking to design a 6-page website and blog experience, with the goal of staying as close as possible to the essence of Mortal Kombat.\n\nThe design focused on immediate recognition — creating an experience where the moment you land on the site, you feel Mortal Kombat. Dark, high-contrast visuals, dramatic typography, and cinematic pacing were used to echo the franchise’s intensity, lore, and legacy, while still supporting a clear, modern web experience.",
         logo: "/logos/nether.png",
         tools: ["Photoshop"],
-        themeColor: "#ec4899" // Pink
+        themeColor: "#f7973b" // Orange/Mortal Kombat themed
     },
     {
         id: "optimo",
@@ -111,8 +111,12 @@ function SetupRow({ item }: { item: SetupItem }) {
             <div
                 className="absolute left-0 top-0 bottom-0 w-[3px] opacity-0 group-hover:opacity-100 transition-all duration-500 scale-y-90 group-hover:scale-y-100 origin-center"
                 style={{
-                    backgroundColor: item.themeColor || '#0158ff',
-                    boxShadow: `0 0 20px 2px ${item.themeColor || '#0158ff'}80`
+                    background: item.id === 'nycpride'
+                        ? 'linear-gradient(to bottom, #ef4444, #3b82f6, #a855f7)'
+                        : (item.themeColor || '#0158ff'),
+                    boxShadow: item.id === 'nycpride'
+                        ? `0 0 20px 2px #3b82f680`
+                        : `0 0 20px 2px ${item.themeColor || '#0158ff'}80`
                 }}
             />
 
