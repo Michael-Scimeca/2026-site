@@ -12,8 +12,8 @@ interface SetupItem {
 
 const setupItems: SetupItem[] = [
     {
-        id: "on",
-        company: "On",
+        id: "optimum-nutrition",
+        company: "Optimum Nutrition",
         description: "Engineered for performance. Partnering on technical innovation and global digital expansion.",
         logo: "/logos/on-logo-white.svg"
     },
@@ -24,8 +24,8 @@ const setupItems: SetupItem[] = [
         logo: "/logos/logo-hat.png"
     },
     {
-        id: "78ventures",
-        company: "78 Ventures",
+        id: "68ventures",
+        company: "68 Ventures",
         description: "Leading the next wave of strategic investments in high-growth technology sectors.",
         logo: "/logos/78venatures.png"
     },
@@ -61,7 +61,7 @@ const setupItems: SetupItem[] = [
     },
     {
         id: "foo",
-        company: "Foo",
+        company: "Foosackly's",
         description: "Everest emerges from stealth mode with a landmark $140 million funding.",
         logo: "/logos/foo.png"
     },
@@ -110,7 +110,7 @@ function SetupRow({ item }: { item: SetupItem }) {
 
                     {/* Right: Description */}
                     <div className="flex items-center">
-                        <p className="text-zinc-400 text-lg md:text-xl font-medium leading-relaxed max-w-xl">
+                        <p className="text-zinc-400 text-lg md:text-xl font-medium leading-relaxed">
                             {item.description}
                         </p>
                     </div>

@@ -76,56 +76,58 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
 
     return (
         <div
-            className="group w-full transition-colors hover:bg-zinc-900 border-zinc-800 max-desktop:border-b max-desktop:py-4 desktop:border-t"
+            className="group w-full transition-colors hover:bg-zinc-900 border-zinc-800 max-desktop:py-8"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
-            <Container className="!pr-0">
-                <div className="grid grid-cols-1 desktop:grid-cols-16 items-center ">
-                    <div className="desktop:col-span-10 flex flex-col gap-6 py-2 pr-2">
-                        <div className="flex flex-col gap-4">
-                            <div className="flex items-baseline gap-2">
-                                <span className="font-bold text-lg desktop:text-xl tracking-tight">
-                                    {item.company}
-                                </span>
-                                <span className="text-zinc-400 font-medium text-sm desktop:text-base">
-                                    — {item.role}
-                                </span>
+            <div className="desktop:container-custom desktop:!pr-0">
+                <div className="flex flex-col desktop:grid desktop:grid-cols-16 items-center ">
+                    <div className="desktop:col-span-10 flex flex-col gap-6 desktop:py-2 desktop:pr-2">
+                        <Container className="desktop:!p-0 desktop:!m-0 desktop:!max-w-none">
+                            <div className="flex flex-col gap-4">
+                                <div className="flex items-baseline gap-2">
+                                    <span className="font-bold text-lg desktop:text-xl tracking-tight">
+                                        {item.company}
+                                    </span>
+                                    <span className="text-zinc-400 font-medium text-sm desktop:text-base">
+                                        — {item.role}
+                                    </span>
+                                </div>
+
+                                <div className="text-zinc-400 text-xs leading-relaxed font-medium">
+                                    <p className="mb-3">
+                                        Leading the technical direction and architectural design for high-scale digital platforms.
+                                        Focused on creating seamless user experiences through performant.
+                                    </p>
+                                    <p>
+                                        Collaborated with cross-functional teams to deliver award-winning products.
+                                    </p>
+                                </div>
                             </div>
 
-                            <div className="text-zinc-400 text-xs leading-relaxed font-medium max-w-2xl">
-                                <p className="mb-3">
-                                    Leading the technical direction and architectural design for high-scale digital platforms.
-                                    Focused on creating seamless user experiences through performant.
-                                </p>
-                                <p>
-                                    Collaborated with cross-functional teams to deliver award-winning products.
-                                </p>
-                            </div>
-                        </div>
-
-                        {item.tools && item.tools.length > 0 && (
-                            <div className="flex flex-wrap items-center">
-                                {item.tools.map((tool, index) => (
-                                    <React.Fragment key={tool}>
-                                        {index !== 0 && (
-                                            <span className="text-[#0158ff] pr-[5px] text-[10px] font-bold">
-                                                ⌁
+                            {item.tools && item.tools.length > 0 && (
+                                <div className="flex flex-wrap items-center">
+                                    {item.tools.map((tool, index) => (
+                                        <React.Fragment key={tool}>
+                                            {index !== 0 && (
+                                                <span className="text-[#0158ff] pr-[5px] text-[10px] font-bold">
+                                                    ⌁
+                                                </span>
+                                            )}
+                                            <span
+                                                className="pl-0 pr-[5px] py-1 text-white/60 text-[10px] uppercase font-bold tracking-wider rounded-full whitespace-nowrap"
+                                            >
+                                                {tool}
                                             </span>
-                                        )}
-                                        <span
-                                            className="pl-0 pr-[5px] py-1 text-white/60 text-[10px] uppercase font-bold tracking-wider rounded-full whitespace-nowrap"
-                                        >
-                                            {tool}
-                                        </span>
-                                    </React.Fragment>
-                                ))}
-                            </div>
-                        )}
+                                        </React.Fragment>
+                                    ))}
+                                </div>
+                            )}
+                        </Container>
                     </div>
 
                     {/* Column 4: Thumbnail (6 cols) */}
-                    <div className="desktop:col-span-6 w-full flex flex-col relative">
+                    <div className="desktop:col-span-6 w-full flex flex-col relative max-desktop:mt-8">
                         <div className="relative aspect-video overflow-hidden shadow-sm">
                             {item.thumbnail && (
                                 (/\.(mp4|webm)($|\?)/i.test(item.thumbnail)) ? (
@@ -203,7 +205,7 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
 
                     </div>
                 </div>
-            </Container >
+            </div>
         </div >
     );
 }
