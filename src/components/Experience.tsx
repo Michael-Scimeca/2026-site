@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Container } from "@/components/Container";
 import Image from "next/image";
 import { gsap } from "gsap";
@@ -27,12 +27,28 @@ interface ExperienceProps {
     items: ExperienceItem[];
 }
 
-function ExperienceRow({ item }: { item: ExperienceItem }) {
+function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirst?: boolean; isLast?: boolean }) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const thumbnailRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const progressCircleRef = useRef<SVGCircleElement>(null);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [isInView, setIsInView] = useState(false);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsInView(true);
+                    observer.disconnect(); // Only need to trigger once
+                }
+            },
+            { rootMargin: '800px' } // Load significantly before it enters the viewport
+        );
+
+        if (containerRef.current) observer.observe(containerRef.current);
+        return () => observer.disconnect();
+    }, []);
     const gsapTickerRef = useRef<gsap.TickerCallback | null>(null);
 
     React.useEffect(() => {
@@ -100,7 +116,7 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
 
     return (
         <div
-            className="group w-full transition-colors relative border-zinc-800 max-desktop:py-8"
+            className={`group w-full transition-colors relative border-zinc-800 pb-8 desktop:py-0 ${isFirst ? 'border-t' : ''} ${!isLast ? 'border-b' : ''}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
@@ -113,8 +129,8 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
             />
 
             <div className="desktop:container-custom desktop:!pr-0 relative z-10">
-                <div className="flex flex-col desktop:grid desktop:grid-cols-16 items-center ">
-                    <div className="desktop:col-span-10 flex flex-col gap-6 desktop:py-2 desktop:pr-2">
+                <div className="flex flex-col-reverse desktop:grid desktop:grid-cols-16 items-center ">
+                    <div className="desktop:col-span-11 flex flex-col gap-6 desktop:py-2 desktop:pr-2">
                         <Container className="desktop:!p-0 desktop:!m-0 desktop:!max-w-none">
                             <div className="flex flex-col gap-4">
                                 <div className="flex items-baseline gap-2">
@@ -138,7 +154,7 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
                             </div>
 
                             {item.tools && item.tools.length > 0 && (
-                                <div className="flex flex-wrap items-center">
+                                <div className="flex flex-wrap items-center mt-4 md:mt-0 ">
                                     {item.tools.map((tool, index) => (
                                         <React.Fragment key={tool}>
                                             {index !== 0 && (
@@ -161,21 +177,29 @@ function ExperienceRow({ item }: { item: ExperienceItem }) {
                         </Container>
                     </div>
 
-                    {/* Column 4: Thumbnail (6 cols) */}
-                    <div className="desktop:col-span-6 w-full flex flex-col relative max-desktop:mt-8" ref={containerRef}>
+                    {/* Column 4: Thumbnail (5 cols) */}
+                    <div className="desktop:col-span-5 w-full flex flex-col relative max-desktop:mb-8" ref={containerRef}>
                         <div className="relative aspect-video overflow-hidden shadow-sm">
                             <div ref={thumbnailRef} className="absolute inset-0 w-full h-[120%] -top-[10%]">
                                 {item.thumbnail && (
                                     (/\.(mp4|webm)($|\?)/i.test(item.thumbnail)) ? (
-                                        <video
-                                            key={item.thumbnail}
-                                            ref={videoRef}
-                                            src={item.thumbnail}
-                                            loop
-                                            muted
-                                            playsInline
-                                            className="object-cover w-full h-full"
-                                        />
+                                        isInView && (
+                                            <video
+                                                key={item.thumbnail}
+                                                ref={videoRef}
+                                                src={item.thumbnail}
+                                                loop
+                                                muted
+                                                playsInline
+                                                autoPlay={window.innerWidth <= 1000}
+                                                className="object-cover w-full h-full"
+                                                onLoadedData={() => {
+                                                    if (window.innerWidth <= 1000 && videoRef.current) {
+                                                        videoRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
+                                                    }
+                                                }}
+                                            />
+                                        )
                                     ) : (
                                         <Image
                                             src={item.thumbnail}
@@ -253,11 +277,14 @@ export function Experience({ items }: ExperienceProps) {
         <section className="bg-black text-white ">
 
             <div className="flex flex-col">
-                {items.map((item) => (
-                    <ExperienceRow key={item._key} item={item} />
+                {items.map((item, index) => (
+                    <ExperienceRow
+                        key={item._key}
+                        item={item}
+                        isFirst={index === 0}
+                        isLast={index === items.length - 1}
+                    />
                 ))}
-                {/* Bottom border for the last item */}
-                <div className="border-t border-zinc-800 w-full max-desktop:hidden" />
             </div>
         </section>
     );

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Container } from './Container';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -18,9 +18,22 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const emailRef = useRef<HTMLDivElement>(null);
     const footerRef = useRef<HTMLElement>(null);
+    const [isInView, setIsInView] = useState(false);
 
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    setIsInView(true);
+                    observer.disconnect();
+                }
+            },
+            { rootMargin: '800px' }
+        );
 
-
+        if (footerRef.current) observer.observe(footerRef.current);
+        return () => observer.disconnect();
+    }, []);
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (!emailRef.current || !videoRef.current) return;
@@ -59,16 +72,18 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
             <Container className="flex-1 flex flex-col justify-between pt-6 md:pt-12 relative z-10">
                 {/* Absolute Video - Now inside Container for alignment */}
                 <div
-                    className="absolute bottom-12 right-0 w-full lg:w-[43%] h-[40vh] lg:h-[60vh] z-0 opacity-80 lg:opacity-100 hidden lg:block rounded-[10px] overflow-hidden pointer-events-none"
+                    className="absolute bottom-12 right-0 w-full lg:w-[40%] h-[40vh] lg:h-[60vh] z-0 opacity-80 lg:opacity-100 rounded-[10px] overflow-hidden pointer-events-none hidden lg:block"
                 >
                     <div className="grain-overlay rounded-[10px]" />
-                    <video
-                        ref={videoRef}
-                        src="/video/footer-video.mp4"
-                        muted
-                        playsInline
-                        className="w-full h-full object-cover rounded-[10px]"
-                    />
+                    {isInView && (
+                        <video
+                            ref={videoRef}
+                            src="/video/footer-video.mp4"
+                            muted
+                            playsInline
+                            className="w-full h-full object-cover rounded-[10px]"
+                        />
+                    )}
                 </div>
 
                 <div className="relative z-10 w-full">

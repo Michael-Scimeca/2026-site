@@ -82,7 +82,10 @@ export default async function Home() {
   return (
     <main className="flex flex-col selection:bg-blue-500/30">
       <PrivacyModal />
-      <div className="relative z-20 bg-black mb-[100vh] shadow-xl">
+      <div
+        className="relative z-20 bg-black mb-[100vh]"
+        style={{ boxShadow: '-9px -2px 52px 19px rgb(0 0 0 / 80%)' }}
+      >
         <Hero
           title={data.title}
           heroImage={data.heroImage}
