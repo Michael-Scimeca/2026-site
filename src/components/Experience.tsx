@@ -2,6 +2,7 @@
 
 import React, { useRef, useState, useEffect } from "react";
 import { Container } from "@/components/Container";
+import { ExperienceContainer } from "@/components/ExperienceContainer";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -21,6 +22,7 @@ interface ExperienceItem {
     thumbnail?: string;
     tools?: string[];
     themeColor?: string;
+    logo?: string;
 }
 
 interface ExperienceProps {
@@ -116,7 +118,7 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
 
     return (
         <div
-            className={`group w-full transition-colors relative border-zinc-800 py-8 ${item.thumbnail ? 'desktop:py-0' : 'desktop:py-8'} ${isFirst ? 'border-t' : ''} ${!isLast ? 'border-b' : ''}`}
+            className={`group w-full transition-colors relative border-zinc-800 py-0 ${item.thumbnail ? 'desktop:py-0' : 'desktop:py-8'} ${isFirst ? 'border-t' : ''} ${!isLast ? 'border-b' : ''}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
@@ -141,24 +143,47 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                 }}
             />
 
-            <div className="desktop:container-custom desktop:!pr-0 relative z-10">
-                <div className="flex flex-col-reverse desktop:grid desktop:grid-cols-16 items-center ">
-                    <div className="desktop:col-span-11 flex flex-col gap-6 desktop:py-2 desktop:pr-2">
-                        <Container className="desktop:!p-0 desktop:!m-0 desktop:!max-w-none">
+            <div className="desktop:!pr-0 relative z-10">
+                <div className="flex flex-col-reverse desktop:grid desktop:grid-cols-16 desktop:items-center">
+                    <div className="desktop:col-span-11 flex flex-col gap-6 desktop:py-2 desktop:pr-2 px-4 md:px-6 desktop:pl-8">
+                        <div className="desktop:!p-0 desktop:!m-0 w-full">
                             <div className="flex flex-col gap-4">
-                                <div className="flex items-baseline gap-2">
-                                    <span className="font-bold text-lg desktop:text-xl tracking-tight">
-                                        {item.company}
-                                    </span>
+                                <div className="flex items-center gap-2">
+                                    {item.logo ? (
+                                        <div className={`relative w-auto ${item._key === 'outleadership' || item.company === 'Out Leadership' ? 'h-8 desktop:h-10 max-w-[500px]' : 'h-5 desktop:h-7 max-w-[200px]'}`}>
+                                            <Image
+                                                src={item.logo}
+                                                alt={item.company}
+                                                width={item._key === 'outleadership' || item.company === 'Out Leadership' ? 500 : 200}
+                                                height={60}
+                                                className="h-full w-auto object-contain object-left"
+                                                priority
+                                            />
+                                        </div>
+                                    ) : (
+                                        <span className="font-bold text-lg desktop:text-xl tracking-tight">
+                                            {item.company}
+                                        </span>
+                                    )}
                                     {item.role && item.role.length <= 50 && (
-                                        <span className="text-zinc-400 font-medium text-sm desktop:text-base">
+                                        <span className="text-zinc-400 font-medium text-sm desktop:text-base whitespace-nowrap">
                                             — {item.role}
                                         </span>
                                     )}
                                 </div>
 
-                                <div className="text-zinc-400 text-xs desktop:text-sm leading-relaxed font-medium max-w-2xl">
+                                <div className="text-zinc-400 text-sm leading-relaxed font-medium">
                                     {(() => {
+                                        const ptComponents = {
+                                            block: {
+                                                normal: ({ children }: any) => (
+                                                    <p className="text-zinc-400 text-sm leading-relaxed font-medium mb-3 last:mb-0">
+                                                        {children}
+                                                    </p>
+                                                ),
+                                            },
+                                        };
+
                                         const renderTextWithThemedPunctuation = (text: string) => {
                                             const isNYCPride = item.company === 'NYC Pride' || item._key === 'nycpride';
                                             return text.split(/([.,])/).map((part, index) => {
@@ -179,24 +204,24 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                                         if (Array.isArray(item.description) && item.description.length > 0) {
                                             if (typeof item.description[0] === 'string') {
                                                 return item.description.map((p, i) => (
-                                                    <p key={i} className={i !== 0 ? "mt-3" : ""}>
+                                                    <p key={i} className={`text-zinc-400 text-sm leading-relaxed font-medium ${i !== 0 ? "mt-3" : ""}`}>
                                                         {renderTextWithThemedPunctuation(p)}
                                                     </p>
                                                 ));
                                             }
-                                            return <PortableText value={item.description} />;
+                                            return <PortableText value={item.description} components={ptComponents} />;
                                         }
 
                                         if (typeof item.description === 'string') {
-                                            return <p>{renderTextWithThemedPunctuation(item.description)}</p>;
+                                            return <p className="text-zinc-400 text-sm leading-relaxed font-medium">{renderTextWithThemedPunctuation(item.description)}</p>;
                                         }
 
                                         if (item.role.length > 50) {
-                                            return <p>{renderTextWithThemedPunctuation(item.role)}</p>;
+                                            return <p className="text-zinc-400 text-sm leading-relaxed font-medium">{renderTextWithThemedPunctuation(item.role)}</p>;
                                         }
 
                                         return (
-                                            <p>
+                                            <p className="text-zinc-400 text-xs desktop:text-sm leading-relaxed font-medium">
                                                 {renderTextWithThemedPunctuation("Leading the technical direction and architectural design for high-scale digital platforms, focusing on creating seamless user experiences through performant, polished code.")}
                                             </p>
                                         );
@@ -205,7 +230,7 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                             </div>
 
                             {item.tools && item.tools.length > 0 && (
-                                <div className="flex flex-wrap items-center mt-8 desktop:mt-3">
+                                <div className="flex flex-wrap items-center mt-8 desktop:mt-3 pb-8 desktop:pb-2">
                                     {item.tools.map((tool, index) => (
                                         <React.Fragment key={tool}>
                                             {index !== 0 && (
@@ -225,43 +250,45 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                                     ))}
                                 </div>
                             )}
-                        </Container>
+                        </div>
                     </div>
 
                     {/* Column 4: Thumbnail (5 cols) */}
                     <div className="desktop:col-span-5 w-full flex flex-col relative max-desktop:mb-8" ref={containerRef}>
-                        <div className="relative aspect-video overflow-hidden shadow-sm">
-                            <div ref={thumbnailRef} className="absolute inset-0 w-full h-[120%] -top-[10%]">
-                                {item.thumbnail && (
-                                    (/\.(mp4|webm)($|\?)/i.test(item.thumbnail)) ? (
-                                        isInView && (
-                                            <video
-                                                key={item.thumbnail}
-                                                ref={videoRef}
+                        <ExperienceContainer>
+                            <div className="relative aspect-video overflow-hidden shadow-sm">
+                                <div ref={thumbnailRef} className="absolute inset-0 w-full h-[120%] -top-[10%]">
+                                    {item.thumbnail && (
+                                        (/\.(mp4|webm)($|\?)/i.test(item.thumbnail)) ? (
+                                            isInView && (
+                                                <video
+                                                    key={item.thumbnail}
+                                                    ref={videoRef}
+                                                    src={item.thumbnail}
+                                                    loop
+                                                    muted
+                                                    playsInline
+                                                    autoPlay={window.innerWidth <= 1000}
+                                                    className="w-full h-full"
+                                                    onLoadedData={() => {
+                                                        if (window.innerWidth <= 1000 && videoRef.current) {
+                                                            videoRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
+                                                        }
+                                                    }}
+                                                />
+                                            )
+                                        ) : (
+                                            <Image
                                                 src={item.thumbnail}
-                                                loop
-                                                muted
-                                                playsInline
-                                                autoPlay={window.innerWidth <= 1000}
-                                                className="object-cover w-full h-full"
-                                                onLoadedData={() => {
-                                                    if (window.innerWidth <= 1000 && videoRef.current) {
-                                                        videoRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
-                                                    }
-                                                }}
+                                                alt={`${item.company} Thumbnail`}
+                                                fill
+                                                className="object-cover"
                                             />
                                         )
-                                    ) : (
-                                        <Image
-                                            src={item.thumbnail}
-                                            alt={`${item.company} Thumbnail`}
-                                            fill
-                                            className="object-cover"
-                                        />
-                                    )
-                                )}
+                                    )}
+                                </div>
                             </div>
-                        </div>
+                        </ExperienceContainer>
 
                         {/* Controls Container - Positioned bottom-left relative to thumbnail */}
                         {item.thumbnail && (/\.(mp4|webm)($|\?)/i.test(item.thumbnail)) && (

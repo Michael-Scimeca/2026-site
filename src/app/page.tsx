@@ -65,22 +65,14 @@ export default async function Home() {
 
   const experienceWithTools = [
     {
-      _key: 'outleadership',
-      company: 'Out Leadership',
-      role: 'Creative Developer',
-      description: "Out Leadership is a global platform for LGBTQ+ business leaders. I led the technical development of their digital presence, focusing on the animation strategy and front-end implementation to create a high-performance, cinematic experience that celebrates the community and their mission.",
-      tools: ["Wordpress", "Browserstack", "Lottie", "GSAP - Scroll Trigger"],
-      thumbnail: '/clips/outleadership.mp4?v=1',
-      themeColor: '#35687e'
-    },
-    {
       _key: 'patreon',
       company: 'Patreon',
       role: 'Creative Developer',
       description: "For Halloween 2021, I led the animation strategy and implementation for Trick-or-True Crime, an interactive microsite created with Patreon. Using immersive Lottie animations and horizontal scrolling, the experience blended cinematic storytelling with playful interactivity to deliver a dark, memorable Halloween experience.",
       tools: ["SPA", "Browserstack", "Lottie", "Sanity CMS", "GSAP"],
       thumbnail: '/clips/patreon.mp4',
-      themeColor: '#e45253'
+      themeColor: '#e45253',
+      logo: '/logos/patreon-logo.svg'
     },
     {
       _key: 'twix',
@@ -89,7 +81,18 @@ export default async function Home() {
       role: 'Creative Developer',
       tools: ["Wordpress", "Browserstack", "GSAP", 'Lenis', 'Barba.js'],
       thumbnail: '/clips/twix.mp4',
-      themeColor: '#f59e0b'
+      themeColor: '#f59e0b',
+      logo: '/logos/nfttwix-logo.png'
+    },
+    {
+      _key: 'outleadership',
+      company: 'Out Leadership',
+      role: 'Creative Developer',
+      description: "Out Leadership is a global platform for LGBTQ+ business leaders. I led the technical development of their digital presence, focusing on the animation strategy and front-end implementation to create a high-performance, cinematic experience that celebrates the community and their mission.",
+      tools: ["Wordpress", "Browserstack", "Lottie", "GSAP - Scroll Trigger"],
+      thumbnail: '/clips/outleadership.mp4?v=1',
+      themeColor: '#35687e',
+      logo: '/logos/outleadship-logo.png'
     },
     {
       _key: 'kovitz',
@@ -98,7 +101,8 @@ export default async function Home() {
       description: "Working at Kovitz, I focused on building and optimizing financial tools and wealth management platforms. My role involved developing complex frontend interfaces using Angular and integrating with a Java/Spring Boot backend to deliver secure, data-rich applications for high-net-worth clients.",
       tools: ["Wordpress", "Browserstack", "GSAP", 'locomotive'],
       thumbnail: '/clips/kovitz.mp4',
-      themeColor: '#76817a'
+      themeColor: '#76817a',
+      logo: '/logos/kovitz-logo.svg'
     },
     {
       _key: 'longview',
@@ -107,7 +111,8 @@ export default async function Home() {
       description: "I handled the development and animation implementation for the Longview Innovation website, using interactive motion and thoughtful transitions to support a modern, engaging digital experience.",
       tools: ["SPA", "Wordpress", "Browserstack", "GSAP", 'locomotive', 'Highway.js'],
       thumbnail: '/clips/longview.mp4',
-      themeColor: '#1d63c2'
+      themeColor: '#b04a25',
+      logo: '/logos/longview-innovation-logo.svg'
     },
     ...(data.experience?.filter((item: any) =>
       item.company !== 'Apple' &&
@@ -124,6 +129,22 @@ export default async function Home() {
     })) || [])
   ];
 
+  const customAbout = [
+    {
+      _key: "about-block",
+      _type: "block",
+      children: [
+        {
+          _key: "about-span",
+          _type: "span",
+          text: "For the past 15 years, I've had the pleasure of working with exceptional creatives, crafting beautiful, high-performing digital products for major brands—and in recent years, integrating AI automation to create even more seamless and intelligent experiences."
+        }
+      ],
+      markDefs: [],
+      style: "normal"
+    }
+  ];
+
   return (
     <main className="flex flex-col selection:bg-blue-500/30">
 
@@ -138,7 +159,7 @@ export default async function Home() {
           subHeadline={data.subHeadline}
         />
 
-        {data.about && <About description={data.about} />}
+        <About description={customAbout} />
         {experienceWithTools && <Experience items={experienceWithTools} />}
         <Setup />
       </div>
@@ -147,7 +168,7 @@ export default async function Home() {
 
       <Footer
         email={data.footer?.email}
-        location={data.footer?.location}
+        location="Chicago, IL"
         socialHandle={data.footer?.socialHandle}
       />
 

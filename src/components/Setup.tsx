@@ -139,7 +139,7 @@ function SetupRow({ item }: { item: SetupItem }) {
                     {/* Right: Description & Tools */}
                     <div className="flex flex-col justify-center md:col-span-3 gap-6">
                         {item.description.split('\n\n').map((paragraph, i) => (
-                            <p key={i} className="text-zinc-400 text-lg md:text-xl font-medium leading-relaxed">
+                            <p key={i} className="text-zinc-400 text-[13px] font-medium leading-relaxed">
                                 {paragraph.split(/([.,])/).map((part, index) => {
                                     if (part === '.' || part === ',') {
                                         const colorIndex = Math.floor(index / 2);

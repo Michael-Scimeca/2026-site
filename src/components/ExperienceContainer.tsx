@@ -5,9 +5,9 @@ interface ContainerProps {
     className?: string;
 }
 
-export function Container({ children, className = '' }: ContainerProps) {
+export function ExperienceContainer({ children, className = '' }: ContainerProps) {
     return (
-        <div className={`px-4 md:px-6 desktop:px-8 ${className}`}>
+        <div className={`w-full ${className}`}>
             {children}
         </div>
     );

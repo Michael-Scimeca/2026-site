@@ -67,21 +67,54 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
 
 
 
+
+    const renderTextWithThemedPunctuation = (text: string) => {
+        return text.split(/([.,])/).map((part, index) => {
+            if (part === '.' || part === ',') {
+                return (
+                    <span key={index} className="text-[#0158ff]">{part}</span>
+                );
+            }
+            return <React.Fragment key={index}>{part}</React.Fragment>;
+        });
+    };
+
     return (
         <footer ref={footerRef} className="fixed bottom-0 left-0 w-full bg-black text-white h-screen flex flex-col z-10">
             <Container className="flex-1 flex flex-col justify-between pt-6 md:pt-12 relative z-10">
-                {/* Absolute Video - Now inside Container for alignment */}
+                {/* User Provided SVG Mask */}
+                <svg width="0" height="0" className="absolute">
+                    <defs>
+                        <mask id="footer-custom-mask" maskContentUnits="objectBoundingBox">
+                            <g transform="scale(0.00212314, 0.00224972)">
+                                <path d="M337,0c8.49,1.93,16.43,5.25,22.67,11.84,6.11,6.45,10.25,14.58,10.31,23.64l.14,23.05c.12,20.16,18.44,36.3,38.37,36.4l24.02.13c8.86.05,17.05,3.11,23.99,8.37,8.16,6.18,12.69,14.91,14.51,24.58v282.5c-1.49,8.97-5.09,17.02-12.17,23.4-6.08,5.48-14.2,9.11-22.27,10.06-.29.03-1.09.5-1.05.54H134c-8.49-1.93-16.43-5.25-22.67-11.84s-10.25-14.58-10.31-23.64l-.14-23.05c-.12-20.15-18.43-36.3-38.37-36.4l-24.02-.13c-8.86-.05-17.05-3.11-23.99-8.37-8.16-6.18-12.69-14.91-14.51-24.58V34c0-8.13,5.63-16.39,10.8-21.98C17.66,4.6,26.34,2.09,35.5,0h301.5Z" fill="white" />
+                            </g>
+                        </mask>
+                    </defs>
+                </svg>
+
+                {/* Absolute Video - Now masked with Custom SVG */}
                 <div
-                    className="absolute bottom-12 right-0 w-full lg:w-[40%] h-[40vh] lg:h-[60vh] z-0 opacity-80 lg:opacity-100 rounded-[10px] overflow-hidden pointer-events-none hidden lg:block"
+                    className="absolute bottom-12 right-0 w-full lg:w-[40%] h-[40vh] lg:h-[79vh] z-0 opacity-80 lg:opacity-100 overflow-hidden pointer-events-none hidden lg:block"
+                    style={{
+                        maskImage: 'url(#footer-custom-mask)',
+                        WebkitMaskImage: 'url(#footer-custom-mask)',
+                        maskSize: 'cover',
+                        WebkitMaskSize: 'cover',
+                        maskPosition: 'center',
+                        WebkitMaskPosition: 'center',
+                        maskRepeat: 'no-repeat',
+                        WebkitMaskRepeat: 'no-repeat'
+                    }}
                 >
-                    <div className="grain-overlay rounded-[10px]" />
+                    <div className="grain-overlay" />
                     {isInView && (
                         <video
                             ref={videoRef}
                             src="/video/footer-video.mp4"
                             muted
                             playsInline
-                            className="w-full h-full object-cover rounded-[10px]"
+                            className="w-full h-full object-cover"
                         />
                     )}
                 </div>
@@ -102,16 +135,14 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                         <div className="flex flex-col gap-12">
                             <div className="flex flex-col gap-8">
                                 <p className="text-zinc-500 text-lg md:text-xl leading-relaxed">
-                                    Ready to build something exceptional?
-                                    Whether it's an intelligent application, an AI-powered platform, a custom web solution, or an innovative concept that needs technical execution, let's talk. We'll architect it, engineer it, and deploy it together.
-
+                                    {renderTextWithThemedPunctuation("Ready to build something exceptional? Whether it's an intelligent application, an AI-powered platform, a custom web solution, or an innovative concept that needs technical execution, let's talk. We'll architect it, engineer it, and deploy it together.")}
                                 </p>
                                 <p className="text-zinc-500 text-lg md:text-xl">
-                                    Let's strategize. Let's innovate. Let's scale.
+                                    {renderTextWithThemedPunctuation("Let's strategize. Let's innovate. Let's scale.")}
                                 </p>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-10">
+                            <div className="grid grid-cols-1 min-[1160px]:grid-cols-2 gap-x-12 gap-y-10">
                                 <div className="flex flex-col gap-2" ref={emailRef}>
                                     <span className="font-bold text-white text-sm uppercase tracking-wider">Let's Work Together</span>
                                     <a href={`mailto:${defaultEmail}`} className="text-zinc-500 hover:text-white transition-colors text-lg w-fit">

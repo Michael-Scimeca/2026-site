@@ -25,7 +25,7 @@ const MOCK_DATA = {
             children: [
                 {
                     _type: "span",
-                    text: "I am a multidisciplinary developer based in San Francisco, specializing in Next.js, React, and creative coding. With a background in design, I bridge the gap between aesthetics and engineering to build products that feel as good as they look."
+                    text: "For the past 15 years, I&apos;ve had the pleasure of working with exceptional creatives, crafting beautiful, high-performing digital products for major brands—and in recent years, integrating AI automation to create even more seamless and intelligent experiences."
                 }
             ]
         },
@@ -145,8 +145,7 @@ const MOCK_DATA = {
     ],
     footer: {
         email: "mikeyscimeca.dev@gmail.com",
-        location: "San Francisco, CA",
-        socialHandle: "@mikeyscimeca"
+        location: "Chicago, IL",
     }
 };
 

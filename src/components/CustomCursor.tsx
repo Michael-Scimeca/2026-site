@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { gsap } from "gsap";
 
 export default function CustomCursor() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const mouse = useRef({ x: 0, y: 0 });
-    const pos = useRef({ x: 0, y: 0, size: 4 });
+    const isPointer = useRef(false);
+
+    // Current interpolated state
+    const pos = useRef({ x: 0, y: 0, size: 8 });
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -23,18 +25,13 @@ export default function CustomCursor() {
             mouse.current.x = e.clientX;
             mouse.current.y = e.clientY;
 
-            // Check if hovering over clickable element
             const target = e.target as HTMLElement;
             const isTicTacToe = target.closest('.tic-tac-toe-board');
-            const isPointer = !isTicTacToe && (window.getComputedStyle(target).cursor === 'pointer' ||
+            isPointer.current = !isTicTacToe && (
+                window.getComputedStyle(target).cursor === 'pointer' ||
                 target.tagName === 'BUTTON' ||
-                target.tagName === 'A');
-
-            gsap.to(pos.current, {
-                size: isPointer ? 22 : 4,
-                duration: 0.3,
-                overwrite: true
-            });
+                target.tagName === 'A'
+            );
         };
 
         window.addEventListener("resize", setupCanvas);
@@ -42,26 +39,31 @@ export default function CustomCursor() {
         setupCanvas();
 
         let animationFrameId: number;
-        pos.current = { x: 0, y: 0, size: 4 };
 
         const render = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Smoothly follow mouse
-            const lerp = 0.2;
-            pos.current.x += (mouse.current.x - pos.current.x) * lerp;
-            pos.current.y += (mouse.current.y - pos.current.y) * lerp;
+            // Determine Target State
+            const targetX = mouse.current.x;
+            const targetY = mouse.current.y;
+            const targetSize = isPointer.current ? 44 : 8; // Radius 22 -> Dia 44, Radius 4 -> Dia 8
 
-            // Draw dot
+            // Lerp Physics
+            const lerp = 0.15;
+            pos.current.x += (targetX - pos.current.x) * lerp;
+            pos.current.y += (targetY - pos.current.y) * lerp;
+            pos.current.size += (targetSize - pos.current.size) * lerp;
+
+            // Draw
             ctx.beginPath();
-            ctx.arc(pos.current.x, pos.current.y, pos.current.size, 0, Math.PI * 2);
+            ctx.arc(pos.current.x, pos.current.y, pos.current.size / 2, 0, Math.PI * 2);
             ctx.fillStyle = "#0158ff";
             ctx.fill();
 
-            // Add a subtle border when expanded
-            if (pos.current.size > 5) {
+            // Border logic when expanded
+            if (pos.current.size > 10) {
                 ctx.strokeStyle = "rgba(1, 88, 255, 0.5)";
-                ctx.lineWidth = 2;
+                ctx.lineWidth = 1;
                 ctx.stroke();
             }
 
