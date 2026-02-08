@@ -624,3 +624,17 @@ body::-webkit-scrollbar {
     left: -50%;
     opacity: 1;
 }
+
+/* Ticker Scroll Animation */
+@keyframes ticker-scroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.animate-ticker {
+    animation: ticker-scroll 60s linear infinite;
+}

@@ -3,10 +3,7 @@
 import React, { useRef } from 'react';
 import Image from 'next/image';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-
-gsap.registerPlugin(ScrollTrigger);
 
 interface TickerItemProps {
     src: string;
@@ -82,57 +79,32 @@ const TOOLS = [
     },
 ];
 
-const TOOLS_SET = [...TOOLS, ...TOOLS]; // 2 sets, rendered twice = 4 sets total. Enough coverage.
+const TOOLS_SET = [...TOOLS, ...TOOLS]; // 2 sets (32 items total)
 
 export function LogoTicker() {
     const containerRef = useRef<HTMLElement>(null);
-    const innerRef = useRef<HTMLDivElement>(null);
 
     useGSAP(() => {
-        if (!innerRef.current) return;
-
-        // Create the infinite scroll animation
-        // Move container to -50% (since we render 2 sets of TOOLS_SET)
-        const tl = gsap.to(innerRef.current, {
-            xPercent: -50,
+        // Target both tracks and move them left by 100% of their width
+        // logic: Track 1 moves 0 -> -100%. Track 2 moves 100% (start pos) -> 0%.
+        // Reset seamlessly.
+        gsap.to(".ticker-track", {
+            xPercent: -100,
             ease: "none",
-            duration: 60, // Adjust base speed: higher = slower
-            repeat: -1
-        });
-
-        ScrollTrigger.create({
-            trigger: document.body,
-            start: "top top",
-            end: "bottom bottom",
-            onUpdate: (self) => {
-                const vel = Math.abs(self.getVelocity());
-                const boost = vel / 50; // Sensitivity factor
-
-                // Smoothly adjust timeScale
-                gsap.to(tl, {
-                    timeScale: 1 + boost,
-                    duration: 0.5,
-                    overwrite: "auto",
-                    onComplete: () => {
-                        // Return to normal speed
-                        gsap.to(tl, { timeScale: 1, duration: 1.0, ease: "power1.out" });
-                    }
-                });
-            }
+            duration: 60, // Slower duration for smoother look
+            repeat: -1,
+            force3D: true, // Hardware acceleration
         });
     }, { scope: containerRef });
 
     return (
         <section ref={containerRef} className="w-full bg-black py-12 md:py-20 overflow-hidden border-b border-white/5">
-            <div className="flex w-full overflow-hidden">
-                <div ref={innerRef} className="flex w-max whitespace-nowrap" style={{ willChange: "transform" }}>
-                    {/* Render TOOLS_SET twice for seamless looping.
-                        Set 1 corresponds to 0% -> -50%
-                        Set 2 takes over at -50% (which looks like 0%)
-                    */}
+            <div className="flex w-full overflow-hidden whitespace-nowrap">
+                {/* Track 1 */}
+                <div className="ticker-track flex-none flex w-max items-center" style={{ willChange: "transform" }}>
                     {TOOLS_SET.map((tool, index) => (
                         <TickerItem
-                            key={`set1-${tool.name}-${index}`}
+                            key={`t1-${tool.name}-${index}`}
                             src={tool.src}
                             alt={tool.name}
                             color={tool.color}
@@ -141,9 +113,12 @@ export function LogoTicker() {
                             className={tool.className}
                         />
                     ))}
+                </div>
+                {/* Track 2 - Duplicate */}
+                <div className="ticker-track flex-none flex w-max items-center" style={{ willChange: "transform" }}>
                     {TOOLS_SET.map((tool, index) => (
                         <TickerItem
-                            key={`set2-${tool.name}-${index}`}
+                            key={`t2-${tool.name}-${index}`}
                             src={tool.src}
                             alt={tool.name}
                             color={tool.color}
