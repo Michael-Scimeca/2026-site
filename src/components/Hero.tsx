@@ -52,17 +52,6 @@ export function Hero(props: HeroProps) {
         if (!containerRef.current) return;
 
         // Background moves down relative to scroll (appears slower)
-        gsap.to(bgRef.current, {
-            y: "15%",
-            ease: "none",
-            scrollTrigger: {
-                trigger: containerRef.current,
-                start: "top top",
-                end: "bottom top",
-                scrub: true
-            }
-        });
-
         // Background opacity fade out (starts at top, ends halfway through)
         gsap.to(bgRef.current, {
             opacity: 0,
@@ -77,9 +66,20 @@ export function Hero(props: HeroProps) {
 
         const mm = gsap.matchMedia();
 
-        // Portrait moves down slightly (appears deeper than text but in front of BG)
-        // Restricted to desktop to avoid jumps on mobile due to address bar resizing
         mm.add("(min-width: 768px)", () => {
+            // Background parallax
+            gsap.to(bgRef.current, {
+                y: "15%",
+                ease: "none",
+                scrollTrigger: {
+                    trigger: containerRef.current,
+                    start: "top top",
+                    end: "bottom top",
+                    scrub: true
+                }
+            });
+
+            // Portrait moves down slightly (appears deeper than text but in front of BG)
             gsap.to(portraitRef.current, {
                 y: "16%",
                 ease: "none",
@@ -90,30 +90,30 @@ export function Hero(props: HeroProps) {
                     scrub: true
                 }
             });
-        });
 
-        // Content moves up (appears to recede)
-        gsap.to(contentRef.current, {
-            y: "-70%",
-            ease: "none",
-            scrollTrigger: {
-                trigger: containerRef.current,
-                start: "top top",
-                end: "bottom top",
-                scrub: 1.5
-            }
-        });
+            // Content moves up (appears to recede)
+            gsap.to(contentRef.current, {
+                y: "-70%",
+                ease: "none",
+                scrollTrigger: {
+                    trigger: containerRef.current,
+                    start: "top top",
+                    end: "bottom top",
+                    scrub: 1.5
+                }
+            });
 
-        // Marquee parallax - moves up slightly to feel "on top"
-        gsap.to(marqueeRef.current, {
-            y: "-25%",
-            ease: "none",
-            scrollTrigger: {
-                trigger: containerRef.current,
-                start: "top top",
-                end: "bottom top",
-                scrub: true
-            }
+            // Marquee parallax - moves up slightly to feel "on top"
+            gsap.to(marqueeRef.current, {
+                y: "-25%",
+                ease: "none",
+                scrollTrigger: {
+                    trigger: containerRef.current,
+                    start: "top top",
+                    end: "bottom top",
+                    scrub: true
+                }
+            });
         });
 
         // Marquee Infinite Scroll (X-axis) with Velocity
