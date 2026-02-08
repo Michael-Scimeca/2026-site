@@ -10,6 +10,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 import { PortableText } from "@portabletext/react";
+import { SweetPunkText } from "./SweetPunkText";
 
 interface ExperienceItem {
     _key: string;
@@ -116,6 +117,16 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
         }
     };
 
+    const activeThemeColor = React.useMemo(() => {
+        if (item.themeColor) return item.themeColor;
+        const c = item.company?.toLowerCase() || '';
+        if (c.includes('pride') || item._key === 'nycpride') return '#ef4444';
+        if (c.includes('patreon')) return '#FF424D';
+        if (c.includes('twix')) return '#E89F29';
+        if (c.includes('longview')) return '#22d3ee';
+        return '#0158ff';
+    }, [item.company, item.themeColor, item._key]);
+
     return (
         <div
             className={`group w-full transition-colors relative border-zinc-800 py-0 ${item.thumbnail ? 'desktop:py-0' : 'desktop:py-8'} ${isFirst ? 'border-t' : ''} ${!isLast ? 'border-b' : ''}`}
@@ -123,10 +134,11 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
             onMouseLeave={handleMouseLeave}
         >
             {/* Dynamic Background Hover Glow */}
+            {/* Dynamic Background Hover Glow */}
             <div
                 className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none"
                 style={{
-                    background: `radial-gradient(circle at center, ${item.themeColor || '#0158ff'} 0%, transparent 70%)`
+                    background: `radial-gradient(circle at center, ${activeThemeColor} 0%, transparent 70%)`
                 }}
             />
 
@@ -136,10 +148,10 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                 style={{
                     background: (item.company === 'NYC Pride' || item._key === 'nycpride')
                         ? 'linear-gradient(to bottom, #ef4444, #3b82f6, #a855f7)'
-                        : (item.themeColor || '#0158ff'),
+                        : activeThemeColor,
                     boxShadow: (item.company === 'NYC Pride' || item._key === 'nycpride')
                         ? `0 0 20px 2px #3b82f680`
-                        : `0 0 20px 2px ${item.themeColor || '#0158ff'}80`
+                        : `0 0 20px 2px ${activeThemeColor}80`
                 }}
             />
 
@@ -161,14 +173,26 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                                             />
                                         </div>
                                     ) : (
-                                        <span className="font-bold text-lg desktop:text-xl tracking-tight">
-                                            {item.company}
-                                        </span>
+                                        <SweetPunkText
+                                            text={item.company}
+                                            className="font-bold text-lg desktop:text-xl tracking-tight"
+                                            startColor="#52525b"
+                                            midColor={activeThemeColor}
+                                            colorDuration={2.0}
+                                            stagger={0.005} enableMotion={false}
+                                        />
                                     )}
                                     {item.role && item.role.length <= 50 && (
-                                        <span className="text-zinc-400 font-medium text-sm desktop:text-base whitespace-nowrap">
-                                            — {item.role}
-                                        </span>
+                                        <div className="text-zinc-400 font-medium text-sm desktop:text-base whitespace-nowrap">
+                                            <SweetPunkText
+                                                text={`— ${item.role}`}
+                                                startColor="#52525b"
+                                                midColor={activeThemeColor}
+                                                endColor="#52525b"
+                                                colorDuration={2.0}
+                                                stagger={0.005} enableMotion={false}
+                                            />
+                                        </div>
                                     )}
                                 </div>
 
@@ -177,53 +201,70 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                                         const ptComponents = {
                                             block: {
                                                 normal: ({ children }: any) => (
-                                                    <p className="text-zinc-400 text-sm leading-relaxed font-medium mb-3 last:mb-0">
-                                                        {children}
-                                                    </p>
+                                                    <div className="mb-3 last:mb-0 text-sm leading-relaxed font-medium">
+                                                        {React.Children.map(children, child => {
+                                                            if (typeof child === 'string') {
+                                                                return <SweetPunkText text={child} startColor="#52525b" midColor={activeThemeColor} endColor="#ffffff" colorDuration={2.0} stagger={0.005} enableMotion={false} />;
+                                                            }
+                                                            return child;
+                                                        })}
+                                                    </div>
                                                 ),
                                             },
-                                        };
-
-                                        const renderTextWithThemedPunctuation = (text: string) => {
-                                            const isNYCPride = item.company === 'NYC Pride' || item._key === 'nycpride';
-                                            return text.split(/([.,])/).map((part, index) => {
-                                                if (part === '.' || part === ',') {
-                                                    const colorIndex = Math.floor(index / 2);
+                                            marks: {
+                                                link: ({ children, value }: any) => {
                                                     return (
-                                                        <span key={index} style={{
-                                                            color: isNYCPride
-                                                                ? ['#ef4444', '#3b82f6', '#a855f7'][colorIndex % 3]
-                                                                : (item.themeColor || '#0158ff')
-                                                        }}>{part}</span>
+                                                        <a href={value.href} target="_blank" rel="noopener noreferrer" className="hover:underline underline-offset-2 decoration-white/40 transition-all hover:decoration-white/80">
+                                                            {React.Children.map(children, child => {
+                                                                if (typeof child === 'string') {
+                                                                    return <SweetPunkText text={child} startColor="#52525b" midColor={activeThemeColor} endColor="#ffffff" colorDuration={2.0} stagger={0.005} enableMotion={false} />;
+                                                                }
+                                                                return child;
+                                                            })}
+                                                        </a>
                                                     );
-                                                }
-                                                return <React.Fragment key={index}>{part}</React.Fragment>;
-                                            });
+                                                },
+                                                strong: ({ children }: any) => (
+                                                    <strong className="font-bold text-white">
+                                                        {React.Children.map(children, child => {
+                                                            if (typeof child === 'string') {
+                                                                return <SweetPunkText text={child} startColor="#52525b" midColor={activeThemeColor} endColor="#ffffff" colorDuration={2.0} stagger={0.005} enableMotion={false} />;
+                                                            }
+                                                            return child;
+                                                        })}
+                                                    </strong>
+                                                ),
+                                            }
                                         };
 
                                         if (Array.isArray(item.description) && item.description.length > 0) {
                                             if (typeof item.description[0] === 'string') {
                                                 return item.description.map((p, i) => (
-                                                    <p key={i} className={`text-zinc-400 text-sm leading-relaxed font-medium ${i !== 0 ? "mt-3" : ""}`}>
-                                                        {renderTextWithThemedPunctuation(p)}
-                                                    </p>
+                                                    <div key={i} className={`text-sm leading-relaxed font-medium ${i !== 0 ? "mt-3" : ""}`}>
+                                                        <SweetPunkText text={p} startColor="#52525b" midColor={activeThemeColor} endColor="#ffffff" colorDuration={2.0} stagger={0.005} enableMotion={false} />
+                                                    </div>
                                                 ));
                                             }
                                             return <PortableText value={item.description} components={ptComponents} />;
                                         }
 
                                         if (typeof item.description === 'string') {
-                                            return <p className="text-zinc-400 text-sm leading-relaxed font-medium">{renderTextWithThemedPunctuation(item.description)}</p>;
+                                            return <SweetPunkText text={item.description} startColor="#52525b" midColor={activeThemeColor} endColor="#ffffff" colorDuration={2.0} stagger={0.005} enableMotion={false} />;
                                         }
 
                                         if (item.role.length > 50) {
-                                            return <p className="text-zinc-400 text-sm leading-relaxed font-medium">{renderTextWithThemedPunctuation(item.role)}</p>;
+                                            return <SweetPunkText text={item.role} startColor="#52525b" midColor={activeThemeColor} endColor="#ffffff" colorDuration={2.0} stagger={0.005} enableMotion={false} />;
                                         }
 
                                         return (
-                                            <p className="text-zinc-400 text-xs desktop:text-sm leading-relaxed font-medium">
-                                                {renderTextWithThemedPunctuation("Leading the technical direction and architectural design for high-scale digital platforms, focusing on creating seamless user experiences through performant, polished code.")}
-                                            </p>
+                                            <SweetPunkText
+                                                text="Leading the technical direction and architectural design for high-scale digital platforms, focusing on creating seamless user experiences through performant, polished code."
+                                                startColor="#52525b"
+                                                midColor={activeThemeColor}
+                                                endColor="#ffffff"
+                                                colorDuration={2.0}
+                                                stagger={0.005} enableMotion={false}
+                                            />
                                         );
                                     })()}
                                 </div>
@@ -236,16 +277,20 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                                             {index !== 0 && (
                                                 <span
                                                     className="pr-[5px] text-[10px] font-bold"
-                                                    style={{ color: item.themeColor || '#0158ff' }}
+                                                    style={{ color: activeThemeColor }}
                                                 >
                                                     ⌁
                                                 </span>
                                             )}
-                                            <span
-                                                className="pl-0 pr-[5px] py-1 text-white/60 text-[10px] uppercase font-bold tracking-wider rounded-full whitespace-nowrap"
-                                            >
-                                                {tool}
-                                            </span>
+                                            <SweetPunkText
+                                                text={tool}
+                                                className="pl-0 pr-[5px] py-1 text-[10px] uppercase font-bold tracking-wider whitespace-nowrap"
+                                                startColor="#52525b"
+                                                midColor={activeThemeColor}
+                                                endColor="#52525b"
+                                                colorDuration={2.0}
+                                                stagger={0.005} enableMotion={false}
+                                            />
                                         </React.Fragment>
                                     ))}
                                 </div>
@@ -334,7 +379,7 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                                             stroke="currentColor"
                                             strokeWidth="2"
                                             className="transition-all duration-75 ease-linear"
-                                            style={{ color: item.themeColor || '#0158ff' }}
+                                            style={{ color: activeThemeColor }}
                                             strokeDasharray="50.27"
                                             strokeDashoffset="50.27"
                                         />

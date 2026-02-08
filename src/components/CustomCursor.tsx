@@ -8,7 +8,7 @@ export default function CustomCursor() {
     const isPointer = useRef(false);
 
     // Current interpolated state
-    const pos = useRef({ x: 0, y: 0, size: 8 });
+    const pos = useRef({ x: 0, y: 0, size: 10 });
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -46,7 +46,7 @@ export default function CustomCursor() {
             // Determine Target State
             const targetX = mouse.current.x;
             const targetY = mouse.current.y;
-            const targetSize = isPointer.current ? 44 : 8; // Radius 22 -> Dia 44, Radius 4 -> Dia 8
+            const targetSize = isPointer.current ? 44 : 10; // Radius 22 -> Dia 44, Radius 5 -> Dia 10
 
             // Lerp Physics
             const lerp = 0.15;

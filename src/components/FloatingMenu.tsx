@@ -38,7 +38,7 @@ export function FloatingMenu() {
 
     return (
         <div
-            className={`group fixed right-4 md:right-6 desktop:right-8 top-4 md:top-6 desktop:top-8 z-50 flex flex-col items-center rounded-3xl border border-white/10 backdrop-blur-md transition-all duration-500 ${isVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+            className={`group floating-menu-glow fixed right-4 md:right-6 desktop:right-8 top-4 md:top-6 desktop:top-8 z-50 flex flex-col items-center rounded-3xl backdrop-blur-md transition-all duration-500 ${isVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
             onMouseLeave={() => setIsExpanded(false)}
         >
             {/* Scroll to Top */}

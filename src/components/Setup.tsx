@@ -3,6 +3,7 @@
 import React from "react";
 import { Container } from "@/components/Container";
 import Image from "next/image";
+import { SweetPunkText } from "@/components/SweetPunkText";
 
 interface SetupItem {
     id: string;
@@ -139,21 +140,17 @@ function SetupRow({ item }: { item: SetupItem }) {
                     {/* Right: Description & Tools */}
                     <div className="flex flex-col justify-center md:col-span-3 gap-6">
                         {item.description.split('\n\n').map((paragraph, i) => (
-                            <p key={i} className="text-zinc-400 text-[13px] font-medium leading-relaxed">
-                                {paragraph.split(/([.,])/).map((part, index) => {
-                                    if (part === '.' || part === ',') {
-                                        const colorIndex = Math.floor(index / 2);
-                                        return (
-                                            <span key={index} style={{
-                                                color: item.id === 'nycpride'
-                                                    ? ['#ef4444', '#3b82f6', '#a855f7'][colorIndex % 3]
-                                                    : (item.themeColor || '#0158ff')
-                                            }}>{part}</span>
-                                        );
-                                    }
-                                    return <React.Fragment key={index}>{part}</React.Fragment>;
-                                })}
-                            </p>
+                            <div key={i} className="text-sm leading-relaxed font-medium">
+                                <SweetPunkText
+                                    text={paragraph}
+                                    startColor="#52525b"
+                                    midColor={item.id === 'nycpride' ? '#ef4444' : (item.themeColor || '#0158ff')}
+                                    endColor="#ffffff"
+                                    colorDuration={2.0}
+                                    stagger={0.005}
+                                    enableMotion={false}
+                                />
+                            </div>
                         ))}
 
                         {item.tools && item.tools.length > 0 && (
@@ -172,9 +169,16 @@ function SetupRow({ item }: { item: SetupItem }) {
                                                 ⌁
                                             </span>
                                         )}
-                                        <span className="text-zinc-500 text-[10px] font-bold tracking-widest uppercase">
-                                            {tool}
-                                        </span>
+                                        <SweetPunkText
+                                            text={tool}
+                                            className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap"
+                                            startColor="#52525b"
+                                            midColor={item.id === 'nycpride' ? '#ef4444' : (item.themeColor || '#0158ff')}
+                                            endColor="#52525b"
+                                            colorDuration={2.0}
+                                            stagger={0.005}
+                                            enableMotion={false}
+                                        />
                                     </div>
                                 ))}
                             </div>

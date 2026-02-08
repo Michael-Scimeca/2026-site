@@ -1,5 +1,6 @@
 import { Hero } from "@/components/Hero";
 import { About } from "@/components/About";
+import { LogoTicker } from "@/components/LogoTicker";
 import { Experience } from "@/components/Experience";
 import { Setup } from "@/components/Setup";
 import { Footer } from "@/components/Footer";
@@ -114,6 +115,16 @@ export default async function Home() {
       themeColor: '#b04a25',
       logo: '/logos/longview-innovation-logo.svg'
     },
+    {
+      _key: 'ripco',
+      company: 'RIPCO Real Estate',
+      role: 'Creative Developer',
+      description: "We connected RIPCO’s internal real estate listings and property data into the website so the content is dynamic, structured, and always up to date. Instead of manually managing listings, the site pulls from a centralized data source that reflects real inventory in real time.",
+      tools: ["Wordpress", "Browserstack", "GSAP", "Google Maps API", "Ripco Database"],
+      thumbnail: '/clips/ripco.mp4?v=1',
+      themeColor: '#e13c46',
+      logo: '/logos/ripco-logo.svg'
+    },
     ...(data.experience?.filter((item: any) =>
       item.company !== 'Apple' &&
       item.company !== 'Meta Reality Labs' &&
@@ -160,6 +171,7 @@ export default async function Home() {
         />
 
         <About description={customAbout} />
+        <LogoTicker />
         {experienceWithTools && <Experience items={experienceWithTools} />}
         <Setup />
       </div>

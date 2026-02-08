@@ -39,7 +39,17 @@ export function useWeather() {
                 const response = await fetch(
                     "https://api.open-meteo.com/v1/forecast?latitude=41.8781&longitude=-87.6298&current_weather=true&temperature_unit=fahrenheit"
                 );
+
+                if (!response.ok) {
+                    throw new Error(`Weather API error: ${response.status}`);
+                }
+
                 const data = await response.json();
+
+                if (!data.current_weather) {
+                    throw new Error("Invalid weather data format");
+                }
+
                 const temp = data.current_weather.temperature;
                 const newWeather = {
                     temp: Math.round(temp),
@@ -50,7 +60,8 @@ export function useWeather() {
                 lastFetchTime = now;
                 setWeather(newWeather);
             } catch (error) {
-                console.error("Failed to fetch weather:", error);
+                // Silently fail or warn to avoid disrupting the user experience
+                console.warn("Weather fetch failed, using fallback/cache if available.", error);
             }
         };
 

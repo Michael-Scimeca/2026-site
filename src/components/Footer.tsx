@@ -2,8 +2,10 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { Container } from './Container';
+import { SweetPunkText } from './SweetPunkText';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { GradientBackground } from './GradientBackground';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -37,6 +39,10 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (!emailRef.current || !videoRef.current) return;
+            const video = videoRef.current;
+
+            // Ensure video metadata is loaded
+            if (!isFinite(video.duration)) return;
 
             const rect = emailRef.current.getBoundingClientRect();
             const emailX = rect.left + rect.width / 2;
@@ -46,27 +52,57 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                 Math.pow(e.clientX - emailX, 2) + Math.pow(e.clientY - emailY, 2)
             );
 
-            const radius = 250;
+            const isSmallScreen = window.innerWidth < 1024;
+            const radius = isSmallScreen ? 350 : 600; // Smaller radius for tablet/mobile layouts
+            let targetTime = 0;
+
             if (distance < radius) {
-                const duration = videoRef.current.duration;
-                if (!duration) return;
-
-                // progress is 0 at radius, 1 at center
+                // progressive ease
                 const progress = 1 - (distance / radius);
-
-                // Scrub the video based on distance
-                videoRef.current.currentTime = progress * duration;
-            } else if (videoRef.current.currentTime !== 0) {
-                videoRef.current.currentTime = 0;
+                const easedProgress = Math.pow(progress, 1.5); // Slight ease-in
+                targetTime = easedProgress * video.duration;
             }
+
+            // Smoothly animate the video playhead
+            gsap.to(video, {
+                currentTime: targetTime,
+                duration: 0.6,
+                ease: "power2.out",
+                overwrite: true
+            });
         };
 
         window.addEventListener('mousemove', handleMouseMove);
         return () => window.removeEventListener('mousemove', handleMouseMove);
-    }, []);
+    }, [isInView]);
 
+    useEffect(() => {
+        if (!videoRef.current) return;
 
+        // Set initial scale to allow for parallax movement without showing edges
+        // Set initial scale to allow for parallax movement without showing edges
+        gsap.set(videoRef.current, { scale: 1.15 });
 
+        const tl = gsap.timeline({
+            scrollTrigger: {
+                trigger: document.body,
+                // Start animating when the bottom of the body is 1 viewport height away from the bottom of the viewport
+                // (assuming a standard footer reveal or end-of-page effect)
+                start: "bottom bottom+=100%",
+                end: "bottom bottom",
+                scrub: true,
+            }
+        });
+
+        tl.fromTo(videoRef.current,
+            { yPercent: -2 },
+            { yPercent: 2, ease: "none" }
+        );
+
+        return () => {
+            tl.kill();
+        };
+    }, [isInView]);
 
     const renderTextWithThemedPunctuation = (text: string) => {
         return text.split(/([.,])/).map((part, index) => {
@@ -80,8 +116,10 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
     };
 
     return (
-        <footer ref={footerRef} className="fixed bottom-0 left-0 w-full bg-black text-white h-screen flex flex-col z-10">
-            <Container className="flex-1 flex flex-col justify-between pt-6 md:pt-12 relative z-10">
+        <footer ref={footerRef} className="fixed bottom-0 left-0 w-full text-white h-screen flex flex-col z-10 overflow-hidden">
+            <GradientBackground />
+
+            <Container className="flex-1 flex flex-col justify-between py-4 md:py-12 relative z-10">
                 {/* User Provided SVG Mask */}
                 <svg width="0" height="0" className="absolute">
                     <defs>
@@ -95,7 +133,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
 
                 {/* Absolute Video - Now masked with Custom SVG */}
                 <div
-                    className="absolute bottom-12 right-0 w-full lg:w-[40%] h-[40vh] lg:h-[79vh] z-0 opacity-80 lg:opacity-100 overflow-hidden pointer-events-none hidden lg:block"
+                    className="absolute -bottom-[5%] -right-[10%] lg:bottom-12 lg:right-0 w-[50vh] h-[45vh] lg:w-[40%] lg:h-[79vh] z-0 opacity-60 md:opacity-80 lg:opacity-100 overflow-hidden pointer-events-none hidden min-[700px]:block bg-transparent"
                     style={{
                         maskImage: 'url(#footer-custom-mask)',
                         WebkitMaskImage: 'url(#footer-custom-mask)',
@@ -107,7 +145,6 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                         WebkitMaskRepeat: 'no-repeat'
                     }}
                 >
-                    <div className="grain-overlay" />
                     {isInView && (
                         <video
                             ref={videoRef}
@@ -121,10 +158,18 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
 
                 <div className="relative z-10 w-full">
                     {/* Top Header Row */}
-                    <div className="flex flex-col md:flex-row justify-between items-start mb-16 gap-8">
-                        <div className="flex flex-col gap-8">
-                            <h2 className="text-7xl md:text-[120px] font-bold tracking-tighter leading-none">
-                                Say hi<span className="text-[#0158ff]">,</span>
+                    <div className="flex flex-col md:flex-row justify-between items-start mb-4 md:mb-16 gap-4 md:gap-8">
+                        <div className="flex flex-col gap-4 md:gap-8">
+                            <h2 className="text-5xl md:text-[120px] font-bold tracking-tighter leading-none">
+                                <SweetPunkText
+                                    text="Say Hi"
+                                    startColor="#ffffff"
+                                    animate={false}
+                                /><SweetPunkText
+                                    text=","
+                                    startColor="#0158ff"
+                                    animate={false}
+                                />
                             </h2>
                         </div>
                     </div>
@@ -132,14 +177,14 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                     {/* Main Content Row */}
                     <div className="w-full lg:w-1/2">
                         {/* Left Side: Text and Links (Now takes full width of its half) */}
-                        <div className="flex flex-col gap-12">
-                            <div className="flex flex-col gap-8">
-                                <p className="text-zinc-500 text-lg md:text-xl leading-relaxed">
-                                    {renderTextWithThemedPunctuation("Ready to build something exceptional? Whether it's an intelligent application, an AI-powered platform, a custom web solution, or an innovative concept that needs technical execution, let's talk. We'll architect it, engineer it, and deploy it together.")}
-                                </p>
-                                <p className="text-zinc-500 text-lg md:text-xl">
-                                    {renderTextWithThemedPunctuation("Let's strategize. Let's innovate. Let's scale.")}
-                                </p>
+                        <div className="flex flex-col gap-6 md:gap-12">
+                            <div className="flex flex-col gap-4 md:gap-8">
+                                <div className="text-lg md:text-xl leading-relaxed text-gradient-flow">
+                                    Ready to build something exceptional? Whether it's an intelligent application, an AI-powered platform, a custom web solution, or an innovative concept that needs technical execution, let's talk. We'll architect it, engineer it, and deploy it together.
+                                </div>
+                                <div className="text-lg md:text-xl text-gradient-flow">
+                                    Let's strategize. Let's innovate. Let's scale.
+                                </div>
                             </div>
 
                             <div className="grid grid-cols-1 min-[1160px]:grid-cols-2 gap-x-12 gap-y-10">
@@ -182,7 +227,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
             {/* Bottom Bar - Own Block Level */}
             <div className="border-t border-zinc-900/50 py-6">
                 <Container>
-                    <div className="flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-zinc-600">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 text-sm text-zinc-600">
                         <div className="flex items-center gap-2">
                             <span>© {new Date().getFullYear()} Michael Scimeca</span>
                         </div>
