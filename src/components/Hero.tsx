@@ -75,16 +75,21 @@ export function Hero(props: HeroProps) {
             }
         });
 
+        const mm = gsap.matchMedia();
+
         // Portrait moves down slightly (appears deeper than text but in front of BG)
-        gsap.to(portraitRef.current, {
-            y: "16%",
-            ease: "none",
-            scrollTrigger: {
-                trigger: containerRef.current,
-                start: "top top",
-                end: "bottom top",
-                scrub: true
-            }
+        // Restricted to desktop to avoid jumps on mobile due to address bar resizing
+        mm.add("(min-width: 768px)", () => {
+            gsap.to(portraitRef.current, {
+                y: "16%",
+                ease: "none",
+                scrollTrigger: {
+                    trigger: containerRef.current,
+                    start: "top top",
+                    end: "bottom top",
+                    scrub: true
+                }
+            });
         });
 
         // Content moves up (appears to recede)
