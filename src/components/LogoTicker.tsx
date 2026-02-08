@@ -19,30 +19,7 @@ interface TickerItemProps {
 
 function TickerItem({ src, alt, color, customFilter, index, className }: TickerItemProps) {
     const [isHovered, setIsHovered] = React.useState(false);
-    const [isActive, setIsActive] = React.useState(false);
-
-    React.useEffect(() => {
-        // Wave Animation Parameters
-        const staggerDelay = 150; // ms between items
-        const waveDuration = 1500; // ms each item stays active
-
-        // Cycle must be a multiple of (totalItems * staggerDelay) for seamless looping across duplicates
-        // 15 items * 150ms = 2250ms per set.
-        // Using 2250ms ensures each set starts at the same phase.
-        const cycleDuration = 2250;
-
-        const intervalId = setInterval(() => {
-            const now = Date.now();
-            // Calculate if this item is currently in the "active" window of the wave
-            const timeInCycle = (now - (index * staggerDelay)) % cycleDuration;
-            const active = timeInCycle >= 0 && timeInCycle < waveDuration;
-            setIsActive(active);
-        }, 100);
-
-        return () => clearInterval(intervalId);
-    }, [index]);
-
-    const showColor = isHovered || isActive;
+    const showColor = isHovered;
 
     return (
         <div
@@ -88,6 +65,7 @@ const TOOLS = [
     { name: "Next.js", src: "/tools/Nextjs-logo.svg", color: "#000000", customFilter: 'brightness(0) invert(1)', className: "scale-75" },
     { name: "Docker", src: "/tools/docker.svg", color: "#2496ED" },
     { name: "Figma", src: "/tools/figma.svg", color: "#F24E1E" },
+    { name: "Flywheel", src: "/logos/getflywheel-ar21.svg", color: "#48C6DD" },
     { name: "GitHub", src: "/tools/github.svg", color: "#181717", customFilter: 'brightness(0) invert(1)' },
     { name: "n8n", src: "/tools/n8n-color.svg", color: "#FF6584" },
     { name: "Netlify", src: "/tools/Netlify.svg", color: "#00C7B7" },
@@ -104,7 +82,7 @@ const TOOLS = [
     },
 ];
 
-const TOOLS_SET = [...TOOLS, ...TOOLS, ...TOOLS, ...TOOLS, ...TOOLS, ...TOOLS]; // 6 sets to ensure no gaps on wide screens
+const TOOLS_SET = [...TOOLS, ...TOOLS]; // 2 sets, rendered twice = 4 sets total. Enough coverage.
 
 export function LogoTicker() {
     const containerRef = useRef<HTMLElement>(null);
