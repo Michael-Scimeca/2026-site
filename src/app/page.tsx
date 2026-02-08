@@ -160,7 +160,7 @@ export default async function Home() {
     <main className="flex flex-col selection:bg-blue-500/30">
 
       <div
-        className="relative z-20 bg-black mb-[100vh]"
+        className="relative z-20 bg-black"
         style={{ boxShadow: '-9px -2px 52px 19px rgb(0 0 0 / 80%)' }}
       >
         <Hero

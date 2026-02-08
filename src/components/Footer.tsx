@@ -4,10 +4,9 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Container } from './Container';
 import { SweetPunkText } from './SweetPunkText';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
 import { GradientBackground } from './GradientBackground';
 
-gsap.registerPlugin(ScrollTrigger);
 
 interface FooterProps {
     email?: string;
@@ -79,30 +78,10 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
     useEffect(() => {
         if (!videoRef.current) return;
 
-        // Set initial scale to allow for parallax movement without showing edges
-        // Set initial scale to allow for parallax movement without showing edges
+        // Initial setup for video
         gsap.set(videoRef.current, { scale: 1.15 });
 
-        const tl = gsap.timeline({
-            scrollTrigger: {
-                trigger: document.body,
-                // Start animating when the bottom of the body is 1 viewport height away from the bottom of the viewport
-                // (assuming a standard footer reveal or end-of-page effect)
-                start: "bottom bottom+=100%",
-                end: "bottom bottom",
-                scrub: true,
-            }
-        });
-
-        tl.fromTo(videoRef.current,
-            { yPercent: -2 },
-            { yPercent: 2, ease: "none" }
-        );
-
-        return () => {
-            tl.kill();
-        };
-    }, [isInView]);
+    }, []);
 
     const renderTextWithThemedPunctuation = (text: string) => {
         return text.split(/([.,])/).map((part, index) => {
@@ -116,8 +95,10 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
     };
 
     return (
-        <footer ref={footerRef} className="fixed bottom-0 left-0 w-full text-white h-screen flex flex-col z-10 overflow-hidden">
-            <GradientBackground />
+        <footer ref={footerRef} className="relative w-full text-white bg-black flex flex-col overflow-hidden">
+            <div className="absolute inset-0 hidden lg:block z-0 pointer-events-none">
+                <GradientBackground />
+            </div>
 
             <Container className="flex-1 flex flex-col justify-between py-4 md:py-12 relative z-10">
                 {/* User Provided SVG Mask */}
