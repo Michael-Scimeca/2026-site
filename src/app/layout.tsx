@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     siteName: "Michael Scimeca Portfolio",
     images: [
       {
-        url: "/profile.jpg",
+        url: "/hero-portrait.png",
         width: 1200,
         height: 630,
         alt: "Michael Scimeca - Web Developer & AI Automation Specialist",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Michael Scimeca | Full-Stack Web Developer & AI Automation Specialist",
     description: "Full-stack web developer and AI automation specialist helping startups and brands create beautiful, high-performing digital products.",
-    images: ["/profile.jpg"],
+    images: ["/hero-portrait.png"],
     creator: "@mikeyscimeca",
   },
   robots: {
