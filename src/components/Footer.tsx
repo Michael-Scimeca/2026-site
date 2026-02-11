@@ -168,11 +168,17 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 min-[1160px]:grid-cols-2 gap-x-12 gap-y-10">
-                                <div className="flex flex-col gap-2" ref={emailRef}>
+                            <div className="grid grid-cols-1 min-[1160px]:grid-cols-2 gap-x-12 gap-y-10" ref={emailRef}>
+                                <div className="flex flex-col gap-2">
                                     <span className="font-bold text-white text-sm uppercase tracking-wider">Let's Work Together</span>
                                     <a href={`mailto:${defaultEmail}`} className="text-zinc-500 hover:text-white transition-colors text-lg w-fit">
                                         {defaultEmail}
+                                    </a>
+                                </div>
+                                <div className="flex flex-col gap-2">
+                                    <span className="font-bold text-white text-sm uppercase tracking-wider">Call Me</span>
+                                    <a href="tel:+18475089516" className="text-zinc-500 hover:text-white transition-colors text-lg w-fit">
+                                        +1 (847) 508-9516
                                     </a>
                                 </div>
 

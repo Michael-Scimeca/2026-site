@@ -630,6 +630,7 @@ body::-webkit-scrollbar {
     0% {
         transform: translateX(0);
     }
+
     100% {
         transform: translateX(-50%);
     }
@@ -637,4 +638,54 @@ body::-webkit-scrollbar {
 
 .animate-ticker {
     animation: ticker-scroll 60s linear infinite;
+}
+
+/* Pulsing Flow Animation for Borders */
+@keyframes pulse-flow {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.group:hover .animate-pulse-flow {
+    animation: pulse-flow 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* FAQ Wave Text Animation */
+@keyframes wave-reveal {
+    0% {
+        background-position: 0% 100%;
+    }
+
+    100% {
+        background-position: 0% 0%;
+    }
+}
+
+.faq-answer-wave {
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    background-image: linear-gradient(to bottom,
+            #a1a1aa 0%,
+            #a1a1aa 40%,
+            #3b82f6 50%,
+            transparent 60%,
+            transparent 100%);
+    background-size: 100% 250%;
+    background-position: 0% 100%;
+}
+
+.faq-answer-wave.is-open {
+    animation: wave-reveal 0.8s ease-out forwards;
 }

@@ -1,5 +1,6 @@
 import { Hero } from "@/components/Hero";
 import { About } from "@/components/About";
+import { Faq } from "@/components/Faq";
 import { LogoTicker } from "@/components/LogoTicker";
 import { Experience } from "@/components/Experience";
 import { Setup } from "@/components/Setup";
@@ -171,6 +172,7 @@ export default async function Home() {
         />
 
         <About description={customAbout} />
+        <Faq />
         <LogoTicker />
         {experienceWithTools && <Experience items={experienceWithTools} />}
         <Setup />

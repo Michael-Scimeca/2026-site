@@ -58,6 +58,7 @@ const TOOLS = [
     { name: "Figma", src: "/tools/figma.svg", color: "#F24E1E" },
     { name: "Flywheel", src: "/tools/flywheel.svg", color: "#48C6DD" },
     { name: "GitHub", src: "/tools/github.svg", color: "#181717", customFilter: 'brightness(0) invert(1)' },
+    { name: "GSAP", src: "/tools/gsap.svg", color: "#88CE02" },
     { name: "n8n", src: "/tools/n8n-color.svg", color: "#FF6584" },
     { name: "Netlify", src: "/tools/Netlify.svg", color: "#00C7B7" },
     { name: "Node.js", src: "/tools/node.js.svg", color: "#339933" },

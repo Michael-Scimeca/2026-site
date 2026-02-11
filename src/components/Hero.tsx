@@ -88,9 +88,9 @@ export function Hero(props: HeroProps) {
                 }
             });
 
-            // Portrait moves down slightly (appears deeper than text but in front of BG)
+            // Portrait moves down (parallax effect)
             gsap.to(portraitRef.current, {
-                y: "16%",
+                y: "45%",
                 ease: "none",
                 scrollTrigger: {
                     trigger: containerRef.current,
@@ -102,7 +102,7 @@ export function Hero(props: HeroProps) {
 
             // Content moves up (appears to recede)
             gsap.to(contentRef.current, {
-                y: "-70%",
+                y: "-90%",
                 ease: "none",
                 scrollTrigger: {
                     trigger: containerRef.current,
