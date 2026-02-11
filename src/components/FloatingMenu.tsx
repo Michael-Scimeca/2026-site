@@ -69,7 +69,6 @@ export function FloatingMenu() {
             >
                 <div className="w-[3px] h-[3px] rounded-full bg-zinc-500"></div>
                 <div className="w-[3px] h-[3px] rounded-full bg-zinc-500"></div>
-                <div className="w-[3px] h-[3px] rounded-full bg-zinc-500"></div>
             </div>
 
             {/* Mobile Collapse Indicator (Two Dots) */}
