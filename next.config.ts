@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
     ],
     qualities: [75, 100],
   },
+  reactStrictMode: false,
 };
 
 export default nextConfig;

@@ -31,7 +31,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
         const calculateGrid = () => {
             const width = footerRef.current!.offsetWidth;
             const height = footerRef.current!.offsetHeight;
-            const squareSize = 30; // 30px squares
+            const squareSize = 50; // 50px squares
 
             const cols = Math.ceil(width / squareSize);
             const rows = Math.ceil(height / squareSize);
@@ -164,7 +164,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                 <GradientBackground />
             </div>
 
-            <Container className="flex-1 flex flex-col justify-between py-4 md:py-12 relative z-10">
+            <Container className="flex-1 flex flex-col justify-between py-4  relative z-10">
                 {/* User Provided SVG Mask */}
                 <svg width="0" height="0" className="absolute">
                     <defs>
@@ -276,7 +276,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
             </Container>
 
             {/* Bottom Bar - Own Block Level */}
-            <div className="border-t border-zinc-900/50 py-6">
+            <div className="border-t border-zinc-900/50 py-1">
                 <Container>
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 text-sm text-zinc-600">
                         <div className="flex items-center gap-2">

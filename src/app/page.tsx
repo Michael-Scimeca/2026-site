@@ -173,9 +173,9 @@ export default async function Home() {
 
         <About description={customAbout} />
 
-        <LogoTicker />
         {experienceWithTools && <Experience items={experienceWithTools} />}
         <Setup />
+        <LogoTicker />
         <Faq />
       </div>
 
