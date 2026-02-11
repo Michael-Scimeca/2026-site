@@ -199,7 +199,7 @@ export function Hero(props: HeroProps) {
                 </div>
 
                 {/* Foreground Portrait Layer - Increased height for bleed */}
-                <div className="absolute inset-0 z-10 flex items-center justify-center pointer-events-none">
+                <div className="absolute top-0 left-0 w-full h-[100svh] md:h-full z-10 flex items-center justify-center pointer-events-none">
                     <div ref={portraitRef} className="relative w-full h-full top-0 md:h-[110%] md:top-[10%] max-w-4xl flex items-end will-change-transform">
                         <Image
                             src="/hero-portrait.png"
