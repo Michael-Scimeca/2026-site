@@ -201,16 +201,7 @@ export function Hero(props: HeroProps) {
                 {/* Foreground Portrait Layer - Increased height for bleed */}
                 <div className="absolute top-0 left-0 w-full h-[100svh] md:h-full z-10 flex items-center justify-center pointer-events-none">
                     <div ref={portraitRef} className="relative w-full h-full top-0 md:h-[110%] md:top-[10%] max-w-4xl flex items-end will-change-transform">
-                        <Image
-                            src="/hero-portrait.png"
-                            alt="Michael Scimeca"
-                            fill
-                            className="object-contain object-bottom"
-                            priority
-                            unoptimized
-                            quality={100}
-                            sizes="(max-width: 768px) 100vw, 80vw"
-                        />
+
 
                         <div ref={contentRef} className="absolute top-[calc(38%-40px)] right-[calc(25%-90px)] z-20 flex flex-col items-start gap-1 md:translate-x-[clamp(0px,calc(20vw-180px),210px)] max-w-[90vw] md:max-w-4xl [transform:translate3d(0px,-0.0002%,0px)_rotate(-2.00003deg)] md:transform md:-rotate-2 will-change-transform">
                             <span className="text-[clamp(25px,3.1vw,44px)] font-medium font-sans text-white leading-[1.2] tracking-tight whitespace-nowrap md:whitespace-normal">
