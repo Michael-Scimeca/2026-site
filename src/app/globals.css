@@ -677,9 +677,9 @@ body::-webkit-scrollbar {
     background-clip: text;
     -webkit-background-clip: text;
     background-image: linear-gradient(to bottom,
-            #a1a1aa 0%,
-            #a1a1aa 40%,
-            #3b82f6 50%,
+            #ffffff 0%,
+            #ffffff 40%,
+            #0158ff 50%,
             transparent 60%,
             transparent 100%);
     background-size: 100% 250%;

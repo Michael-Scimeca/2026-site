@@ -4,9 +4,11 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Container } from './Container';
 import { SweetPunkText } from './SweetPunkText';
 import { gsap } from 'gsap';
-
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import { GradientBackground } from './GradientBackground';
 
+gsap.registerPlugin(ScrollTrigger);
 
 interface FooterProps {
     email?: string;
@@ -19,7 +21,55 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const emailRef = useRef<HTMLDivElement>(null);
     const footerRef = useRef<HTMLElement>(null);
+    const gridRef = useRef<HTMLDivElement>(null);
     const [isInView, setIsInView] = useState(false);
+    const [gridDimensions, setGridDimensions] = useState({ cols: 20, count: 400 });
+
+    useEffect(() => {
+        if (!footerRef.current) return;
+
+        const calculateGrid = () => {
+            const width = footerRef.current!.offsetWidth;
+            const height = footerRef.current!.offsetHeight;
+            const squareSize = 30; // 30px squares
+
+            const cols = Math.ceil(width / squareSize);
+            const rows = Math.ceil(height / squareSize);
+
+            setGridDimensions({ cols, count: cols * rows });
+        };
+
+        calculateGrid();
+        window.addEventListener('resize', calculateGrid);
+        return () => window.removeEventListener('resize', calculateGrid);
+    }, []);
+
+    useGSAP(() => {
+        if (!gridRef.current) return;
+
+        const squares = gsap.utils.toArray('.reveal-square');
+        const spacer = document.getElementById('footer-reveal-spacer');
+
+        if (squares.length === 0 || !spacer) return;
+
+        gsap.to(squares, {
+            opacity: 0,
+            duration: 0.001, // Instant transition per square
+            stagger: {
+                amount: 1,
+                from: "random",
+                grid: [Math.ceil(gridDimensions.count / gridDimensions.cols), gridDimensions.cols],
+                ease: "none"
+            },
+            ease: "none",
+            scrollTrigger: {
+                trigger: spacer,
+                start: "top bottom",
+                end: "top top",
+                scrub: 1
+            }
+        });
+    }, { scope: footerRef, dependencies: [gridDimensions] });
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -35,6 +85,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
         if (footerRef.current) observer.observe(footerRef.current);
         return () => observer.disconnect();
     }, []);
+
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (!emailRef.current || !videoRef.current) return;
@@ -95,7 +146,20 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
     };
 
     return (
-        <footer ref={footerRef} className="relative w-full text-white bg-black flex flex-col overflow-hidden">
+        <footer ref={footerRef} className="fixed bottom-0 left-0 w-full min-h-screen text-white bg-black flex flex-col overflow-hidden z-0">
+            {/* Reveal Grid Overlay */}
+            <div
+                ref={gridRef}
+                className="absolute inset-0 z-50 grid pointer-events-none h-full w-full"
+                style={{
+                    gridTemplateColumns: `repeat(${gridDimensions.cols}, 1fr)`
+                }}
+            >
+                {[...Array(gridDimensions.count)].map((_, i) => (
+                    <div key={i} className="reveal-square w-full h-full bg-[#0158ff] opacity-100" />
+                ))}
+            </div>
+
             <div className="absolute inset-0 hidden lg:block z-0 pointer-events-none">
                 <GradientBackground />
             </div>

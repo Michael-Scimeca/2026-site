@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container } from './Container';
 
 interface FaqItem {
@@ -59,13 +59,27 @@ const faqs: FaqItem[] = [
 
 export function Faq() {
     const [openIndex, setOpenIndex] = useState<number | null>(null);
+    const containerRef = useRef<HTMLElement>(null);
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+                setOpenIndex(null);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
 
     const toggleFaq = (index: number) => {
         setOpenIndex(openIndex === index ? null : index);
     };
 
     return (
-        <section className="py-24 md:py-32 bg-black overflow-hidden border-t border-white/5">
+        <section ref={containerRef} className="bg-black overflow-hidden relative py-24">
             <Container>
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-8 relative z-10">
                     {/* Header: Label - Now spans full width to align with grid start */}
@@ -97,19 +111,19 @@ export function Faq() {
 function FaqItem({ item, isOpen, onClick }: { item: FaqItem, isOpen: boolean, onClick: () => void }) {
     return (
         <div
-            className={`border-b py-6 cursor-pointer group relative overflow-hidden transition-colors duration-300 ${isOpen ? 'border-blue-500' : 'border-white/10'}`}
+            className={`border-b py-6 cursor-pointer group relative overflow-hidden transition-colors duration-300 ${isOpen ? 'border-[#0158ff]' : 'border-white/10'}`}
             onClick={onClick}
         >
             {/* Pulsing Blue Border */}
-            <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse-flow z-10 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#0158ff] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 animate-pulse-flow z-10 pointer-events-none" />
 
             <div className="flex justify-between items-center gap-4 relative z-20">
-                <h3 className="text-lg md:text-xl font-medium text-white group-hover:text-blue-500 transition-colors duration-300">
+                <h3 className="text-lg md:text-xl font-medium text-white group-hover:text-[#0158ff] transition-colors duration-300">
                     {item.question}
                 </h3>
                 <div className={`transform transition-transform duration-300 ${isOpen ? 'rotate-90' : 'rotate-0'}`}>
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white group-hover:text-blue-500 transition-colors" />
+                        <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white group-hover:text-[#0158ff] transition-colors" />
                     </svg>
                 </div>
             </div>

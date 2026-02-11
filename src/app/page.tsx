@@ -172,11 +172,16 @@ export default async function Home() {
         />
 
         <About description={customAbout} />
-        <Faq />
+
         <LogoTicker />
         {experienceWithTools && <Experience items={experienceWithTools} />}
         <Setup />
+        <Faq />
       </div>
+
+
+
+      <div id="footer-reveal-spacer" className="h-screen w-full relative -z-10 pointer-events-none" />
 
       <FloatingMenu />
 
