@@ -148,7 +148,7 @@ export function Hero(props: HeroProps) {
     }, { scope: containerRef });
 
     return (
-        <section ref={containerRef} className="hero relative h-screen w-full overflow-hidden bg-black border-b border-white/20">
+        <section ref={containerRef} className="hero relative h-[100svh] md:h-screen w-full overflow-hidden bg-black border-b border-white/20">
             <div className="relative h-full w-full overflow-hidden bg-black">
                 {/* Semantic Header for Top Elements */}
                 <header>
