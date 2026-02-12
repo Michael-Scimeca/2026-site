@@ -356,7 +356,7 @@ export function Pong({ isOpen, onToggle, hideCloseButton, onWin, initialHumanWin
                 </button>
             )}
 
-            <div className={hideCloseButton ? 'opacity-100 relative' : `flex flex-col items-center gap-3 backdrop-blur-sm bg-black/5 p-6 rounded-2xl border border-white/5 shadow-2xl animate-fade-in transition-opacity duration-300 opacity-100 relative`}>
+            <div className={hideCloseButton ? 'opacity-100 relative' : `flex flex-col items-center gap-3 backdrop-blur-sm bg-black/5 p-6 rounded-2xl border border-white/10 shadow-2xl animate-fade-in transition-opacity duration-300 opacity-100 relative`}>
                 <div className="relative">
                     <canvas
                         ref={canvasRef}

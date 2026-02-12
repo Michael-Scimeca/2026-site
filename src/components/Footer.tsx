@@ -276,7 +276,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
             </Container>
 
             {/* Bottom Bar - Own Block Level */}
-            <div className="border-t border-zinc-900/50 py-1">
+            <div className="border-t border-white/10 py-1">
                 <Container>
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 text-sm text-zinc-600">
                         <div className="flex items-center gap-2">

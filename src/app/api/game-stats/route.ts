@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { serverClient } from "@/sanity/lib/server-client";
+import { sendWinnerNotification } from "@/lib/email";
 
 export async function POST(request: Request) {
     try {
@@ -9,13 +10,39 @@ export async function POST(request: Request) {
 
         // 1. If name and email are provided, create a winner submission
         if (name && email) {
+            // Basic email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
+            }
+
+            // Sanitize inputs (prevent excessively long strings)
+            const sanitizedName = String(name).trim().slice(0, 100);
+            const sanitizedEmail = String(email).trim().toLowerCase().slice(0, 100);
+
+            // Check if this email already submitted recently (prevent duplicates)
+            const recentSubmission = await serverClient.fetch(
+                `*[_type == "winnerSubmission" && email == $email && submittedAt > $cutoff][0]`,
+                {
+                    email: sanitizedEmail,
+                    cutoff: new Date(Date.now() - 60 * 60 * 1000).toISOString() // 1 hour ago
+                }
+            );
+
+            if (recentSubmission) {
+                return NextResponse.json({ error: "You've already submitted recently" }, { status: 429 });
+            }
+
             await serverClient.create({
                 _type: "winnerSubmission",
-                name,
-                email,
+                name: sanitizedName,
+                email: sanitizedEmail,
                 game: game || "tictactoe",
                 submittedAt: new Date().toISOString(),
             });
+
+            // Send email notification
+            await sendWinnerNotification(sanitizedName, sanitizedEmail, game || "tictactoe");
         }
 
         // 2. Fetch the single gameStats document.

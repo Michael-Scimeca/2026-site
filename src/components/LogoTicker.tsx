@@ -270,7 +270,7 @@ export function LogoTicker() {
     }, { scope: containerRef });
 
     return (
-        <section ref={containerRef} className="w-full bg-black pt-10 pb-0 md:py-12 overflow-hidden border-b border-white/5 relative">
+        <section ref={containerRef} className="w-full bg-black pt-10 pb-0 md:py-12 overflow-hidden border-b border-white/10 relative">
             <Container className="mb-8">
                 <div className="text-left">
                     <span className="text-zinc-500 text-sm md:text-base block">

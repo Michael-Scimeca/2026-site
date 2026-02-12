@@ -260,7 +260,7 @@ export function Checkers({ isOpen, onToggle, hideCloseButton, onWin, initialHuma
                 </button>
             )}
 
-            <div className={hideCloseButton ? '' : 'flex flex-col items-center gap-3 backdrop-blur-sm bg-black/5 p-6 rounded-2xl border border-white/5 shadow-2xl transition-opacity duration-300'}>
+            <div className={hideCloseButton ? '' : 'flex flex-col items-center gap-3 backdrop-blur-sm bg-black/5 p-6 rounded-2xl border border-white/10 shadow-2xl transition-opacity duration-300'}>
                 <div className="relative w-[280px] h-[280px] bg-[#333333] border-4 border-[#333333] rounded-sm board-shadow">
                     <div className="grid grid-cols-8 grid-rows-8 w-full h-full">
                         {board.map((row, r) =>

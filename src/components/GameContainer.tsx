@@ -190,7 +190,7 @@ export function GameContainer() {
 
             {/* Game container - only shows when open and form is hidden */}
             {isOpen && (
-                <div className={`flex flex-col items-center gap-3 backdrop-blur-sm bg-black/5 p-6 rounded-2xl border border-white/5 shadow-2xl pointer-events-auto animate-fade-in transition-opacity duration-300 ${showWinnerForm ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+                <div className={`flex flex-col items-center gap-3 backdrop-blur-sm bg-black/5 p-6 rounded-2xl border border-white/10 shadow-2xl pointer-events-auto animate-fade-in transition-opacity duration-300 ${showWinnerForm ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
                     {/* Close button - inside blur container */}
                     <button
                         onClick={() => {

@@ -183,7 +183,7 @@ export function TicTacToe({ isOpen, onToggle, hideCloseButton, onWin, initialHum
                 </button>
             )}
 
-            <div className={hideCloseButton ? '' : 'flex flex-col items-center gap-3 backdrop-blur-sm bg-black/5 p-6 rounded-2xl border border-white/5 shadow-2xl transition-opacity duration-300'}>
+            <div className={hideCloseButton ? '' : 'flex flex-col items-center gap-3 backdrop-blur-sm bg-black/5 p-6 rounded-2xl border border-white/10 shadow-2xl transition-opacity duration-300'}>
                 <div className="relative w-[150px] h-[150px] md:w-[180px] md:h-[180px] pointer-events-auto group tic-tac-toe-board">
                     <div className="grid grid-cols-3 grid-rows-3 w-full h-full border-collapse">
                         {board.map((cell, i) => (

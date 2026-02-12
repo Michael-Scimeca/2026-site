@@ -337,7 +337,7 @@ export function SpaceInvaders({ isOpen, onToggle, hideCloseButton = false, onWin
     };
 
     return (
-        <div className={hideCloseButton ? 'flex flex-col items-center' : 'flex flex-col items-center gap-3 backdrop-blur-sm bg-black/5 p-6 rounded-2xl border border-white/5 shadow-2xl transition-opacity duration-300'}>
+        <div className={hideCloseButton ? 'flex flex-col items-center' : 'flex flex-col items-center gap-3 backdrop-blur-sm bg-black/5 p-6 rounded-2xl border border-white/10 shadow-2xl transition-opacity duration-300'}>
             <div className="flex justify-between w-full px-4 mb-2 text-white font-mono text-xs">
                 <span>Score: {score}</span>
                 <span>{gameOver ? "GAME OVER" : gameWon ? "YOU WIN" : "ARROWS TO MOVE + SPACE TO SHOOT"}</span>
