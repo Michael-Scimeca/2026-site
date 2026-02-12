@@ -12,8 +12,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Michael Scimeca | Full-Stack Web Developer & AI Automation Specialist",
-  description: "Full-stack web developer and AI automation specialist helping startups and brands create beautiful, high-performing digital products. Expert in WordPress, HTML, CSS, JavaScript, Next.js, and AI automation.",
+  title: "Michael Scimeca — Senior Web Developer & AI Automation Specialist",
+  description: "Experienced senior web developer and AI automation specialist building intelligent digital products and workflows for brands and teams.",
   keywords: [
     "web developer",
     "full-stack developer",
@@ -39,8 +39,8 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: "https://michaelscimeca.com",
-    title: "Michael Scimeca | Full-Stack Web Developer & AI Automation Specialist",
-    description: "Full-stack web developer and AI automation specialist helping startups and brands create beautiful, high-performing digital products.",
+    title: "Michael Scimeca — Senior Web Developer & AI Automation Specialist",
+    description: "Experienced senior web developer and AI automation specialist building intelligent digital products and workflows for brands and teams.",
     siteName: "Michael Scimeca Portfolio",
     images: [
       {
@@ -53,8 +53,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Michael Scimeca | Full-Stack Web Developer & AI Automation Specialist",
-    description: "Full-stack web developer and AI automation specialist helping startups and brands create beautiful, high-performing digital products.",
+    title: "Michael Scimeca — Senior Web Developer & AI Automation Specialist",
+    description: "Experienced senior web developer and AI automation specialist building intelligent digital products and workflows for brands and teams.",
     images: ["/og-image.png"],
     creator: "@mikeyscimeca",
   },

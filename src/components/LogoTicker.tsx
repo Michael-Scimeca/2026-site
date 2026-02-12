@@ -26,7 +26,7 @@ const TOOLS = [
     { name: "Next.js", src: "/tools/Nextjs-logo.svg", color: "#000000", customFilter: 'brightness(0) invert(1)', className: "scale-75" },
     { name: "Docker", src: "/tools/docker.svg", color: "#2496ED", customFilter: 'brightness(0) invert(1)' },
     { name: "Figma", src: "/tools/figma.svg", color: "#F24E1E", customFilter: 'brightness(0) invert(1)' },
-    { name: "Flywheel", src: "/tools/flywheel.svg", color: "#48C6DD", customFilter: 'brightness(0) invert(1)' },
+    { name: "Shopify", src: "/tools/shopify-logo-svg-vector.svg", color: "#96bf48", customFilter: 'brightness(0) invert(1)' },
     { name: "GitHub", src: "/tools/github.svg", color: "#181717", customFilter: 'brightness(0) invert(1)' },
     { name: "GSAP", src: "/tools/gsap.svg", color: "#88CE02", customFilter: 'brightness(0) invert(1)' },
     { name: "n8n", src: "/tools/n8n-color.svg", color: "#FF6584", customFilter: 'brightness(0) invert(1)' },
@@ -247,7 +247,7 @@ export function LogoTicker() {
 
             // Scroll Trigger
             gsap.to(time, {
-                value: Math.PI * 8,
+                value: Math.PI * 4,
                 ease: "none",
                 scrollTrigger: {
                     trigger: containerRef.current,

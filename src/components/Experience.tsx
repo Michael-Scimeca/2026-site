@@ -6,8 +6,9 @@ import { ExperienceContainer } from "@/components/ExperienceContainer";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useGSAP } from "@gsap/react";
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 import { PortableText } from "@portabletext/react";
 import { SweetPunkText } from "./SweetPunkText";
@@ -29,6 +30,16 @@ interface ExperienceItem {
 interface ExperienceProps {
     items: ExperienceItem[];
 }
+
+// Deterministic random number generator based on string
+const getPseudoRandom = (seed: string, min: number, max: number) => {
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+        hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const normalized = (Math.abs(hash) % 1000) / 1000;
+    return Math.floor(normalized * (max - min + 1)) + min;
+};
 
 function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirst?: boolean; isLast?: boolean }) {
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -53,6 +64,27 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
         return () => observer.disconnect();
     }, []);
     const gsapTickerRef = useRef<gsap.TickerCallback | null>(null);
+
+    const pulseRef = useRef<SVGPathElement>(null);
+
+    // Generate stable random length for this item (40px - 150px)
+    // We use a deterministic random based on item ID so it's consistent between server/client re-renders
+    const pulseLength = React.useMemo(() => getPseudoRandom(item._key + 'pulse', 40, 150), [item._key]);
+    const cycleLength = 2000; // Longer cycle for smoother, less frequent appearance
+
+    useGSAP(() => {
+        if (pulseRef.current) {
+            gsap.fromTo(pulseRef.current,
+                { strokeDashoffset: 0 },
+                {
+                    strokeDashoffset: -cycleLength,
+                    duration: 4 + (pulseLength / 100), // Slight duration variance based on length
+                    repeat: -1,
+                    ease: "linear"
+                }
+            );
+        }
+    }, { scope: containerRef });
 
     React.useEffect(() => {
         if (thumbnailRef.current && containerRef.current) {
@@ -129,10 +161,59 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
 
     return (
         <div
-            className={`group w-full transition-colors relative border-zinc-800 py-0 ${item.thumbnail ? 'desktop:py-0' : 'desktop:py-8'} ${isFirst ? 'border-t' : ''} ${!isLast ? 'border-b' : ''}`}
+            ref={containerRef}
+            className={`group w-full transition-colors relative py-0 ${item.thumbnail ? 'desktop:py-0' : 'desktop:py-8'}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
+            {/* Helix-Style Dual-Layer Bottom Border - Dash Pulse Animation */}
+            {!isLast && (
+                <div className="absolute bottom-0 left-0 right-0 pointer-events-none z-50" style={{ overflow: 'visible' }}>
+                    <svg
+                        width="100%"
+                        height="10"
+                        viewBox="0 0 1000 10"
+                        preserveAspectRatio="none"
+                        style={{ display: 'block', position: 'absolute', bottom: '-4px', left: 0, right: 0, overflow: 'visible' }}
+                    >
+                        <defs>
+                            {/* Original Gradient */}
+                            <linearGradient id={`experience-gradient-${item._key}`} x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stopColor="#60a9ff" />
+                                <stop offset="25%" stopColor="#6500ff" />
+                                <stop offset="50%" stopColor="#006aff" />
+                                <stop offset="75%" stopColor="#0900b3" />
+                                <stop offset="100%" stopColor="#076dff" />
+                            </linearGradient>
+
+                        </defs>
+                        {/* Static Base Line */}
+                        <path
+                            d="M 0 5 H 1000"
+                            stroke="rgba(255,255,255,0.15)"
+                            strokeWidth="1"
+                            vectorEffect="non-scaling-stroke"
+                        />
+                        {/* Moving Pulse Line */}
+                        <path
+                            ref={pulseRef}
+                            d="M 0 5 H 1000"
+                            stroke={activeThemeColor}
+                            strokeWidth="1.5"
+                            strokeDasharray={`${pulseLength} ${cycleLength - pulseLength}`}
+                            strokeLinecap="round"
+                            vectorEffect="non-scaling-stroke"
+                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                            style={{
+                                filter: `drop-shadow(0 0 4px ${activeThemeColor})`
+                            }}
+                        />
+                    </svg>
+                </div>
+            )}
+
+            {/* Top Border for First Item */}
+            {isFirst && <div className="absolute top-0 left-0 w-full h-[1px] bg-zinc-800" />}
             {/* Dynamic Background Hover Glow */}
             {/* Dynamic Background Hover Glow */}
             <div
@@ -299,9 +380,13 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                     </div>
 
                     {/* Column 4: Thumbnail (5 cols) */}
-                    <div className="desktop:col-span-5 w-full flex flex-col relative max-desktop:mb-8" ref={containerRef}>
+                    <div className="desktop:col-span-5 w-full flex flex-col relative max-desktop:mb-8">
+
                         <ExperienceContainer>
-                            <div className="relative aspect-video overflow-hidden shadow-sm">
+                            <div
+                                className="relative aspect-video overflow-hidden shadow-sm"
+                                style={{ backgroundColor: activeThemeColor }}
+                            >
                                 <div ref={thumbnailRef} className="absolute inset-0 w-full h-[120%] -top-[10%]">
                                     {item.thumbnail && (
                                         (/\.(mp4|webm)($|\?)/i.test(item.thumbnail)) ? (
@@ -397,7 +482,27 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
 
 export function Experience({ items }: ExperienceProps) {
     return (
-        <section className="bg-black text-white ">
+        <section className="bg-black text-white relative">
+            {/* Global SVG Definitions - Guaranteed visibility */}
+            <svg className="absolute w-0 h-0 pointer-events-none overflow-hidden" aria-hidden="true">
+                <defs>
+                    <filter id="experience-helix-glow" x="-50%" y="-50%" width="200%" height="200%">
+                        <feGaussianBlur stdDeviation="8" result="blur" />
+                        <feMerge>
+                            <feMergeNode in="blur" />
+                            <feMergeNode in="blur" />
+                            <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                    </filter>
+                    <linearGradient id="experience-helix-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stopColor="#60a9ff" />
+                        <stop offset="25%" stopColor="#6500ff" />
+                        <stop offset="50%" stopColor="#006aff" />
+                        <stop offset="75%" stopColor="#0900b3" />
+                        <stop offset="100%" stopColor="#076dff" />
+                    </linearGradient>
+                </defs>
+            </svg>
 
             <div className="flex flex-col">
                 {items.map((item, index) => (

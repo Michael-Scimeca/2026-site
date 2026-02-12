@@ -1,9 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import { Container } from "@/components/Container";
 import Image from "next/image";
 import { SweetPunkText } from "@/components/SweetPunkText";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
+
+gsap.registerPlugin(useGSAP);
 
 interface SetupItem {
     id: string;
@@ -97,9 +101,85 @@ const setupItems: SetupItem[] = [
     },
 ];
 
-function SetupRow({ item }: { item: SetupItem }) {
+// Deterministic random number generator based on string
+const getPseudoRandom = (seed: string, min: number, max: number) => {
+    let hash = 0;
+    for (let i = 0; i < seed.length; i++) {
+        hash = seed.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const normalized = (Math.abs(hash) % 1000) / 1000;
+    return Math.floor(normalized * (max - min + 1)) + min;
+};
+
+function SetupRow({ item, isLast }: { item: SetupItem; isLast?: boolean }) {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const pulseRef = useRef<SVGPathElement>(null);
+
+    const pulseLength = React.useMemo(() => getPseudoRandom(item.id + 'pulse', 40, 150), [item.id]);
+    const cycleLength = 2000;
+
+    useGSAP(() => {
+        if (pulseRef.current) {
+            gsap.fromTo(pulseRef.current,
+                { strokeDashoffset: 0 },
+                {
+                    strokeDashoffset: -cycleLength,
+                    duration: 4 + (pulseLength / 100),
+                    repeat: -1,
+                    ease: "linear"
+                }
+            );
+        }
+    }, { scope: containerRef });
+
     return (
-        <div className="group border-b border-zinc-800 w-full transition-colors relative py-8 desktop:py-8 overflow-hidden">
+        <div
+            ref={containerRef}
+            className="group w-full transition-colors relative py-8 desktop:py-8 overflow-visible"
+        >
+            {/* Helix-Style Dual-Layer Bottom Border - Dash Pulse Animation */}
+            <div className="absolute bottom-0 left-0 right-0 pointer-events-none z-50" style={{ overflow: 'visible' }}>
+                <svg
+                    width="100%"
+                    height="10"
+                    viewBox="0 0 1000 10"
+                    preserveAspectRatio="none"
+                    style={{ display: 'block', position: 'absolute', bottom: '-4px', left: 0, right: 0, overflow: 'visible' }}
+                >
+                    <defs>
+                        <linearGradient id={`setup-gradient-${item.id}`} x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stopColor="#60a9ff" />
+                            <stop offset="25%" stopColor="#6500ff" />
+                            <stop offset="50%" stopColor="#006aff" />
+                            <stop offset="75%" stopColor="#0900b3" />
+                            <stop offset="100%" stopColor="#076dff" />
+                        </linearGradient>
+
+                    </defs>
+                    {/* Static Base Line */}
+                    <path
+                        d="M 0 5 H 1000"
+                        stroke="rgba(255,255,255,0.15)"
+                        strokeWidth="1"
+                        vectorEffect="non-scaling-stroke"
+                    />
+                    {/* Moving Pulse Line */}
+                    <path
+                        ref={pulseRef}
+                        d="M 0 5 H 1000"
+                        stroke={item.themeColor || '#0158ff'}
+                        strokeWidth="1.5"
+                        strokeDasharray={`${pulseLength} ${cycleLength - pulseLength}`}
+                        strokeLinecap="round"
+                        vectorEffect="non-scaling-stroke"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                        style={{
+                            filter: `drop-shadow(0 0 4px ${item.themeColor || '#0158ff'})`
+                        }}
+                    />
+                </svg>
+            </div>
+
             {/* Dynamic Background Hover Glow */}
             <div
                 className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none"
@@ -192,10 +272,15 @@ function SetupRow({ item }: { item: SetupItem }) {
 
 export function Setup() {
     return (
-        <section className="bg-black text-white border-t border-zinc-800">
+
+        <section className="bg-black text-white border-t border-zinc-800 relative">
             <div className="flex flex-col">
-                {setupItems.map((item) => (
-                    <SetupRow key={item.id} item={item} />
+                {setupItems.map((item, index) => (
+                    <SetupRow
+                        key={item.id}
+                        item={item}
+                        isLast={index === setupItems.length - 1}
+                    />
                 ))}
             </div>
         </section>

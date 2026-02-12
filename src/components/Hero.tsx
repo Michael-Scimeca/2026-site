@@ -42,7 +42,7 @@ export function Hero(props: HeroProps) {
                 setWaterFilled(true);
                 // Create a temporary link and click it to trigger mailto reliably
                 const mailtoLink = document.createElement('a');
-                mailtoLink.href = "mailto:mikeyscimeca.dev@gmail.com";
+                mailtoLink.href = "mailto:mikeyscimeca.dev@gmail.com?subject=I would love to get a 15 - 20 min call with you to talk about a potential project";
                 mailtoLink.click();
 
                 // Reset after a delay to allow the user to see the success state
@@ -55,9 +55,12 @@ export function Hero(props: HeroProps) {
     }, [isHovering, waterFilled]);
 
     useEffect(() => {
-        // Set fixed height on mobile to prevent address bar resizing jumps
-        if (typeof window !== 'undefined' && window.innerWidth < 768) {
-            setHeroHeight(`${window.innerHeight}px`);
+        // Set fixed height to exactly 100vh to prevent address bar resizing jumps and ensure strict layout
+        if (typeof window !== 'undefined') {
+            const updateHeight = () => setHeroHeight(`${window.innerHeight}px`);
+            updateHeight();
+            window.addEventListener('resize', updateHeight);
+            return () => window.removeEventListener('resize', updateHeight);
         }
     }, []);
 
@@ -163,7 +166,7 @@ export function Hero(props: HeroProps) {
     return (
         <section
             ref={containerRef}
-            className="hero relative h-[100svh] md:h-screen w-full overflow-hidden bg-black border-b border-white/20"
+            className="hero relative h-screen w-full overflow-hidden bg-black border-b border-white/20"
             style={heroHeight ? { height: heroHeight, minHeight: heroHeight, maxHeight: heroHeight } : undefined}
         >
             <div className="relative h-full w-full overflow-hidden bg-black">
@@ -228,27 +231,37 @@ export function Hero(props: HeroProps) {
                             quality={100}
                             sizes="(max-width: 768px) 100vw, 80vw"
                         />
-                        <div ref={contentRef} className="absolute top-[calc(38%-40px)] right-[calc(25%-90px)] z-20 flex flex-col items-start gap-1 md:translate-x-[clamp(0px,calc(20vw-180px),210px)] max-w-[90vw] md:max-w-4xl [transform:translate3d(0px,-0.0002%,0px)_rotate(-2.00003deg)] md:transform md:-rotate-2 will-change-transform">
-                            <span className="text-[clamp(25px,3.1vw,44px)] font-medium font-sans text-white leading-[1.2] tracking-tight whitespace-nowrap md:whitespace-normal">
-                                I Build Revenue-Driving<br />
-                                Digital Products &<br />
-                                Automated Systems
-                            </span>
+                        <div ref={contentRef} className="absolute z-20 flex flex-col items-start gap-1 
+                            left-5 bottom-[20%] right-auto top-auto md:top-[calc(38%-50px)] md:left-[max(20px,calc(50%-220px))] lg:left-[calc(50%-100px)] xl:left-[calc(55%-100px)] md:right-auto md:bottom-auto
+                            max-w-[85vw] md:min-w-[550px] 
+                            md:rotate-[-2deg]
+                            transition-[left,transform] duration-500 ease-out
+                            will-change-transform">
 
-                            <p className="text-white/70 text-[clamp(14px,1.2vw,18px)] mt-3 max-w-[500px] leading-relaxed">
-                                Helping teams scale their workflows with AI-powered solutions and high-performing web experiences.
+                            {/* Mobile Scrim for Legibility */}
+                            <div className="absolute -inset-6 bg-gradient-to-r from-black/80 via-black/40 to-transparent -z-10 rounded-xl blur-xl md:hidden" />
+
+                            <h1 className="text-[clamp(28px,6vw,36px)] font-medium font-sans text-white leading-[1.1] tracking-tight whitespace-normal drop-shadow-lg md:drop-shadow-none">
+                                🌟 I build high-impact<br className="hidden md:block" />
+                                digital products, AI workflows,<br className="hidden md:block" />
+                                and automation systems that<br className="hidden md:block" />
+                                help teams grow and scale.
+                            </h1>
+
+                            <p className="text-white/90 md:text-white/70 text-[clamp(15px,4vw,18px)] mt-4 max-w-[600px] leading-relaxed drop-shadow-md md:drop-shadow-none">
+                                Senior Web Developer & AI Automation Specialist — I help startups and brands ship intelligent solutions that save time and increase conversions.
                             </p>
 
                             <div className="flex items-center gap-4 mt-6">
                                 <a
-                                    href="mailto:mikeyscimeca.dev@gmail.com"
+                                    href="mailto:mikeyscimeca.dev@gmail.com?subject=I would love to get a 15 - 20 min call with you to talk about a potential project"
                                     onMouseEnter={() => setIsHovering(true)}
                                     onMouseLeave={() => setIsHovering(false)}
                                     className={`shiny-cta water-fill-container pointer-events-auto flex items-center gap-4 transition-all duration-300 ${waterFilled ? 'charged-active' : ''}`}
                                 >
                                     <div className={`water-fill-background ${isHovering ? 'water-fill-active' : ''}`} />
 
-                                    <span className={`relative z-10 transition-colors duration-300`}>
+                                    <span className="relative z-10 transition-colors duration-300 whitespace-nowrap text-[14px] md:text-[1.125rem]">
                                         {waterFilled ? 'Opening Email...' : 'Schedule a 15-min Call'}
                                     </span>
 
