@@ -122,9 +122,9 @@ function SetupRow({ item }: { item: SetupItem }) {
             />
 
             <Container className="relative z-10">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-y-6 md:gap-x-12 items-center">
+                <div className="grid grid-cols-1 md:grid-cols-[150px_1fr] gap-y-6 md:gap-x-6 items-center">
                     {/* Left: Logo & Company Name */}
-                    <div className="flex items-center md:col-span-1">
+                    <div className="flex items-center justify-center md:justify-start">
                         {item.logo && (
                             <div className="relative w-20 h-10 md:w-28 md:h-28 flex-shrink-0 flex items-center justify-center">
                                 <img
@@ -138,7 +138,7 @@ function SetupRow({ item }: { item: SetupItem }) {
                     </div>
 
                     {/* Right: Description & Tools */}
-                    <div className="flex flex-col justify-center md:col-span-3 gap-6">
+                    <div className="flex flex-col justify-center gap-6">
                         {item.description.split('\n\n').map((paragraph, i) => (
                             <div key={i} className="text-sm leading-relaxed font-medium">
                                 <SweetPunkText

@@ -203,7 +203,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
 
                 <div className="relative z-10 w-full">
                     {/* Top Header Row */}
-                    <div className="flex flex-col md:flex-row justify-between items-start mb-4 md:mb-16 gap-4 md:gap-8">
+                    <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
                         <div className="flex flex-col gap-4 md:gap-8">
                             <h2 className="text-5xl md:text-[120px] font-bold tracking-tighter leading-none">
                                 <SweetPunkText

@@ -79,7 +79,7 @@ export function Faq() {
     };
 
     return (
-        <section ref={containerRef} className="bg-black overflow-hidden relative py-24">
+        <section ref={containerRef} className="bg-black overflow-hidden relative pt-10 pb-20 md:py-16">
             <Container>
                 <div className="grid grid-cols-1 md:grid-cols-12 gap-8 relative z-10">
                     {/* Header: Label - Now spans full width to align with grid start */}
