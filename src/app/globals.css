@@ -275,15 +275,8 @@ body::-webkit-scrollbar {
     height: var(--size);
     --position: 2px;
     --space: calc(var(--position) * 2);
-    background: radial-gradient(circle at var(--position) var(--position),
-            white calc(var(--position) / 4),
-            transparent 0) padding-box;
-    background-size: var(--space) var(--space);
-    background-repeat: space;
-    mask-image: conic-gradient(from calc(var(--gradient-angle) + 45deg),
-            black,
-            transparent 10% 90%,
-            black);
+
+
     border-radius: inherit;
     opacity: 0.4;
     z-index: -1;
@@ -688,4 +681,84 @@ body::-webkit-scrollbar {
 
 .faq-answer-wave.is-open {
     animation: wave-reveal 0.8s ease-out forwards;
+}
+
+/* Water Fill Animation */
+.water-fill-container {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+/* CodePen Style Water Fill */
+.water-fill-container {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.water-fill-background {
+    position: absolute;
+    top: 100%;
+    left: -50%;
+    width: 200%;
+    height: 1000%;
+    background: #0158ff;
+    transition: top 3s linear;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.water-fill-background::before,
+.water-fill-background::after {
+    content: "";
+    position: absolute;
+    top: -2%;
+    /* Slightly offset above the block */
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #0158ff;
+    border-radius: 40%;
+}
+
+.water-fill-background::before {
+    animation: water-wave-rotate 7s linear infinite;
+    opacity: 0.5;
+}
+
+.water-fill-background::after {
+    animation: water-wave-rotate 5s linear infinite reverse;
+    opacity: 0.8;
+}
+
+@keyframes water-wave-rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.water-fill-container:hover .water-fill-background {
+    top: -50%;
+}
+
+.charged-active .water-fill-background {
+    top: -500% !important;
+    transition: top 0.4s ease-out;
+}
+
+.water-fill-container:hover {
+    --shiny-cta-bg: #000 !important;
+    --gradient-percent: 0% !important;
+    --gradient-shine: transparent !important;
+    border-color: rgba(1, 88, 255, 0.3) !important;
+}
+
+.water-fill-container:hover::before,
+.water-fill-container:hover::after {
+    opacity: 0 !important;
 }

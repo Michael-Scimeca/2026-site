@@ -11,51 +11,63 @@ interface FaqItem {
 const faqs: FaqItem[] = [
     {
         question: "What makes you different from other developers?",
-        answer: "I don't just build websites—I create experiences. From interactive games to AI-powered tools, I blend creative design with cutting-edge tech. I've built everything from Tic-Tac-Toe AIs to complex web apps for major brands. If you want something that stands out, I'm your person."
+        answer: "I build interactive experiences—not just websites. From AI-powered games to automation systems, I blend design, code, and creativity to make things that stand out."
     },
     {
         question: "Can you build interactive experiences and games?",
-        answer: "Absolutely! I specialize in interactive web experiences. Check out the games on this site—Tic-Tac-Toe, Pong, Checkers, Space Invaders—all built from scratch with custom AI. I love creating engaging, playful experiences that keep users coming back."
+        answer: "Yes! Check out the games on this site (Tic-Tac-Toe, Pong, Checkers, Space Invaders). All built from scratch with custom AI."
     },
     {
         question: "Do you work with AI and automation?",
-        answer: "Yes! I build AI-powered tools and automation systems using platforms like n8n for workflow automation. Whether it's a smart chatbot, predictive analytics, or automating repetitive tasks with custom workflows, I can help you leverage AI to work smarter, not harder."
+        answer: "Absolutely. I build chatbots, workflow automation (n8n), predictive tools, and systems that save teams hours every week."
     },
     {
         question: "How much does a project cost?",
-        answer: "It depends on what you need. A simple landing page might start around $2-5k, while a full web app with custom features could be $10-30k+. I offer flexible pricing and can work within your budget. Let's chat about your project and I'll give you a transparent quote."
+        answer: "Simple landing page: $2-5k. Full web app: $10-30k+. I work within your budget and give transparent quotes upfront."
     },
     {
         question: "How long does a project take?",
-        answer: "Timelines vary. A simple site takes 2-4 weeks, while a complex app might take 2-3 months. I prioritize quality over speed, but I'm also efficient. I'll give you a realistic timeline upfront—no surprises."
+        answer: "Simple site: 2-4 weeks. Complex app: 2-3 months. I'll give you a realistic timeline—no surprises."
     },
     {
         question: "What's your design and development process?",
-        answer: "I start with discovery—understanding your goals and audience. Then I design, prototype, and iterate with your feedback. Once we're aligned, I build, test, and launch. You're involved at every step, and I keep things transparent and collaborative."
+        answer: "Discovery → Design → Build → Test → Launch. You're involved at every step, and I keep things transparent."
     },
     {
         question: "Can you redesign our existing website?",
-        answer: "Definitely! I can audit your current site, identify what's not working, and rebuild it to be faster, more beautiful, and more effective—all while preserving your SEO and brand equity."
+        answer: "Yes. I'll audit your site, identify what's broken, and rebuild it to be faster and more effective—while preserving your SEO."
     },
     {
         question: "Will we be able to update the site ourselves?",
-        answer: "Yes! I build sites with user-friendly CMS platforms like Sanity or WordPress. You'll be able to update content, images, and pages without touching code. I'll also provide training so you feel confident managing it."
+        answer: "Yes! I use CMS platforms like Sanity or WordPress. You can update content without touching code. I'll train you on it too."
     },
     {
         question: "How do you ensure sites are fast?",
-        answer: "I use modern frameworks like Next.js, optimize images, lazy-load content, and minimize code bloat. I also test performance rigorously. Fast sites rank better, convert more, and keep users happy—so speed is non-negotiable for me."
+        answer: "Modern frameworks (Next.js), optimized images, lazy loading, and minimal code bloat. Fast sites rank better and convert more."
     },
     {
         question: "What if our site gets hacked or has security issues?",
-        answer: "Security is built-in from day one. I use SSL certificates, secure hosting, rate limiting, and best practices to protect your site. If you have an existing compromised site, I can clean it up and lock it down."
+        answer: "Security is built-in: SSL, secure hosting, rate limiting, and best practices. If you have a compromised site, I can clean and lock it down."
     },
     {
         question: "Can you integrate third-party tools and APIs?",
-        answer: "Absolutely. I've integrated everything from payment gateways (Stripe) to CRMs (HubSpot, Salesforce), email services (Resend, SendGrid), and custom APIs. If it has an API, I can connect it."
+        answer: "Yes. Stripe, HubSpot, Salesforce, Resend, SendGrid, custom APIs—if it has an API, I can connect it."
     },
     {
         question: "Do you offer ongoing support after launch?",
-        answer: "Yes! I offer maintenance packages for updates, bug fixes, and ongoing improvements. I'm also available for one-off updates if you just need something tweaked. Your site won't be abandoned after launch."
+        answer: "Yes! I offer maintenance packages for updates and bug fixes. Also available for one-off tweaks as needed."
+    },
+    {
+        question: "What do you need from me to start?",
+        answer: "Just your goals, brand assets (logo, colors, content), and any examples of sites you like. I'll handle the rest and guide you through each step."
+    },
+    {
+        question: "How do handoffs and maintenance work?",
+        answer: "You get full access to your site, documentation, and training. For maintenance, I offer monthly packages or pay-as-you-go support—your choice."
+    },
+    {
+        question: "Do you collaborate with agencies and teams?",
+        answer: "Absolutely! I've worked at agencies like RSQ and We Can't Stop Thinking. I integrate seamlessly as an extension of your team."
     },
 ];
 

@@ -67,14 +67,14 @@ export default async function Home() {
 
   const experienceWithTools = [
     {
-      _key: 'patreon',
-      company: 'Patreon',
+      _key: 'longview',
+      company: 'Longview Innovation',
       role: 'Creative Developer',
-      description: "For Halloween 2021, I led the animation strategy and implementation for Trick-or-True Crime, an interactive microsite created with Patreon. Using immersive Lottie animations and horizontal scrolling, the experience blended cinematic storytelling with playful interactivity to deliver a dark, memorable Halloween experience.",
-      tools: ["SPA", "Browserstack", "Lottie", "Sanity CMS", "GSAP"],
-      thumbnail: '/clips/patreon.mp4',
-      themeColor: '#e45253',
-      logo: '/logos/patreon-logo.svg'
+      description: "I handled the development and animation implementation for the Longview Innovation website, using interactive motion and thoughtful transitions to support a modern, engaging digital experience.",
+      tools: ["SPA", "Wordpress", "Browserstack", "GSAP", 'locomotive', 'Highway.js'],
+      thumbnail: '/clips/longview.mp4',
+      themeColor: '#b04a25',
+      logo: '/logos/longview-innovation-logo.svg'
     },
     {
       _key: 'twix',
@@ -107,14 +107,14 @@ export default async function Home() {
       logo: '/logos/kovitz-logo.svg'
     },
     {
-      _key: 'longview',
-      company: 'Longview Innovation',
+      _key: 'patreon',
+      company: 'Patreon',
       role: 'Creative Developer',
-      description: "I handled the development and animation implementation for the Longview Innovation website, using interactive motion and thoughtful transitions to support a modern, engaging digital experience.",
-      tools: ["SPA", "Wordpress", "Browserstack", "GSAP", 'locomotive', 'Highway.js'],
-      thumbnail: '/clips/longview.mp4',
-      themeColor: '#b04a25',
-      logo: '/logos/longview-innovation-logo.svg'
+      description: "For Halloween 2021, I led the animation strategy and implementation for Trick-or-True Crime, an interactive microsite created with Patreon. Using immersive Lottie animations and horizontal scrolling, the experience blended cinematic storytelling with playful interactivity to deliver a dark, memorable Halloween experience.",
+      tools: ["SPA", "Browserstack", "Lottie", "Sanity CMS", "GSAP"],
+      thumbnail: '/clips/patreon.mp4',
+      themeColor: '#e45253',
+      logo: '/logos/patreon-logo.svg'
     },
     {
       _key: 'ripco',

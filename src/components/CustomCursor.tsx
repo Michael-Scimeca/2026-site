@@ -58,6 +58,11 @@ export default function CustomCursor() {
             pos.current.size += (targetSize - pos.current.size) * lerp;
 
             // Draw
+            ctx.shadowBlur = 8;
+            ctx.shadowColor = "rgba(0, 0, 0, 0.4)";
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+
             ctx.beginPath();
             ctx.arc(pos.current.x, pos.current.y, pos.current.size / 2, 0, Math.PI * 2);
             ctx.fillStyle = "#0158ff";
@@ -65,7 +70,10 @@ export default function CustomCursor() {
 
             // Border logic when expanded
             if (pos.current.size > 10) {
-                ctx.strokeStyle = "rgba(1, 88, 255, 0.5)";
+                ctx.shadowBlur = 0; // Disable shadow for border to keep it sharp
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
                 ctx.lineWidth = 1;
                 ctx.stroke();
             }

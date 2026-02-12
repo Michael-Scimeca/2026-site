@@ -23,32 +23,36 @@ interface HeroProps {
 
 export function Hero(props: HeroProps) {
     const { title, heroImage, headline, subHeadline, isTransitionOverlay } = props || {};
-    const [timeToReach, setTimeToReach] = useState<string | null>(null);
-    const [isTextVisible, setIsTextVisible] = useState(false);
+    const [isHovering, setIsHovering] = useState(false);
+    const [waterFilled, setWaterFilled] = useState(false);
 
-    useEffect(() => {
-        if (timeToReach) {
-            setIsTextVisible(true);
-            const timer = setTimeout(() => {
-                setIsTextVisible(false);
-            }, 10000); // Fade out after 10 seconds
-            return () => clearTimeout(timer);
-        }
-    }, [timeToReach]);
-    const startTimeRef = useRef<number>(0);
     const containerRef = useRef<HTMLDivElement>(null);
-
     const bgRef = useRef<HTMLDivElement>(null);
     const portraitRef = useRef<HTMLDivElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
     const marqueeRef = useRef<HTMLDivElement>(null);
     const marqueeInnerRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        startTimeRef.current = performance.now();
-    }, []);
-
     const [heroHeight, setHeroHeight] = useState<string | undefined>(undefined);
+
+    useEffect(() => {
+        let timeout: NodeJS.Timeout;
+        if (isHovering && !waterFilled) {
+            timeout = setTimeout(() => {
+                setWaterFilled(true);
+                // Create a temporary link and click it to trigger mailto reliably
+                const mailtoLink = document.createElement('a');
+                mailtoLink.href = "mailto:mikeyscimeca.dev@gmail.com";
+                mailtoLink.click();
+
+                // Reset after a delay to allow the user to see the success state
+                setTimeout(() => {
+                    setWaterFilled(false);
+                }, 3000);
+            }, 3000);
+        }
+        return () => clearTimeout(timeout);
+    }, [isHovering, waterFilled]);
 
     useEffect(() => {
         // Set fixed height on mobile to prevent address bar resizing jumps
@@ -226,26 +230,46 @@ export function Hero(props: HeroProps) {
                         />
                         <div ref={contentRef} className="absolute top-[calc(38%-40px)] right-[calc(25%-90px)] z-20 flex flex-col items-start gap-1 md:translate-x-[clamp(0px,calc(20vw-180px),210px)] max-w-[90vw] md:max-w-4xl [transform:translate3d(0px,-0.0002%,0px)_rotate(-2.00003deg)] md:transform md:-rotate-2 will-change-transform">
                             <span className="text-[clamp(25px,3.1vw,44px)] font-medium font-sans text-white leading-[1.2] tracking-tight whitespace-nowrap md:whitespace-normal">
-                                Building delightful digital<br />
-                                experiences with code,<br />
-                                design, and AI automation
+                                I Build Revenue-Driving<br />
+                                Digital Products &<br />
+                                Automated Systems
                             </span>
 
-                            <span className={`text-white/50 text-[10px] ml-10 mt-1 block transition-opacity duration-1000 ${isTextVisible ? 'opacity-100' : 'opacity-0'}`}>
-                                {timeToReach || "0.00"} Seconds to reach Call To Action storing data...
-                            </span>
-                            <div className="flex items-center gap-12">
+                            <p className="text-white/70 text-[clamp(14px,1.2vw,18px)] mt-3 max-w-[500px] leading-relaxed">
+                                Helping teams scale their workflows with AI-powered solutions and high-performing web experiences.
+                            </p>
+
+                            <div className="flex items-center gap-4 mt-6">
                                 <a
                                     href="mailto:mikeyscimeca.dev@gmail.com"
-                                    onMouseEnter={() => {
-                                        if (!timeToReach) {
-                                            const elapsed = (performance.now() - startTimeRef.current) / 1000;
-                                            setTimeToReach(elapsed.toFixed(2));
-                                        }
-                                    }}
-                                    className="shiny-cta pointer-events-auto"
+                                    onMouseEnter={() => setIsHovering(true)}
+                                    onMouseLeave={() => setIsHovering(false)}
+                                    className={`shiny-cta water-fill-container pointer-events-auto flex items-center gap-4 transition-all duration-300 ${waterFilled ? 'charged-active' : ''}`}
                                 >
-                                    <span>Let's Build Something Together</span>
+                                    <div className={`water-fill-background ${isHovering ? 'water-fill-active' : ''}`} />
+
+                                    <span className={`relative z-10 transition-colors duration-300`}>
+                                        {waterFilled ? 'Opening Email...' : 'Schedule a 15-min Call'}
+                                    </span>
+
+                                    <div className="relative z-10">
+                                        <div className="relative w-12 h-12">
+                                            <svg viewBox="0 0 100 100" className="w-full h-full">
+                                                <defs>
+                                                    <mask id="phone-mask">
+                                                        <rect width="100" height="100" fill="white" />
+                                                        <image
+                                                            href="/phone-icon.svg"
+                                                            x="20" y="20"
+                                                            width="60" height="60"
+                                                            style={{ filter: 'brightness(0)' }}
+                                                        />
+                                                    </mask>
+                                                </defs>
+                                                <circle cx="50" cy="50" r="50" fill="white" mask="url(#phone-mask)" />
+                                            </svg>
+                                        </div>
+                                    </div>
                                 </a>
                             </div>
                         </div>
