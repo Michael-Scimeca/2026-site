@@ -1,7 +1,14 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+
+let _resend: Resend | null = null;
+function getResend() {
+    if (!_resend) {
+        _resend = new Resend(process.env.RESEND_API_KEY);
+    }
+    return _resend;
+}
 const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL; // Optional: set in .env for n8n integration
 
 // Simple in-memory rate limiting (per IP, 5 requests per hour)
@@ -118,7 +125,7 @@ export async function POST(req: Request) {
         }
 
         // Send notification email to you (Simpler Lead Notification)
-        const { error: emailError } = await resend.emails.send({
+        const { error: emailError } = await getResend().emails.send({
             from: 'Michael Scimeca <onboarding@resend.dev>',
             to: ['mikeyscimeca@gmail.com'],
             subject: isFullBooking
@@ -170,7 +177,7 @@ export async function POST(req: Request) {
 
         // Send confirmation email to the User
         if (isFullBooking) {
-            await resend.emails.send({
+            await getResend().emails.send({
                 from: 'Michael Scimeca <onboarding@resend.dev>',
                 to: [cleanEmail],
                 subject: 'Discovery Call Confirmed! 🎉',
