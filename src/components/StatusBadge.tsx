@@ -60,7 +60,7 @@ export function StatusBadge() {
             </div>
             <div className="flex flex-row items-center gap-2 md:gap-3 leading-none">
                 <span className="text-[10px] tracking-[0.05em] font-bold text-zinc-900 tabular-nums uppercase whitespace-nowrap">
-                    CHICAGO {timeParams.timeString}
+                    CHI {timeParams.timeString}
                 </span>
                 {weather && (
                     <>

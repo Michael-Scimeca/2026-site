@@ -1,0 +1,150 @@
+{
+    "name": "Booking System Automation",
+    "nodes": [
+        {
+            "parameters": {
+                "path": "book-meeting",
+                "responseMode": "lastNode",
+                "options": {}
+            },
+            "id": "webhook-trigger",
+            "name": "Webhook",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 1,
+            "position": [
+                200,
+                300
+            ],
+            "webhookId": "book-meeting"
+        },
+        {
+            "parameters": {
+                "operation": "create",
+                "calendarId": "primary",
+                "start": "={{ $json.date }}T{{ $json.time }}:00",
+                "end": "={{ DateTime.fromISO($json.date + 'T' + $json.time).plus({ minutes: 30 }) }}",
+                "summary": "=Discovery Call: {{ $json.name }}",
+                "description": "=Project: {{ $json.description }}\nBudget: {{ $json.budget }}\n\nBooked via Website.",
+                "attendees": "={{ $json.email }}",
+                "additionalFields": {
+                    "conferenceData": {
+                        "createRequest": {
+                            "requestId": "={{ $executionId }}"
+                        }
+                    }
+                }
+            },
+            "id": "google-calendar",
+            "name": "Google Calendar",
+            "type": "n8n-nodes-base.googleCalendar",
+            "typeVersion": 1,
+            "position": [
+                400,
+                300
+            ],
+            "credentials": {
+                "googleCalendarOAuth2Api": {
+                    "id": "YOUR_CREDENTIAL_ID_HERE",
+                    "name": "Google Calendar Account"
+                }
+            }
+        },
+        {
+            "parameters": {
+                "amount": 1,
+                "unit": "hours"
+            },
+            "id": "wait-1-hour-before",
+            "name": "Wait until 1h before",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1,
+            "position": [
+                600,
+                300
+            ],
+            "webhookId": "wait-node"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.resend.com/emails",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer YOUR_RESEND_API_KEY_HERE"
+                        },
+                        {
+                            "name": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ]
+                },
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "from",
+                            "value": "Michael Scimeca <onboarding@resend.dev>"
+                        },
+                        {
+                            "name": "to",
+                            "value": "={{ $node.Webhook.json.email }}"
+                        },
+                        {
+                            "name": "subject",
+                            "value": "⏰ Reminder: Our call is in 1 hour"
+                        },
+                        {
+                            "name": "html",
+                            "value": "=Hi {{ $node.Webhook.json.name }},<br><br>Just a friendly reminder that our discovery call is starting in 1 hour.<br><br>Join here: <a href=\"{{ $node['Google Calendar'].json.htmlLink }}\">Google Meet Link</a>"
+                        }
+                    ]
+                }
+            },
+            "id": "send-reminder-email",
+            "name": "Send Reminder Email",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 3,
+            "position": [
+                800,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook": {
+            "main": [
+                [
+                    {
+                        "node": "Google Calendar",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Google Calendar": {
+            "main": [
+                [
+                    {
+                        "node": "Wait until 1h before",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Wait until 1h before": {
+            "main": [
+                [
+                    {
+                        "node": "Send Reminder Email",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

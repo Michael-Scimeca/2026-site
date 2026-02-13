@@ -2,6 +2,8 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { Container } from './Container';
+import { useModal } from '@/context/ModalContext';
+import Image from 'next/image';
 import { SweetPunkText } from './SweetPunkText';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -18,6 +20,7 @@ interface FooterProps {
 
 export function Footer({ email, location, socialHandle }: FooterProps) {
     const defaultEmail = email || "mikeyscimeca.dev@gmail.com";
+    const { openModal } = useModal();
     const videoRef = useRef<HTMLVideoElement>(null);
     const emailRef = useRef<HTMLDivElement>(null);
     const footerRef = useRef<HTMLElement>(null);
@@ -241,9 +244,34 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <span className="font-bold text-white text-sm uppercase tracking-wider">Let's Chat</span>
-                                    <a href="tel:+18475089516" className="text-zinc-500 hover:text-white transition-colors text-lg w-fit">
+                                    <a href="tel:+18475089516" className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-lg w-fit group">
+                                        <Image
+                                            src="/Icon/phone-icon.svg"
+                                            alt="Phone"
+                                            width={24}
+                                            height={24}
+                                            className="transition-all duration-300 opacity-60 group-hover:opacity-100 group-hover:rotate-12"
+                                        />
                                         +1 (847) 508-9516
                                     </a>
+                                </div>
+
+                                <div className="flex flex-col gap-2">
+                                    <span className="font-bold text-white text-sm uppercase tracking-wider">Book a Strategy Call</span>
+                                    <button
+                                        onClick={openModal}
+                                        className="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors text-lg w-fit text-left group"
+                                        aria-label="Book a strategy call"
+                                    >
+                                        <Image
+                                            src="/Icon/calendar-icons.svg"
+                                            alt="Calendar"
+                                            width={24}
+                                            height={24}
+                                            className="transition-all duration-300 opacity-60 group-hover:opacity-100 group-hover:scale-110"
+                                        />
+                                        Schedule Time
+                                    </button>
                                 </div>
 
                                 <div className="flex flex-col gap-2">

@@ -6,6 +6,15 @@
     color-scheme: dark;
 }
 
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
@@ -733,4 +742,151 @@ body::-webkit-scrollbar {
 .water-fill-container:hover::before,
 .water-fill-container:hover::after {
     opacity: 0 !important;
+}
+
+/* Liquid Button Animation (CodePen XWJeWyr adaptation) */
+@keyframes drift {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.liquid-button {
+    position: relative;
+    overflow: hidden;
+    /* other styles handled by tailwind classes */
+}
+
+.liquid-wave {
+    position: absolute;
+    top: 50%;
+    /* Adjusted from top: 40% in SCSS to center it relative to button */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200%;
+    /* Make it large enough to cover the button when rotating */
+    height: 200%;
+    /* Make it large enough */
+    border-radius: 40%;
+    background-color: rgba(255, 255, 255, 0.2);
+    /* Subtle white wave by default */
+    animation: drift 6s infinite linear;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.liquid-wave::after {
+    content: "";
+    /* Mimic the pseudo element from SCSS if needed, but the main div is enough for the wave shape */
+}
+
+/* Bubbles / Blobs */
+.liquid-bubble {
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.4);
+    animation: bubble-float 4s infinite ease-in-out;
+    bottom: -20px;
+    z-index: 10;
+    pointer-events: none;
+}
+
+@keyframes bubble-float {
+    0% {
+        transform: translateY(0) scale(0.8);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: translateY(-60px) scale(1.2);
+        opacity: 0;
+    }
+}
+
+
+/* Sloshing Liquid Button Animation (User Customization) */
+@keyframes slosh {
+    0% {
+        transform: translate(-50%, -75%) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(-50%, -75%) rotate(360deg);
+    }
+}
+
+@keyframes fillup {
+    0% {
+        top: -80px;
+    }
+
+    100% {
+        top: -120px;
+    }
+}
+
+/* Filling Body Button Animation (User Requested) */
+/* User Provided "Water" Animation for Liquid Fill */
+@keyframes water {
+    0% {
+        transform: translate(-50%, -70%) rotate(0deg);
+    }
+
+    100% {
+        transform: translate(-50%, -75%) rotate(360deg);
+    }
+}
+
+.btn-liquid {
+    position: relative;
+    overflow: hidden;
+    background-color: #00000024;
+    border-color: hsl(0deg 0% 100% / 6%);
+}
+
+.btn-liquid .liquid-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* The Wave Element */
+.btn-liquid .liquid-fill::before {
+    content: "";
+    position: absolute;
+    width: 200%;
+    padding-bottom: 200%;
+    background: #0158ff;
+    /* Theme Blue */
+    left: 50%;
+    top: 150%;
+    /* Start hidden below */
+    border-radius: 45%;
+
+    transform: translate(-50%, -70%);
+
+    transition: top 4s ease-out;
+    animation: water 10s linear infinite alternate;
+}
+
+.btn-liquid:hover .liquid-fill::before {
+    top: -20%;
+    /* Fill up */
+}
+
+/* No ::after element needed in this version */
+.btn-liquid .liquid-fill::after {
+    display: none;
 }

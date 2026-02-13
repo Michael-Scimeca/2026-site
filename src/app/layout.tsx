@@ -4,6 +4,8 @@ import SmoothScroll from "@/components/SmoothScroll";
 import CustomCursor from "@/components/CustomCursor";
 import { CurveLoader } from "@/components/CurveLoader";
 import DynamicFavicon from "@/components/DynamicFavicon";
+import { ModalProvider } from "@/context/ModalContext";
+import { ScheduleModal } from "@/components/ScheduleModal";
 import Script from "next/script";
 import "./globals.css"; // Global styles
 
@@ -45,7 +47,7 @@ export const metadata: Metadata = {
     siteName: "Michael Scimeca Portfolio",
     images: [
       {
-        url: "/og-image.png",
+        url: "og/og-image.png",
         width: 1200,
         height: 630,
         alt: "Michael Scimeca - Web Developer & AI Automation Specialist",
@@ -56,7 +58,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Michael Scimeca — Senior Web Developer & AI Automation Specialist",
     description: "Experienced senior web developer and AI automation specialist building intelligent digital products and workflows for brands and teams.",
-    images: ["/og-image.png"],
+    images: ["og/og-image.png"],
     creator: "@mikeyscimeca",
   },
   robots: {
@@ -173,7 +175,14 @@ export default function RootLayout({
           </>
         )}
 
-        {children}
+        <ModalProvider>
+          <CurveLoader />
+          <SmoothScroll />
+          <CustomCursor />
+          <DynamicFavicon />
+          <ScheduleModal />
+          {children}
+        </ModalProvider>
       </body>
     </html>
   );

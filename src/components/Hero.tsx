@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useRef, useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useModal } from '@/context/ModalContext';
 import Image from 'next/image';
 import { StatusBadge } from './StatusBadge';
 import { GameContainer } from './GameContainer';
@@ -23,8 +25,9 @@ interface HeroProps {
 
 export function Hero(props: HeroProps) {
     const { title, heroImage, headline, subHeadline, isTransitionOverlay } = props || {};
-    const [isHovering, setIsHovering] = useState(false);
-    const [waterFilled, setWaterFilled] = useState(false);
+    const { openModal } = useModal();
+    const [hoverTarget, setHoverTarget] = useState<'email' | 'book' | null>(null);
+    const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const bgRef = useRef<HTMLDivElement>(null);
@@ -35,32 +38,36 @@ export function Hero(props: HeroProps) {
 
     const [heroHeight, setHeroHeight] = useState<string | undefined>(undefined);
 
+    // Hold-to-act: auto-trigger action after liquid fill completes (4s)
     useEffect(() => {
-        let timeout: NodeJS.Timeout;
-        if (isHovering && !waterFilled) {
-            timeout = setTimeout(() => {
-                setWaterFilled(true);
-                // Create a temporary link and click it to trigger mailto reliably
-                const mailtoLink = document.createElement('a');
-                mailtoLink.href = "mailto:mikeyscimeca.dev@gmail.com?subject=I would love to get a 15 - 20 min call with you to talk about a potential project";
-                mailtoLink.click();
-
-                // Reset after a delay to allow the user to see the success state
-                setTimeout(() => {
-                    setWaterFilled(false);
-                }, 3000);
-            }, 3000);
+        if (hoverTimerRef.current) {
+            clearTimeout(hoverTimerRef.current);
+            hoverTimerRef.current = null;
         }
-        return () => clearTimeout(timeout);
-    }, [isHovering, waterFilled]);
+
+        if (hoverTarget === 'email') {
+            hoverTimerRef.current = setTimeout(() => {
+                const mailtoLink = document.createElement('a');
+                mailtoLink.href = "mailto:mikeyscimeca.dev@gmail.com?subject=Let's Talk Strategy";
+                mailtoLink.click();
+                setHoverTarget(null);
+            }, 4000);
+        } else if (hoverTarget === 'book') {
+            hoverTimerRef.current = setTimeout(() => {
+                openModal();
+                setHoverTarget(null);
+            }, 4000);
+        }
+
+        return () => {
+            if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+        };
+    }, [hoverTarget, openModal]);
 
     useEffect(() => {
-        // Set fixed height to exactly 100vh to prevent address bar resizing jumps and ensure strict layout
+        // Set fixed height once on mount to prevent mobile address bar resize jumps
         if (typeof window !== 'undefined') {
-            const updateHeight = () => setHeroHeight(`${window.innerHeight}px`);
-            updateHeight();
-            window.addEventListener('resize', updateHeight);
-            return () => window.removeEventListener('resize', updateHeight);
+            setHeroHeight(`${window.innerHeight}px`);
         }
     }, []);
 
@@ -219,7 +226,7 @@ export function Hero(props: HeroProps) {
                 </div>
 
                 {/* Foreground Portrait Layer - Increased height for bleed */}
-                <div className="absolute top-0 left-0 w-full h-full z-10 flex items-center justify-center pointer-events-none">
+                <div className="absolute top-0 left-0 w-full h-full z-30 flex items-center justify-center pointer-events-none">
                     <div ref={portraitRef} className="relative w-full h-full top-0 md:h-[110%] md:top-[10%] max-w-4xl flex items-end will-change-transform">
                         <Image
                             src="/hero-portrait.png"
@@ -231,9 +238,9 @@ export function Hero(props: HeroProps) {
                             quality={100}
                             sizes="(max-width: 768px) 100vw, 80vw"
                         />
-                        <div ref={contentRef} className="absolute z-20 flex flex-col items-start gap-1 
-                            left-5 bottom-[20%] right-auto top-auto md:top-[calc(38%-50px)] md:left-[max(20px,calc(50%-220px))] lg:left-[calc(50%-100px)] xl:left-[calc(55%-100px)] md:right-auto md:bottom-auto
-                            max-w-[85vw] md:min-w-[550px] 
+                        <div ref={contentRef} className="absolute z-50 flex flex-col items-start gap-1 pointer-events-auto
+                            left-5 bottom-6 right-auto top-auto md:top-[calc(38%-50px)] md:left-[max(20px,calc(50%-220px))] lg:left-[calc(40%-100px)] xl:left-[calc(55%-100px)] md:right-auto md:bottom-auto
+                            max-w-[85vw] md:min-w-[700px] 
                             md:rotate-[-2deg]
                             transition-[left,transform] duration-500 ease-out
                             will-change-transform">
@@ -241,10 +248,10 @@ export function Hero(props: HeroProps) {
                             {/* Mobile Scrim for Legibility */}
                             <div className="absolute -inset-6 bg-gradient-to-r from-black/80 via-black/40 to-transparent -z-10 rounded-xl blur-xl md:hidden" />
 
-                            <h1 className="text-[clamp(28px,6vw,36px)] font-medium font-sans text-white leading-[1.1] tracking-tight whitespace-normal drop-shadow-lg md:drop-shadow-none">
-                                🌟 I build high-impact<br className="hidden md:block" />
-                                digital products, AI workflows,<br className="hidden md:block" />
-                                and automation systems that<br className="hidden md:block" />
+                            <h1 className="text-[clamp(26px,5vw,44px)] font-medium font-sans text-white leading-[1.1] tracking-tight whitespace-normal drop-shadow-lg md:drop-shadow-none">
+                                🌟 I build high-impact<br className="hidden md:block" />{' '}
+                                digital products, AI workflows,<br className="hidden md:block" />{' '}
+                                and automation systems that<br className="hidden md:block" />{' '}
                                 help teams grow and scale.
                             </h1>
 
@@ -252,38 +259,44 @@ export function Hero(props: HeroProps) {
                                 Senior Web Developer & AI Automation Specialist — I help startups and brands ship intelligent solutions that save time and increase conversions.
                             </p>
 
-                            <div className="flex items-center gap-4 mt-6">
+                            <div className="flex flex-col md:flex-row gap-4 mt-6 w-full md:w-auto">
                                 <a
-                                    href="mailto:mikeyscimeca.dev@gmail.com?subject=I would love to get a 15 - 20 min call with you to talk about a potential project"
-                                    onMouseEnter={() => setIsHovering(true)}
-                                    onMouseLeave={() => setIsHovering(false)}
-                                    className={`shiny-cta water-fill-container pointer-events-auto flex items-center gap-4 transition-all duration-300 ${waterFilled ? 'charged-active' : ''}`}
+                                    href="mailto:mikeyscimeca.dev@gmail.com?subject=Let's Talk Strategy"
+                                    onMouseEnter={() => setHoverTarget('email')}
+                                    onMouseLeave={() => setHoverTarget(null)}
+                                    className="relative inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full font-medium text-lg text-white overflow-hidden bg-transparent border border-white btn-liquid"
                                 >
-                                    <div className={`water-fill-background ${isHovering ? 'water-fill-active' : ''}`} />
+                                    {/* Liquid Fill Effect */}
+                                    <div className="liquid-fill" />
 
-                                    <span className="relative z-10 transition-colors duration-300 whitespace-nowrap text-[14px] md:text-[1.125rem]">
-                                        {waterFilled ? 'Opening Email...' : 'Schedule a 15-min Call'}
-                                    </span>
-
-                                    <div className="relative z-10">
-                                        <div className="relative w-12 h-12">
-                                            <svg viewBox="0 0 100 100" className="w-full h-full">
-                                                <defs>
-                                                    <mask id="phone-mask">
-                                                        <rect width="100" height="100" fill="white" />
-                                                        <image
-                                                            href="/phone-icon.svg"
-                                                            x="20" y="20"
-                                                            width="60" height="60"
-                                                            style={{ filter: 'brightness(0)' }}
-                                                        />
-                                                    </mask>
-                                                </defs>
-                                                <circle cx="50" cy="50" r="50" fill="white" mask="url(#phone-mask)" />
-                                            </svg>
-                                        </div>
-                                    </div>
+                                    <span className="relative z-10">Email Me</span>
+                                    <Image
+                                        src="/Icon/email-icon.svg"
+                                        alt="Email"
+                                        width={32}
+                                        height={32}
+                                        className="relative z-10 invert"
+                                    />
                                 </a>
+
+                                <button
+                                    onClick={openModal}
+                                    onMouseEnter={() => setHoverTarget('book')}
+                                    onMouseLeave={() => setHoverTarget(null)}
+                                    className="relative inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full font-medium text-lg text-white overflow-hidden bg-transparent border border-white btn-liquid"
+                                >
+                                    {/* Liquid Fill Effect */}
+                                    <div className="liquid-fill" />
+
+                                    <span className="relative z-10">Book Strategy Call</span>
+                                    <Image
+                                        src="/Icon/calendar-icons.svg"
+                                        alt="Calendar"
+                                        width={24}
+                                        height={24}
+                                        className="relative z-10"
+                                    />
+                                </button>
                             </div>
                         </div>
 
