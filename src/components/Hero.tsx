@@ -114,15 +114,15 @@ export function Hero(props: HeroProps) {
                 }
             });
 
-            // Content moves up (appears to recede)
+            // Content moves up (subtle parallax)
             gsap.to(contentRef.current, {
-                y: "-90%",
+                y: "-75%",
                 ease: "none",
                 scrollTrigger: {
                     trigger: containerRef.current,
                     start: "top top",
                     end: "bottom top",
-                    scrub: 1.5
+                    scrub: true
                 }
             });
 
@@ -273,8 +273,8 @@ export function Hero(props: HeroProps) {
                                     <Image
                                         src="/Icon/email-icon.svg"
                                         alt="Email"
-                                        width={32}
-                                        height={32}
+                                        width={24}
+                                        height={24}
                                         className="relative z-10 invert"
                                     />
                                 </a>

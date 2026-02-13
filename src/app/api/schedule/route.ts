@@ -26,6 +26,21 @@ function checkRateLimit(ip: string): boolean {
     return true;
 }
 
+// Sanitize user input for safe HTML embedding
+function sanitizeHtml(str: string): string {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+}
+
+// Enforce length limits on input
+function sanitizeField(value: string | undefined, maxLength: number): string {
+    return sanitizeHtml(String(value || '').trim().slice(0, maxLength));
+}
+
 export async function POST(req: Request) {
     try {
         // Rate limiting
@@ -38,7 +53,16 @@ export async function POST(req: Request) {
         }
 
         const body = await req.json();
-        const { name, email, company, budget, date, time, description } = body;
+        const { name: rawName, email: rawEmail, company: rawCompany, budget: rawBudget, date: rawDate, time: rawTime, description: rawDescription } = body;
+
+        // Sanitize all inputs
+        const name = sanitizeField(rawName, 100);
+        const email = sanitizeField(rawEmail, 150);
+        const company = sanitizeField(rawCompany, 150);
+        const budget = sanitizeField(rawBudget, 50);
+        const date = sanitizeField(rawDate, 20);
+        const time = sanitizeField(rawTime, 20);
+        const description = sanitizeField(rawDescription, 1000);
 
         // Server-side validation
         if (!name || !email) {
@@ -48,21 +72,24 @@ export async function POST(req: Request) {
             );
         }
 
-        // Basic email validation
+        // Basic email validation (use raw input for regex, sanitized for display)
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
+        if (!emailRegex.test(String(rawEmail).trim())) {
             return NextResponse.json(
                 { error: 'Invalid email address.' },
                 { status: 400 }
             );
         }
 
+        // Clean email for sending (not HTML-escaped)
+        const cleanEmail = String(rawEmail).trim().slice(0, 150);
+
         // If date/time are present, it's a full booking (legacy/future support)
         const isFullBooking = date && time;
         let formattedDate = '';
 
         if (isFullBooking) {
-            const meetingDate = new Date(date + 'T12:00:00');
+            const meetingDate = new Date(String(rawDate).trim() + 'T12:00:00');
             formattedDate = meetingDate.toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
@@ -145,7 +172,7 @@ export async function POST(req: Request) {
         if (isFullBooking) {
             await resend.emails.send({
                 from: 'Michael Scimeca <onboarding@resend.dev>',
-                to: [email],
+                to: [cleanEmail],
                 subject: 'Discovery Call Confirmed! 🎉',
                 html: `
                     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #fff; border-radius: 12px; overflow: hidden;">

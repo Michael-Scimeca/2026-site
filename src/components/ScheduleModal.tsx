@@ -42,6 +42,7 @@ export function ScheduleModal() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const formRef = useRef<HTMLFormElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -84,6 +85,11 @@ export function ScheduleModal() {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
         setError(null);
+        setFieldErrors(prev => {
+            const next = { ...prev };
+            delete next[name];
+            return next;
+        });
     };
 
     // Calculate form completion progress
@@ -120,11 +126,40 @@ export function ScheduleModal() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Validate required fields
-        if (!formData.name || !formData.email || !formData.date || !formData.time) {
-            setError('Please fill in all required fields.');
+        // Field-level validation
+        const errors: Record<string, string> = {};
+
+        if (!formData.name.trim()) {
+            errors.name = 'Name is required';
+        }
+
+        if (!formData.email.trim()) {
+            errors.email = 'Email is required';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            errors.email = 'Enter a valid email address';
+        }
+
+        if (!formData.budget) {
+            errors.budget = 'Select a budget range';
+        }
+
+        if (!formData.date) {
+            errors.date = 'Select a date';
+        } else if (formData.date < getMinDate()) {
+            errors.date = 'Date must be in the future';
+        }
+
+        if (!formData.time) {
+            errors.time = 'Select a time';
+        }
+
+        if (Object.keys(errors).length > 0) {
+            setFieldErrors(errors);
+            setError('Please fix the highlighted fields.');
             return;
         }
+
+        setFieldErrors({});
 
         // Prevent double submission
         if (isSubmitting) return;
@@ -161,20 +196,20 @@ export function ScheduleModal() {
     if (!isModalOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center">
+        <div className="fixed inset-0 z-[100] flex items-end justify-center">
             {/* Backdrop */}
             <div
-                className="absolute inset-0  backdrop-blur-sm transition-opacity duration-300"
+                className="absolute inset-0 backdrop-blur-sm transition-opacity duration-300"
                 onClick={closeModal}
             />
 
             {/* Modal Card */}
-            <div className="relative w-full h-screen flex flex-col bg-[#0a0a0a] border border-white/10 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+            <div className="relative w-full h-screen flex flex-col bg-[#0a0a0a] border border-white/10 shadow-2xl overflow-hidden" style={{ animation: 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}>
                 {/* Gradient Border Top */}
 
                 <button
                     onClick={closeModal}
-                    className="absolute top-8 right-8 z-20 text-zinc-500 hover:text-white transition-colors"
+                    className="absolute top-8 right-4 md:right-8 z-20 text-zinc-500 hover:text-white transition-colors"
                     aria-label="Close modal"
                 >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -233,11 +268,12 @@ export function ScheduleModal() {
                                             id="booking-name"
                                             name="name"
                                             required
-                                            className={`w-full px-3 py-2 bg-white/5 rounded-lg text-sm placeholder:text-zinc-600 focus:outline-none focus:border-[#0158ff] focus:ring-1 focus:ring-[#0158ff]/50 transition-all ${formData.name ? 'text-white' : 'text-zinc-600'}`}
+                                            className={`w-full px-3 py-2 bg-white/5 rounded-lg text-sm placeholder:text-zinc-600 focus:outline-none focus:border-[#0158ff] focus:ring-1 focus:ring-[#0158ff]/50 transition-all ${formData.name ? 'text-white' : 'text-zinc-600'} ${fieldErrors.name ? 'border border-red-500/60 ring-1 ring-red-500/30' : ''}`}
                                             placeholder="Full Name"
                                             value={formData.name}
                                             onChange={handleChange}
                                         />
+                                        {fieldErrors.name && <p className="text-red-400 text-[11px] mt-1 ml-1">{fieldErrors.name}</p>}
                                     </div>
                                     <div>
                                         <input
@@ -245,11 +281,12 @@ export function ScheduleModal() {
                                             id="booking-email"
                                             name="email"
                                             required
-                                            className={`w-full px-3 py-2 bg-white/5 rounded-lg text-sm placeholder:text-zinc-600 focus:outline-none focus:border-[#0158ff] focus:ring-1 focus:ring-[#0158ff]/50 transition-all ${formData.email ? 'text-white' : 'text-zinc-600'}`}
+                                            className={`w-full px-3 py-2 bg-white/5 rounded-lg text-sm placeholder:text-zinc-600 focus:outline-none focus:border-[#0158ff] focus:ring-1 focus:ring-[#0158ff]/50 transition-all ${formData.email ? 'text-white' : 'text-zinc-600'} ${fieldErrors.email ? 'border border-red-500/60 ring-1 ring-red-500/30' : ''}`}
                                             placeholder="Email Address"
                                             value={formData.email}
                                             onChange={handleChange}
                                         />
+                                        {fieldErrors.email && <p className="text-red-400 text-[11px] mt-1 ml-1">{fieldErrors.email}</p>}
                                     </div>
                                 </div>
 
@@ -258,7 +295,7 @@ export function ScheduleModal() {
                                     <select
                                         id="booking-budget"
                                         name="budget"
-                                        className={`w-full px-3 py-2 bg-white/5 rounded-lg text-sm focus:outline-none focus:border-[#0158ff] focus:ring-1 focus:ring-[#0158ff]/50 transition-all appearance-none cursor-pointer [color-scheme:dark] ${formData.budget ? 'text-white' : 'text-zinc-600'}`}
+                                        className={`w-full px-3 py-2 bg-white/5 rounded-lg text-sm focus:outline-none focus:border-[#0158ff] focus:ring-1 focus:ring-[#0158ff]/50 transition-all appearance-none cursor-pointer [color-scheme:dark] ${formData.budget ? 'text-white' : 'text-zinc-600'} ${fieldErrors.budget ? 'border border-red-500/60 ring-1 ring-red-500/30' : ''}`}
                                         value={formData.budget}
                                         onChange={handleChange}
                                     >
@@ -268,6 +305,7 @@ export function ScheduleModal() {
                                             </option>
                                         ))}
                                     </select>
+                                    {fieldErrors.budget && <p className="text-red-400 text-[11px] mt-1 ml-1">{fieldErrors.budget}</p>}
                                 </div>
 
                                 {/* Row: Date + Time */}
@@ -288,17 +326,18 @@ export function ScheduleModal() {
                                                 e.currentTarget.type = 'date';
                                                 e.currentTarget.showPicker();
                                             }}
-                                            className={`w-full min-w-0 px-3 py-2 bg-white/5 rounded-lg text-sm focus:outline-none focus:border-[#0158ff] focus:ring-1 focus:ring-[#0158ff]/50 transition-all [color-scheme:dark] cursor-pointer placeholder:text-zinc-600 ${formData.date ? 'text-white' : 'text-zinc-600'}`}
+                                            className={`w-full min-w-0 px-3 py-2 bg-white/5 rounded-lg text-sm focus:outline-none focus:border-[#0158ff] focus:ring-1 focus:ring-[#0158ff]/50 transition-all [color-scheme:dark] cursor-pointer placeholder:text-zinc-600 ${formData.date ? 'text-white' : 'text-zinc-600'} ${fieldErrors.date ? 'border border-red-500/60 ring-1 ring-red-500/30' : ''}`}
                                             value={formData.date}
                                             onChange={handleChange}
                                         />
+                                        {fieldErrors.date && <p className="text-red-400 text-[11px] mt-1 ml-1">{fieldErrors.date}</p>}
                                     </div>
                                     <div>
                                         <select
                                             id="booking-time"
                                             name="time"
                                             required
-                                            className={`w-full px-3 py-2 bg-white/5 rounded-lg text-sm focus:outline-none focus:border-[#0158ff] focus:ring-1 focus:ring-[#0158ff]/50 transition-all appearance-none cursor-pointer [color-scheme:dark] ${formData.time ? 'text-white' : 'text-zinc-600'}`}
+                                            className={`w-full px-3 py-2 bg-white/5 rounded-lg text-sm focus:outline-none focus:border-[#0158ff] focus:ring-1 focus:ring-[#0158ff]/50 transition-all appearance-none cursor-pointer [color-scheme:dark] ${formData.time ? 'text-white' : 'text-zinc-600'} ${fieldErrors.time ? 'border border-red-500/60 ring-1 ring-red-500/30' : ''}`}
                                             value={formData.time}
                                             onChange={handleChange}
                                         >
@@ -307,6 +346,7 @@ export function ScheduleModal() {
                                                 <option key={time} value={time} className="bg-[#0a0a0a]">{time}</option>
                                             ))}
                                         </select>
+                                        {fieldErrors.time && <p className="text-red-400 text-[11px] mt-1 ml-1">{fieldErrors.time}</p>}
                                     </div>
                                 </div>
 

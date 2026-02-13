@@ -159,7 +159,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                 }}
             >
                 {[...Array(gridDimensions.count)].map((_, i) => (
-                    <div key={i} className="reveal-square w-full h-full bg-[#0158ff] opacity-100" />
+                    <div key={i} className="reveal-square w-full h-full bg-black opacity-100" />
                 ))}
             </div>
 

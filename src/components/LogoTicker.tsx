@@ -45,6 +45,8 @@ const TOOLS = [
     { name: "WordPress", src: "/tools/WordPress_blue_logo.svg", color: "#21759b", customFilter: 'brightness(0) invert(1)' },
     { name: "BugHerd", src: "/tools/bugherd.svg", color: "#41CBA8", customFilter: 'brightness(0) invert(1)' },
     { name: "Google Analytics", src: "/tools/Logo_Google_Analytics.svg.png", color: "#F9AB00", customFilter: 'brightness(0) invert(1)' },
+    { name: "Sanity", src: "/tools/Sanity-logo.svg", color: "#F03E2F", customFilter: 'brightness(0) invert(1)' },
+    { name: "Prismic", src: "/tools/prismic-logo.svg", color: "#5163BA", customFilter: 'brightness(0) invert(1)' },
 ];
 
 // --- Mobile/Stacked Item (< 1000px) ---
@@ -70,7 +72,7 @@ const HELIX_Sep = 0.5;
 function HelixItem({ tool, className, style }: { tool: typeof TOOLS[0], className?: string, style?: React.CSSProperties }) {
     return (
         <div
-            className={`absolute flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-black/40 backdrop-blur-sm rounded-full border border-white/10 ${className}`}
+            className={`absolute flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-black/80 rounded-full border border-white/10 will-change-transform ${className}`}
             data-color={tool.color}
             data-custom-filter={tool.customFilter}
             style={{
@@ -95,8 +97,8 @@ function HelixItem({ tool, className, style }: { tool: typeof TOOLS[0], classNam
 
 export function LogoTicker() {
     const containerRef = useRef<HTMLElement>(null);
-    const strand1 = TOOLS.slice(0, 10);
-    const strand2 = TOOLS.slice(10, 20);
+    const strand1 = TOOLS.slice(0, 11);
+    const strand2 = TOOLS.slice(11, 22);
 
     useGSAP(() => {
         const mm = gsap.matchMedia();
@@ -147,10 +149,10 @@ export function LogoTicker() {
                    The gap distribution in `justify-between` is (width / (n-1)).
                    We have 10 items, so 9 gaps.
                 */
-                const step = innerWidth / 9;
+                const step = innerWidth / 10;
 
                 // Loop from -3 to 12 to generate bleed-off lines
-                for (let i = -3; i <= 12; i++) {
+                for (let i = -3; i <= 13; i++) {
                     const angle = time.value + (i * HELIX_Sep);
 
                     const sin1 = Math.sin(angle);
@@ -163,7 +165,7 @@ export function LogoTicker() {
                     const y2 = (sin2 * HELIX_Amp) + 100;
                     points2.push({ x, y: y2 });
 
-                    if (i >= 0 && i < 10) {
+                    if (i >= 0 && i < 11) {
                         const line = lines[i];
                         const item1 = items1[i];
                         const item2 = items2[i];

@@ -25,20 +25,25 @@ export async function sendWinnerNotification(
         return;
     }
 
+    // Sanitize inputs for safe HTML embedding
+    const safeName = name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const safeEmail = email.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    const safeGame = game.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
     try {
         await client.emails.send({
             from: 'Game Notifications <onboarding@resend.dev>', // You'll update this after domain verification
             to: 'mikeyscimeca.dev@gmail.com',
-            subject: `🎉 New Winner: ${name} beat the ${game} AI!`,
+            subject: `🎉 New Winner: ${safeName} beat the ${safeGame} AI!`,
             html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #0158ff;">🎮 New Game Winner!</h2>
           <p>Someone just beat your AI!</p>
           
           <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
-            <p><strong>Name:</strong> ${name}</p>
-            <p><strong>Email:</strong> ${email}</p>
-            <p><strong>Game:</strong> ${game}</p>
+            <p><strong>Name:</strong> ${safeName}</p>
+            <p><strong>Email:</strong> ${safeEmail}</p>
+            <p><strong>Game:</strong> ${safeGame}</p>
             <p><strong>Time:</strong> ${new Date().toLocaleString()}</p>
           </div>
           
