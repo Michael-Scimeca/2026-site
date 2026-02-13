@@ -50,12 +50,37 @@ export function FloatingMenu() {
     return (
         <div
             ref={menuRef}
-            className={`group floating-menu-glow fixed right-4 md:right-6 desktop:right-8 top-4 md:top-6 desktop:top-8 z-50 flex flex-col items-center rounded-3xl backdrop-blur-md transition-all duration-500 ${isVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+            className={`group fixed right-4 md:right-6 desktop:right-8 top-4 md:top-6 desktop:top-8 z-50 flex flex-col items-center rounded-3xl backdrop-blur-md transition-all duration-500 ${isVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
         >
+            {/* SVG Border Overlay */}
+            <svg className="absolute inset-0 w-full h-full pointer-events-none z-50 overflow-visible rounded-3xl">
+                <defs>
+                    <linearGradient id="border-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stopColor="#60a9ff">
+                            <animate attributeName="stop-color" values="#60a9ff;#6500ff;#006aff;#0900b3;#076dff;#60a9ff" dur="4s" repeatCount="indefinite" />
+                        </stop>
+                        <stop offset="50%" stopColor="#6500ff">
+                            <animate attributeName="stop-color" values="#6500ff;#006aff;#0900b3;#076dff;#60a9ff;#6500ff" dur="4s" repeatCount="indefinite" />
+                        </stop>
+                        <stop offset="100%" stopColor="#006aff">
+                            <animate attributeName="stop-color" values="#006aff;#0900b3;#076dff;#60a9ff;#6500ff;#006aff" dur="4s" repeatCount="indefinite" />
+                        </stop>
+                    </linearGradient>
+                </defs>
+                <rect
+                    x="1" y="1"
+                    width="calc(100% - 2px)" height="calc(100% - 2px)"
+                    rx="23" ry="23"
+                    fill="none"
+                    stroke="url(#border-glow)"
+                    strokeWidth="2"
+                />
+            </svg>
+
             {/* Scroll to Top */}
             <button
                 onClick={scrollToTop}
-                className={`transition-all duration-300 p-2 ${isAtBottom ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'text-[#838384] hover:text-white'}`}
+                className={`relative z-10 transition-all duration-300 p-2 ${isAtBottom ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'text-[#838384] hover:text-white'}`}
                 aria-label="Scroll to top"
             >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -85,7 +110,7 @@ export function FloatingMenu() {
                 {/* Email (Envelope) */}
                 <a
                     href="mailto:mikeyscimeca.dev@gmail.com"
-                    className="text-[#838384] hover:text-white transition-colors p-2"
+                    className="text-[#838384] hover:text-white transition-colors p-2 relative z-10"
                     aria-label="Email"
                     onClick={() => setIsExpanded(false)}
                 >
@@ -100,7 +125,7 @@ export function FloatingMenu() {
                     href="https://discord.com/users/michael_scimeca"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#838384] hover:text-white transition-colors p-2"
+                    className="text-[#838384] hover:text-white transition-colors p-2 relative z-10"
                     aria-label="Discord"
                     onClick={() => setIsExpanded(false)}
                 >

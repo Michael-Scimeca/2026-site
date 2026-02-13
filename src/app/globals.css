@@ -361,35 +361,7 @@ body::-webkit-scrollbar {
 }
 
 /* Floating Menu Glow Border */
-.floating-menu-glow {
-    /* position: relative; Removed to allow 'fixed' class to work */
-    /* No default border */
-}
-
-/* The Moving Gradient Border */
-.floating-menu-glow::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    /* Match size */
-    padding: 1.5px;
-    /* Border thickness */
-    border-radius: inherit;
-    background: conic-gradient(from var(--gradient-angle),
-            #60a9ff,
-            #6500ff,
-            #006aff,
-            #0900b3,
-            #076dff);
-    -webkit-mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
-    z-index: 10;
-    animation: gradient-angle 3s linear infinite;
-}
+/* Floating Menu Glow Border - REMOVED (Replaced with SVG) */
 
 /* Morphing Gradient Background */
 :root {

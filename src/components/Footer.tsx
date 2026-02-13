@@ -164,7 +164,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                 <GradientBackground />
             </div>
 
-            <Container className="flex-1 flex flex-col justify-between py-4  relative z-10">
+            <Container className="flex-1 flex flex-col justify-center gap-8 py-4 relative z-10">
                 {/* User Provided SVG Mask */}
                 <svg width="0" height="0" className="absolute">
                     <defs>
@@ -240,7 +240,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                                     </a>
                                 </div>
                                 <div className="flex flex-col gap-2">
-                                    <span className="font-bold text-white text-sm uppercase tracking-wider">Call Me</span>
+                                    <span className="font-bold text-white text-sm uppercase tracking-wider">Let's Chat</span>
                                     <a href="tel:+18475089516" className="text-zinc-500 hover:text-white transition-colors text-lg w-fit">
                                         +1 (847) 508-9516
                                     </a>
@@ -276,7 +276,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
             </Container>
 
             {/* Bottom Bar - Own Block Level */}
-            <div className="border-t border-white/10 py-1">
+            <div className="border-t border-white/10 pt-4 pb-8">
                 <Container>
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 text-sm text-zinc-600">
                         <div className="flex items-center gap-2">
