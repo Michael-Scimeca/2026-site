@@ -47,6 +47,8 @@ const TOOLS = [
     { name: "Google Analytics", src: "/tools/Logo_Google_Analytics.svg.png", color: "#F9AB00", customFilter: 'brightness(0) invert(1)' },
     { name: "Sanity", src: "/tools/Sanity-logo.svg", color: "#F03E2F", customFilter: 'brightness(0) invert(1)' },
     { name: "Prismic", src: "/tools/prismic-logo.svg", color: "#5163BA", customFilter: 'brightness(0) invert(1)' },
+    { name: "Flywheel", src: "/tools/flywheel.svg", color: "#51C4C4", customFilter: 'brightness(0) invert(1)' },
+    { name: "Claude", src: "/tools/claude.svg", color: "#D4A574", customFilter: 'brightness(0) invert(1)' },
 ];
 
 // --- Mobile/Stacked Item (< 1000px) ---
@@ -97,8 +99,9 @@ function HelixItem({ tool, className, style }: { tool: typeof TOOLS[0], classNam
 
 export function LogoTicker() {
     const containerRef = useRef<HTMLElement>(null);
-    const strand1 = TOOLS.slice(0, 11);
-    const strand2 = TOOLS.slice(11, 22);
+    const mobileGridRef = useRef<HTMLDivElement>(null);
+    const strand1 = TOOLS.slice(0, 12);
+    const strand2 = TOOLS.slice(12, 24);
 
     useGSAP(() => {
         const mm = gsap.matchMedia();
@@ -115,11 +118,190 @@ export function LogoTicker() {
                 stagger: 0.05,
                 scrollTrigger: {
                     trigger: containerRef.current,
-                    start: "top 80%", // Start whenever the top of the section enters view
-                    end: "bottom 50%", // Fully colored by the time user scrolls past middle
-                    scrub: 1, // Smooth scrub linked to scroll position
+                    start: "top 80%",
+                    end: "bottom 50%",
+                    scrub: 1,
                 }
             });
+
+            // Mobile grid pulse — random pulse on grid borders
+            const grid = mobileGridRef.current;
+            if (!grid) return;
+
+            const segmentGroupRef = { current: null as SVGGElement | null };
+            let randomTl: gsap.core.Timeline | null = null;
+
+            const buildRandomPulse = () => {
+                const gridEl = grid.querySelector('.mobile-tools-grid') as HTMLElement;
+                const svg = grid.querySelector('.mobile-grid-pulse-svg') as SVGSVGElement;
+                if (!gridEl || !svg) return;
+
+                const w = gridEl.offsetWidth;
+                const h = gridEl.offsetHeight;
+                svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
+
+                // Clear previous segments
+                if (segmentGroupRef.current) {
+                    segmentGroupRef.current.remove();
+                }
+                const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                segmentGroupRef.current = g;
+                svg.appendChild(g);
+
+                const cells = gridEl.children;
+                if (!cells.length) return;
+
+                const firstCell = cells[0] as HTMLElement;
+                const cellRect = firstCell.getBoundingClientRect();
+                const cellW = cellRect.width;
+                const cellH = cellRect.height;
+                const cols = Math.round(w / cellW);
+                const rows = Math.ceil(cells.length / cols);
+
+                // Generate a random zigzag path through grid intersections
+                const generateRandomPath = (): { d: string; length: number } => {
+                    const minGridLength = cellW * 2; // must traverse at least 2 cells
+                    for (let attempt = 0; attempt < 10; attempt++) {
+                        // Pick a random starting edge
+                        const startEdge = Math.floor(Math.random() * 4); // 0=left,1=right,2=top,3=bottom
+                        let col: number, row: number;
+                        if (startEdge === 0) { col = 0; row = Math.floor(Math.random() * (rows + 1)); }
+                        else if (startEdge === 1) { col = cols; row = Math.floor(Math.random() * (rows + 1)); }
+                        else if (startEdge === 2) { row = 0; col = Math.floor(Math.random() * (cols + 1)); }
+                        else { row = rows; col = Math.floor(Math.random() * (cols + 1)); }
+
+                        // Start point off-grid, then the actual edge point
+                        const offscreen = 80;
+                        const startPt = { x: col * cellW, y: row * cellH };
+                        const offPt = { ...startPt };
+                        if (startEdge === 0) offPt.x = -offscreen;
+                        else if (startEdge === 1) offPt.x = w + offscreen;
+                        else if (startEdge === 2) offPt.y = -offscreen;
+                        else offPt.y = h + offscreen;
+
+                        const points = [offPt, startPt];
+                        let gridLength = 0;
+                        let totalLength = offscreen;
+                        let goHorizontal = startEdge === 2 || startEdge === 3;
+                        const steps = 6 + Math.floor(Math.random() * 6);
+
+                        for (let s = 0; s < steps; s++) {
+                            if (goHorizontal) {
+                                // Bias direction: if at left edge go right, if at right edge go left, else random
+                                const dir = col === 0 ? 1 : col === cols ? -1 : (Math.random() > 0.5 ? 1 : -1);
+                                const dist = 1 + Math.floor(Math.random() * 3);
+                                const nc = Math.max(0, Math.min(cols, col + dir * dist));
+                                if (nc !== col) {
+                                    const seg = Math.abs(nc - col) * cellW;
+                                    totalLength += seg;
+                                    gridLength += seg;
+                                    col = nc;
+                                    points.push({ x: col * cellW, y: row * cellH });
+                                }
+                            } else {
+                                // Bias direction: if at top edge go down, if at bottom edge go up, else random
+                                const dir = row === 0 ? 1 : row === rows ? -1 : (Math.random() > 0.5 ? 1 : -1);
+                                const dist = 1 + Math.floor(Math.random() * 3);
+                                const nr = Math.max(0, Math.min(rows, row + dir * dist));
+                                if (nr !== row) {
+                                    const seg = Math.abs(nr - row) * cellH;
+                                    totalLength += seg;
+                                    gridLength += seg;
+                                    row = nr;
+                                    points.push({ x: col * cellW, y: row * cellH });
+                                }
+                            }
+                            goHorizontal = !goHorizontal;
+                            if (s > 2 && (col === 0 || col === cols || row === 0 || row === rows)) break;
+                        }
+
+                        // Extend end point off-grid
+                        const lastPt = points[points.length - 1];
+                        const lastDir = goHorizontal;
+                        if (col === 0) points.push({ x: -offscreen, y: lastPt.y });
+                        else if (col === cols) points.push({ x: w + offscreen, y: lastPt.y });
+                        else if (row === 0) points.push({ x: lastPt.x, y: -offscreen });
+                        else if (row === rows) points.push({ x: lastPt.x, y: h + offscreen });
+                        else {
+                            if (!lastDir) points.push({ x: lastPt.x, y: lastPt.y < h / 2 ? -offscreen : h + offscreen });
+                            else points.push({ x: lastPt.x < w / 2 ? -offscreen : w + offscreen, y: lastPt.y });
+                        }
+                        totalLength += offscreen;
+
+                        // Only accept paths that actually traverse the grid
+                        if (gridLength >= minGridLength) {
+                            return {
+                                d: 'M ' + points.map(p => `${p.x},${p.y}`).join(' L '),
+                                length: totalLength
+                            };
+                        }
+                    }
+                    // Fallback: simple horizontal line across the grid
+                    const fy = Math.floor(Math.random() * (rows + 1)) * cellH;
+                    return {
+                        d: `M -80,${fy} L ${w + 80},${fy}`,
+                        length: w + 160
+                    };
+                };
+
+                // Create 4 reusable pulse paths
+                const pulsePaths: SVGPathElement[] = [];
+                for (let i = 0; i < 4; i++) {
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.setAttribute('fill', 'none');
+                    path.setAttribute('stroke', '#0158ff');
+                    path.setAttribute('stroke-width', '1');
+                    path.setAttribute('stroke-linecap', 'round');
+                    path.setAttribute('stroke-linejoin', 'round');
+                    g.appendChild(path);
+                    pulsePaths.push(path);
+                }
+
+                // Kill previous timeline
+                if (randomTl) randomTl.kill();
+                const activeTweens: gsap.core.Tween[] = [];
+
+                // Each pulse runs its own independent loop
+                const launchPulse = (pulse: SVGPathElement) => {
+                    const { d, length } = generateRandomPath();
+                    const dashVis = 20;
+                    const dashGap = length + dashVis;
+
+                    pulse.setAttribute('d', d);
+                    pulse.setAttribute('stroke-dasharray', `${dashVis} ${dashGap}`);
+
+                    gsap.set(pulse, {
+                        attr: { 'stroke-dashoffset': dashGap }
+                    });
+
+                    const duration = 4 + Math.random() * 3;
+                    const tween = gsap.to(pulse, {
+                        attr: { 'stroke-dashoffset': -dashGap },
+                        duration: duration,
+                        ease: 'none',
+                        onComplete: () => launchPulse(pulse),
+                    });
+                    activeTweens.push(tween);
+                };
+
+                // Stagger initial launch
+                pulsePaths.forEach((pulse, i) => {
+                    const delay = i * 0.8;
+                    setTimeout(() => launchPulse(pulse), delay * 1000);
+                });
+
+                // Store ref for cleanup
+                randomTl = { kill: () => activeTweens.forEach(t => t.kill()) } as any;
+            };
+
+            // Build on load and resize
+            buildRandomPulse();
+            window.addEventListener('resize', buildRandomPulse);
+
+            return () => {
+                window.removeEventListener('resize', buildRandomPulse);
+                if (randomTl) randomTl.kill();
+            };
         });
 
         // -----------------------
@@ -149,10 +331,10 @@ export function LogoTicker() {
                    The gap distribution in `justify-between` is (width / (n-1)).
                    We have 10 items, so 9 gaps.
                 */
-                const step = innerWidth / 10;
+                const step = innerWidth / 11;
 
                 // Loop from -3 to 12 to generate bleed-off lines
-                for (let i = -3; i <= 13; i++) {
+                for (let i = -3; i <= 14; i++) {
                     const angle = time.value + (i * HELIX_Sep);
 
                     const sin1 = Math.sin(angle);
@@ -165,7 +347,7 @@ export function LogoTicker() {
                     const y2 = (sin2 * HELIX_Amp) + 100;
                     points2.push({ x, y: y2 });
 
-                    if (i >= 0 && i < 11) {
+                    if (i >= 0 && i < 12) {
                         const line = lines[i];
                         const item1 = items1[i];
                         const item2 = items2[i];
@@ -272,7 +454,7 @@ export function LogoTicker() {
     }, { scope: containerRef });
 
     return (
-        <section ref={containerRef} className="w-full bg-black pt-10 pb-0 md:py-12 overflow-hidden border-b border-white/10 relative">
+        <section ref={containerRef} className="w-full bg-black pt-10 pb-0 min-[1000px]:py-12 overflow-hidden border-b border-white/10 relative">
             <Container className="mb-8">
                 <div className="text-left">
                     <span className="text-zinc-500 text-sm md:text-base block">
@@ -282,12 +464,32 @@ export function LogoTicker() {
             </Container>
 
             {/* --- MOBILE: STACKED GRID (< 1000px) --- */}
-            <div className="w-full min-[1000px]:hidden border-t border-l border-white/10">
-                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 w-full">
+            <div ref={mobileGridRef} className="w-full min-[1000px]:hidden border-t border-l border-white/10 relative">
+                <div className="mobile-tools-grid grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 w-full">
                     {TOOLS.map((tool, i) => (
                         <StackedItem key={i} tool={tool} />
                     ))}
                 </div>
+                {/* SVG Pulse Overlay */}
+                <svg className="mobile-grid-pulse-svg absolute inset-0 w-full h-full pointer-events-none z-10" preserveAspectRatio="none">
+                    <defs>
+                        <filter id="mobile-glow-pulse" x="0" y="0" width="2000" height="2000" filterUnits="userSpaceOnUse">
+                            <feGaussianBlur stdDeviation="5" result="blur" />
+                            <feMerge>
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="blur" />
+                                <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                        </filter>
+                        <linearGradient id="mobile-pulse-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stopColor="#60a9ff" />
+                            <stop offset="25%" stopColor="#6500ff" />
+                            <stop offset="50%" stopColor="#006aff" />
+                            <stop offset="75%" stopColor="#0900b3" />
+                            <stop offset="100%" stopColor="#076dff" />
+                        </linearGradient>
+                    </defs>
+                </svg>
             </div>
 
             {/* --- DESKTOP: HELIX (>= 1000px) --- */}

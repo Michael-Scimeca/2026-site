@@ -167,14 +167,14 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
             onMouseLeave={handleMouseLeave}
         >
             {/* Helix-Style Dual-Layer Bottom Border - Dash Pulse Animation */}
-            {!isLast && (
+            {(
                 <div className="absolute bottom-0 left-0 right-0 pointer-events-none z-50" style={{ overflow: 'visible' }}>
                     <svg
                         width="100%"
                         height="10"
                         viewBox="0 0 1000 10"
                         preserveAspectRatio="none"
-                        style={{ display: 'block', position: 'absolute', bottom: '-4px', left: 0, right: 0, overflow: 'visible' }}
+                        style={{ display: 'block', position: 'absolute', bottom: '-5px', left: 0, right: 0, overflow: 'visible' }}
                     >
                         <defs>
                             {/* Original Gradient */}
@@ -238,7 +238,7 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
 
             <div className="desktop:!pr-0 relative z-10">
                 <div className="flex flex-col-reverse desktop:grid desktop:grid-cols-16 desktop:items-center">
-                    <div className="desktop:col-span-11 flex flex-col gap-6 desktop:py-2 desktop:pr-2 px-4 md:px-6 desktop:pl-8">
+                    <div className="desktop:col-span-9 flex flex-col gap-6 desktop:py-2 desktop:pr-8 px-4 md:px-6 desktop:pl-8">
                         <div className="desktop:!p-0 desktop:!m-0 w-full">
                             <div className="flex flex-col gap-4">
                                 <div className="flex items-center gap-2">
@@ -380,7 +380,7 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                     </div>
 
                     {/* Column 4: Thumbnail (5 cols) */}
-                    <div className="desktop:col-span-5 w-full flex flex-col relative max-desktop:mb-8">
+                    <div className="desktop:col-span-7 w-full flex flex-col relative max-desktop:mb-8">
 
                         <ExperienceContainer>
                             <div

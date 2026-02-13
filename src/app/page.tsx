@@ -73,7 +73,7 @@ export default async function Home() {
       description: "I handled the development and animation implementation for the Longview Innovation website, using interactive motion and thoughtful transitions to support a modern, engaging digital experience.",
       tools: ["SPA", "Wordpress", "Browserstack", "GSAP", 'locomotive', 'Highway.js'],
       thumbnail: '/clips/longview.mp4',
-      themeColor: '#b04a25',
+      themeColor: '#031b3a',
       logo: '/logos/longview-innovation-logo.svg'
     },
     {

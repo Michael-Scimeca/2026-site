@@ -24,55 +24,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const emailRef = useRef<HTMLDivElement>(null);
     const footerRef = useRef<HTMLElement>(null);
-    const gridRef = useRef<HTMLDivElement>(null);
     const [isInView, setIsInView] = useState(false);
-    const [gridDimensions, setGridDimensions] = useState({ cols: 20, count: 400 });
-
-    useEffect(() => {
-        if (!footerRef.current) return;
-
-        const calculateGrid = () => {
-            const width = footerRef.current!.offsetWidth;
-            const height = footerRef.current!.offsetHeight;
-            const squareSize = 50; // 50px squares
-
-            const cols = Math.ceil(width / squareSize);
-            const rows = Math.ceil(height / squareSize);
-
-            setGridDimensions({ cols, count: cols * rows });
-        };
-
-        calculateGrid();
-        window.addEventListener('resize', calculateGrid);
-        return () => window.removeEventListener('resize', calculateGrid);
-    }, []);
-
-    useGSAP(() => {
-        if (!gridRef.current) return;
-
-        const squares = gsap.utils.toArray('.reveal-square');
-        const spacer = document.getElementById('footer-reveal-spacer');
-
-        if (squares.length === 0 || !spacer) return;
-
-        gsap.to(squares, {
-            opacity: 0,
-            duration: 0.001, // Instant transition per square
-            stagger: {
-                amount: 1,
-                from: "random",
-                grid: [Math.ceil(gridDimensions.count / gridDimensions.cols), gridDimensions.cols],
-                ease: "none"
-            },
-            ease: "none",
-            scrollTrigger: {
-                trigger: spacer,
-                start: "top bottom",
-                end: "top top",
-                scrub: 1
-            }
-        });
-    }, { scope: footerRef, dependencies: [gridDimensions] });
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -105,8 +57,13 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                 Math.pow(e.clientX - emailX, 2) + Math.pow(e.clientY - emailY, 2)
             );
 
-            const isSmallScreen = window.innerWidth < 1024;
-            const radius = isSmallScreen ? 350 : 600; // Smaller radius for tablet/mobile layouts
+            // Dynamic radius: distance between email center and video center
+            const videoRect = video.getBoundingClientRect();
+            const videoX = videoRect.left + videoRect.width / 2;
+            const videoY = videoRect.top + videoRect.height / 2;
+            const radius = Math.sqrt(
+                Math.pow(videoX - emailX, 2) + Math.pow(videoY - emailY, 2)
+            );
             let targetTime = 0;
 
             if (distance < radius) {
@@ -149,25 +106,14 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
     };
 
     return (
-        <footer ref={footerRef} className="fixed bottom-0 left-0 w-full min-h-screen text-white bg-black flex flex-col overflow-hidden z-0">
-            {/* Reveal Grid Overlay */}
-            <div
-                ref={gridRef}
-                className="absolute inset-0 z-50 grid pointer-events-none h-full w-full"
-                style={{
-                    gridTemplateColumns: `repeat(${gridDimensions.cols}, 1fr)`
-                }}
-            >
-                {[...Array(gridDimensions.count)].map((_, i) => (
-                    <div key={i} className="reveal-square w-full h-full bg-black opacity-100" />
-                ))}
-            </div>
+        <footer ref={footerRef} className="fixed bottom-0 left-0 w-full h-screen max-h-screen text-white bg-black flex flex-col overflow-hidden z-0">
+
 
             <div className="absolute inset-0 hidden lg:block z-0 pointer-events-none">
                 <GradientBackground />
             </div>
 
-            <Container className="flex-1 flex flex-col justify-center gap-8 py-4 relative z-10">
+            <Container className="flex-1 flex flex-col justify-center gap-4 md:gap-6 py-4 relative z-10">
                 {/* User Provided SVG Mask */}
                 <svg width="0" height="0" className="absolute">
                     <defs>
@@ -206,9 +152,9 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
 
                 <div className="relative z-10 w-full">
                     {/* Top Header Row */}
-                    <div className="flex flex-col md:flex-row justify-between items-start gap-4 mb-6">
-                        <div className="flex flex-col gap-4 md:gap-8">
-                            <h2 className="text-5xl md:text-[120px] font-bold tracking-tighter leading-none">
+                    <div className="flex flex-col md:flex-row justify-between items-start gap-3 mb-4">
+                        <div className="flex flex-col gap-3 md:gap-6">
+                            <h2 className="text-4xl md:text-[100px] font-bold tracking-tighter leading-none">
                                 <SweetPunkText
                                     text="Say Hi"
                                     startColor="#ffffff"
@@ -225,17 +171,17 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                     {/* Main Content Row */}
                     <div className="w-full lg:w-1/2">
                         {/* Left Side: Text and Links (Now takes full width of its half) */}
-                        <div className="flex flex-col gap-6 md:gap-12">
-                            <div className="flex flex-col gap-4 md:gap-8">
-                                <div className="text-lg md:text-xl leading-relaxed text-gradient-flow">
+                        <div className="flex flex-col gap-4 md:gap-8">
+                            <div className="flex flex-col gap-3 md:gap-5">
+                                <div className="text-base md:text-lg leading-relaxed text-gradient-flow">
                                     Ready to build something exceptional? Whether it's an intelligent application, an AI-powered platform, a custom web solution, or an innovative concept that needs technical execution, let's talk. We'll architect it, engineer it, and deploy it together.
                                 </div>
-                                <div className="text-lg md:text-xl text-gradient-flow">
+                                <div className="text-base md:text-lg text-gradient-flow">
                                     Let's strategize. Let's innovate. Let's scale.
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 min-[1160px]:grid-cols-2 gap-x-12 gap-y-10" ref={emailRef}>
+                            <div className="grid grid-cols-1 min-[1160px]:grid-cols-2 gap-x-10 gap-y-6" ref={emailRef}>
                                 <div className="flex flex-col gap-2">
                                     <span className="font-bold text-white text-sm uppercase tracking-wider">Let's Work Together</span>
                                     <a href={`mailto:${defaultEmail}`} className="text-zinc-500 hover:text-white transition-colors text-lg w-fit">
@@ -304,7 +250,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
             </Container>
 
             {/* Bottom Bar - Own Block Level */}
-            <div className="border-t border-white/10 pt-4 pb-8">
+            <div className="border-t border-white/10 pt-3 pb-4">
                 <Container>
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 text-sm text-zinc-600">
                         <div className="flex items-center gap-2">

@@ -144,7 +144,7 @@ function SetupRow({ item, isLast }: { item: SetupItem; isLast?: boolean }) {
                     height="10"
                     viewBox="0 0 1000 10"
                     preserveAspectRatio="none"
-                    style={{ display: 'block', position: 'absolute', bottom: '-4px', left: 0, right: 0, overflow: 'visible' }}
+                    style={{ display: 'block', position: 'absolute', bottom: '-5px', left: 0, right: 0, overflow: 'visible' }}
                 >
                     <defs>
                         <linearGradient id={`setup-gradient-${item.id}`} x1="0%" y1="0%" x2="100%" y2="0%">
@@ -273,7 +273,7 @@ function SetupRow({ item, isLast }: { item: SetupItem; isLast?: boolean }) {
 export function Setup() {
     return (
 
-        <section className="bg-black text-white border-t border-zinc-800 relative">
+        <section className="bg-black text-white relative">
             <div className="flex flex-col">
                 {setupItems.map((item, index) => (
                     <SetupRow

@@ -80,11 +80,6 @@ const faqs: FaqItem[] = [
         answer: "You get full access to your site, documentation, and training. For maintenance, I offer monthly packages or pay-as-you-go support—your choice.",
         category: "Support"
     },
-    {
-        question: "Do you collaborate with agencies and teams?",
-        answer: "Absolutely! I've worked at agencies like RSQ and We Can't Stop Thinking. I integrate seamlessly as an extension of your team.",
-        category: "Timeline"
-    },
 ];
 
 const categories = ["All", "Pricing", "Timeline", "AI/Automation", "Design", "Support"];
