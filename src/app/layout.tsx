@@ -152,10 +152,8 @@ export default function RootLayout({
         className={`${inter.variable} antialiased bg-[#656766] text-zinc-900`}
         suppressHydrationWarning
       >
-        <CurveLoader />
-        <SmoothScroll />
-        <CustomCursor />
-        <DynamicFavicon />
+
+
 
         <ModalProvider>
           <CurveLoader />

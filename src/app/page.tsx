@@ -158,7 +158,7 @@ export default async function Home() {
   ];
 
   return (
-    <main className="flex flex-col selection:bg-blue-500/30">
+    <main id="main-content" className="flex flex-col selection:bg-blue-500/30">
 
       <div
         className="relative z-20 bg-black"

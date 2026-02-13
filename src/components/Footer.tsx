@@ -222,13 +222,15 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
 
                                 <div className="flex flex-col gap-2">
                                     <span className="font-bold text-white text-sm uppercase tracking-wider">Hit Me Up on Discord</span>
-                                    <a href="https://discord.com/users/michael_scimeca" className="text-zinc-500 hover:text-white transition-colors text-lg w-fit">
+                                    <a href="https://discord.com/users/michael_scimeca" target="_blank" rel="noopener noreferrer" className="text-zinc-500 hover:text-white transition-colors text-lg w-fit">
                                         michaelscimeca
                                     </a>
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <a
                                         href="https://www.linkedin.com/in/mikey-scimeca/"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         className="text-zinc-500 hover:text-white transition-colors w-fit"
                                         aria-label="LinkedIn Profile"
                                     >

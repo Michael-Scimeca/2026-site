@@ -44,7 +44,18 @@ export function StatusBadge() {
         return () => clearInterval(timeInterval);
     }, []);
 
-    if (!timeParams || !weather) return null;
+    if (!timeParams || !weather) return (
+        <div className="flex items-center gap-3 bg-white/80 py-2 px-[11px] md:px-4 shadow-xl rounded-[20px] min-w-[120px] min-h-[28px]">
+            <div className="relative flex items-center justify-center w-3 h-3">
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-zinc-300"></span>
+            </div>
+            <div className="flex flex-row items-center gap-2 md:gap-3 leading-none">
+                <span className="text-[10px] tracking-[0.05em] font-bold text-zinc-300 tabular-nums uppercase whitespace-nowrap">
+                    --:-- --
+                </span>
+            </div>
+        </div>
+    );
 
     return (
         <div className="flex items-center gap-3 bg-white py-2 px-[11px] md:px-4 shadow-xl rounded-[20px]">

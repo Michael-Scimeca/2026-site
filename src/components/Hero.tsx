@@ -179,10 +179,14 @@ export function Hero(props: HeroProps) {
             <div className="relative h-full w-full overflow-hidden bg-black">
                 {/* Semantic Header for Top Elements */}
                 <header>
+                    {/* Skip to Content Link */}
+                    <a href="#main-content" className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:rounded-md focus:text-sm focus:font-medium">
+                        Skip to content
+                    </a>
                     {/* Title - Top Left (20px/20px) */}
-                    <h1 className="absolute top-[20px] left-[20px] z-50 text-lg md:text-xl font-medium tracking-tight text-white leading-none">
+                    <p className="absolute top-[20px] left-[20px] z-50 text-lg md:text-xl font-medium tracking-tight text-white leading-none">
                         {title || 'Michael Scimeca'}
-                    </h1>
+                    </p>
 
                     {/* Status Badge & Games - Top Right */}
                     <div className="absolute top-[20px] right-[20px] z-50 flex flex-col items-end pointer-events-auto gap-3">
@@ -248,12 +252,12 @@ export function Hero(props: HeroProps) {
                             {/* Mobile Scrim for Legibility */}
                             <div className="absolute -inset-6 bg-gradient-to-r from-black/80 via-black/40 to-transparent -z-10 rounded-xl blur-xl md:hidden" />
 
-                            <h1 className="text-[clamp(26px,5vw,44px)] font-medium font-sans text-white leading-[1.1] tracking-tight whitespace-normal drop-shadow-lg md:drop-shadow-none">
+                            <h2 className="text-[clamp(26px,5vw,44px)] font-medium font-sans text-white leading-[1.1] tracking-tight whitespace-normal drop-shadow-lg md:drop-shadow-none">
                                 🌟 I build high-impact<br className="hidden md:block" />{' '}
                                 digital products, AI workflows,<br className="hidden md:block" />{' '}
                                 and automation systems that<br className="hidden md:block" />{' '}
                                 help teams grow and scale.
-                            </h1>
+                            </h2>
 
                             <p className="text-white/90 md:text-white/70 text-[clamp(15px,4vw,18px)] mt-4 max-w-[600px] leading-relaxed drop-shadow-md md:drop-shadow-none">
                                 Senior Web Developer & AI Automation Specialist — I help startups and brands ship intelligent solutions that save time and increase conversions.

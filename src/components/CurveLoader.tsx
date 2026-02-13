@@ -54,7 +54,7 @@ export function CurveLoader() {
         setPath(newCurve);
 
         if (loader.current) {
-            loader.current.style.top = easeOutQuad(elapsed, 0, -loaderHeight(), duration) + "px";
+            loader.current.style.transform = `translateY(${easeOutQuad(elapsed, 0, -loaderHeight(), duration)}px)`;
         }
 
         if (elapsed < duration) {
