@@ -48,6 +48,7 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
     const progressCircleRef = useRef<SVGCircleElement>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isInView, setIsInView] = useState(false);
+    const [isVideoLoaded, setIsVideoLoaded] = useState(false);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -387,6 +388,28 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                                 className="relative aspect-video overflow-hidden shadow-sm"
                                 style={{ backgroundColor: activeThemeColor }}
                             >
+                                {/* Shimmer Loading Overlay */}
+                                {item.thumbnail && (/\.(mp4|webm)($|\?)/i.test(item.thumbnail)) && !isVideoLoaded && (
+                                    <div className="absolute inset-0 z-10">
+                                        <div
+                                            className="absolute inset-0"
+                                            style={{
+                                                background: `linear-gradient(
+                                                    110deg,
+                                                    ${activeThemeColor}00 0%,
+                                                    ${activeThemeColor}40 20%,
+                                                    rgba(255,255,255,0.08) 40%,
+                                                    rgba(255,255,255,0.12) 50%,
+                                                    rgba(255,255,255,0.08) 60%,
+                                                    ${activeThemeColor}40 80%,
+                                                    ${activeThemeColor}00 100%
+                                                )`,
+                                                backgroundSize: '200% 100%',
+                                                animation: 'shimmer 1.8s ease-in-out infinite',
+                                            }}
+                                        />
+                                    </div>
+                                )}
                                 <div ref={thumbnailRef} className="absolute inset-0 w-full h-[120%] -top-[10%]">
                                     {item.thumbnail && (
                                         (/\.(mp4|webm)($|\?)/i.test(item.thumbnail)) ? (
@@ -399,8 +422,10 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                                                     muted
                                                     playsInline
                                                     autoPlay={window.innerWidth <= 1000}
-                                                    className="w-full h-full"
+                                                    className="w-full h-full transition-opacity duration-700 ease-out"
+                                                    style={{ opacity: isVideoLoaded ? 1 : 0 }}
                                                     onLoadedData={() => {
+                                                        setIsVideoLoaded(true);
                                                         if (window.innerWidth <= 1000 && videoRef.current) {
                                                             videoRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
                                                         }

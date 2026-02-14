@@ -25,6 +25,16 @@
     }
 }
 
+@keyframes slideDown {
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(100%);
+    }
+}
+
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
@@ -362,8 +372,12 @@ body::-webkit-scrollbar {
 }
 
 @keyframes shimmer {
-    to {
-        rotate: 360deg;
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
     }
 }
 

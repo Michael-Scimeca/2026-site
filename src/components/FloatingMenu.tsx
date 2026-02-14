@@ -2,12 +2,14 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import { gsap } from 'gsap';
+import { useModal } from '@/context/ModalContext';
 
 export function FloatingMenu() {
     const [isVisible, setIsVisible] = useState(false);
     const [isAtBottom, setIsAtBottom] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+    const { openModal } = useModal();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -94,6 +96,7 @@ export function FloatingMenu() {
             >
                 <div className="w-[3px] h-[3px] rounded-full bg-zinc-500"></div>
                 <div className="w-[3px] h-[3px] rounded-full bg-zinc-500"></div>
+                <div className="w-[3px] h-[3px] rounded-full bg-zinc-500"></div>
             </div>
 
             {/* Mobile Collapse Indicator (Two Dots) */}
@@ -101,6 +104,7 @@ export function FloatingMenu() {
                 onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}
                 className={`flex md:hidden flex-col gap-[4px] -mt-3 cursor-pointer overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-0 opacity-0 p-0 pointer-events-none' : 'max-h-[40px] opacity-100 p-4'}`}
             >
+                <div className={`w-[3px] h-[3px] rounded-full bg-zinc-500 transition-colors duration-300 ${isExpanded ? 'bg-white' : ''}`}></div>
                 <div className={`w-[3px] h-[3px] rounded-full bg-zinc-500 transition-colors duration-300 ${isExpanded ? 'bg-white' : ''}`}></div>
                 <div className={`w-[3px] h-[3px] rounded-full bg-zinc-500 transition-colors duration-300 ${isExpanded ? 'bg-white' : ''}`}></div>
             </div>
@@ -119,6 +123,21 @@ export function FloatingMenu() {
                         <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94" />
                     </svg>
                 </a>
+
+                {/* Schedule */}
+                <button
+                    onClick={() => { openModal(); setIsExpanded(false); }}
+                    className="text-[#838384] hover:text-white transition-colors p-2 relative z-10 cursor-pointer"
+                    aria-label="Schedule a call"
+                >
+                    <img
+                        src="/Icon/calendar-icons.svg"
+                        alt="Calendar"
+                        width={20}
+                        height={20}
+                        className="opacity-50 hover:opacity-100 transition-opacity"
+                    />
+                </button>
 
                 {/* Discord */}
                 <a

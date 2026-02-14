@@ -45,19 +45,37 @@ export function ScheduleModal() {
     const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
     const formRef = useRef<HTMLFormElement>(null);
     const videoRef = useRef<HTMLVideoElement>(null);
+    const [isClosing, setIsClosing] = useState(false);
+    const [shouldRender, setShouldRender] = useState(false);
 
-    // Prevent body scroll when modal is open
+    // Manage mount/unmount with closing animation
     useEffect(() => {
         if (isModalOpen) {
+            setShouldRender(true);
+            setIsClosing(false);
+        } else if (shouldRender) {
+            // Already rendered — trigger close animation
+            setIsClosing(true);
+            const timer = setTimeout(() => {
+                setShouldRender(false);
+                setIsClosing(false);
+            }, 400); // matches animation duration
+            return () => clearTimeout(timer);
+        }
+    }, [isModalOpen]);
+
+    // Prevent body scroll when modal is open — use Lenis stop/start
+    useEffect(() => {
+        if (isModalOpen) {
+            // Tell Lenis to stop smooth scrolling
+            window.dispatchEvent(new Event('lenis-stop'));
             document.body.style.overflow = 'hidden';
             document.documentElement.style.overflow = 'hidden';
-            document.body.style.position = 'fixed';
-            document.body.style.width = '100%';
         } else {
+            // Re-enable Lenis smooth scrolling
             document.body.style.overflow = '';
             document.documentElement.style.overflow = '';
-            document.body.style.position = '';
-            document.body.style.width = '';
+            window.dispatchEvent(new Event('lenis-start'));
             if (isSuccess) {
                 setTimeout(() => {
                     setIsSuccess(false);
@@ -69,10 +87,13 @@ export function ScheduleModal() {
         return () => {
             document.body.style.overflow = '';
             document.documentElement.style.overflow = '';
-            document.body.style.position = '';
-            document.body.style.width = '';
+            window.dispatchEvent(new Event('lenis-start'));
         };
     }, [isModalOpen, isSuccess]);
+
+    const handleClose = () => {
+        closeModal();
+    };
 
     // Get minimum date (tomorrow)
     const getMinDate = () => {
@@ -182,7 +203,7 @@ export function ScheduleModal() {
 
             // Close modal after delay
             setTimeout(() => {
-                closeModal();
+                handleClose();
             }, 5000);
 
         } catch (err) {
@@ -193,22 +214,29 @@ export function ScheduleModal() {
         }
     };
 
-    if (!isModalOpen) return null;
+    if (!shouldRender) return null;
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-end justify-center">
+        <div className={`fixed inset-0 z-[100] flex items-end justify-center ${isClosing ? 'pointer-events-none' : ''}`}>
             {/* Backdrop */}
             <div
-                className="absolute inset-0 backdrop-blur-sm transition-opacity duration-300"
-                onClick={closeModal}
+                className={`absolute inset-0 backdrop-blur-sm transition-opacity duration-400 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
+                onClick={handleClose}
             />
 
             {/* Modal Card */}
-            <div className="relative w-full h-screen flex flex-col bg-[#0a0a0a] border border-white/10 shadow-2xl overflow-hidden" style={{ animation: 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards' }}>
+            <div
+                className="relative w-full h-screen flex flex-col bg-[#0a0a0a] border border-white/10 shadow-2xl overflow-hidden"
+                style={{
+                    animation: isClosing
+                        ? 'slideDown 0.4s cubic-bezier(0.7, 0, 0.84, 0) forwards'
+                        : 'slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                }}
+            >
                 {/* Gradient Border Top */}
 
                 <button
-                    onClick={closeModal}
+                    onClick={handleClose}
                     className="absolute top-8 right-4 md:right-8 z-20 text-zinc-500 hover:text-white transition-colors"
                     aria-label="Close modal"
                 >

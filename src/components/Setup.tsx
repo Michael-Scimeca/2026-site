@@ -154,7 +154,17 @@ function SetupRow({ item, isLast }: { item: SetupItem; isLast?: boolean }) {
                             <stop offset="75%" stopColor="#0900b3" />
                             <stop offset="100%" stopColor="#076dff" />
                         </linearGradient>
-
+                        {item.id === 'nycpride' && (
+                            <linearGradient id="rainbow-pulse-gradient" gradientUnits="userSpaceOnUse" x1="0" y1="5" x2="1000" y2="5">
+                                <stop offset="0%" stopColor="#ef4444" />
+                                <stop offset="20%" stopColor="#f97316" />
+                                <stop offset="40%" stopColor="#eab308" />
+                                <stop offset="55%" stopColor="#22c55e" />
+                                <stop offset="70%" stopColor="#3b82f6" />
+                                <stop offset="85%" stopColor="#8b5cf6" />
+                                <stop offset="100%" stopColor="#ec4899" />
+                            </linearGradient>
+                        )}
                     </defs>
                     {/* Static Base Line */}
                     <path
@@ -167,14 +177,16 @@ function SetupRow({ item, isLast }: { item: SetupItem; isLast?: boolean }) {
                     <path
                         ref={pulseRef}
                         d="M 0 5 H 1000"
-                        stroke={item.themeColor || '#0158ff'}
+                        stroke={item.id === 'nycpride' ? 'url(#rainbow-pulse-gradient)' : (item.themeColor || '#0158ff')}
                         strokeWidth="1.5"
                         strokeDasharray={`${pulseLength} ${cycleLength - pulseLength}`}
                         strokeLinecap="round"
                         vectorEffect="non-scaling-stroke"
                         className="opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                         style={{
-                            filter: `drop-shadow(0 0 4px ${item.themeColor || '#0158ff'})`
+                            filter: item.id === 'nycpride'
+                                ? 'drop-shadow(0 0 4px #ef4444) drop-shadow(0 0 4px #3b82f6)'
+                                : `drop-shadow(0 0 4px ${item.themeColor || '#0158ff'})`
                         }}
                     />
                 </svg>

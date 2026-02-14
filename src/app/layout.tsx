@@ -7,6 +7,7 @@ import DynamicFavicon from "@/components/DynamicFavicon";
 import { ModalProvider } from "@/context/ModalContext";
 import { ScheduleModal } from "@/components/ScheduleModal";
 import { CookieConsent } from "@/components/CookieConsent";
+import { OutboundLinkTracker } from "@/components/OutboundLinkTracker";
 import Script from "next/script";
 import "./globals.css"; // Global styles
 
@@ -162,6 +163,7 @@ export default function RootLayout({
           <DynamicFavicon />
           <ScheduleModal />
           <CookieConsent />
+          <OutboundLinkTracker />
           {children}
         </ModalProvider>
       </body>
