@@ -393,11 +393,11 @@ export function Pong({ isOpen, onToggle, hideCloseButton, onWin, initialHumanWin
                 </div>
                 <div className="flex flex-col items-center gap-1 text-[10px] md:text-xs text-white/80 tracking-[0.2em] font-medium uppercase text-center mt-[10px]">
                     <div className="flex justify-between w-full px-8">
-                        <span>HUMAN VS AI </span>
+                        <span>Human vs Nash</span>
                     </div>
                     <div>
-                        <span className="text-[9px]">TOTAL HUMAN WINS: {humanWins}</span><br />
-                        <span className="text-[9px]">TOTAL AI WINS: {aiWins}</span>
+                        <span className="text-[9px]">Total Human Wins: {humanWins}</span><br />
+                        <span className="text-[9px]">Total Nash Wins: {aiWins}</span>
 
                     </div>
                 </div>

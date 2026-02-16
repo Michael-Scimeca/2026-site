@@ -135,7 +135,7 @@ function SetupRow({ item, isLast }: { item: SetupItem; isLast?: boolean }) {
     return (
         <div
             ref={containerRef}
-            className="group w-full transition-colors relative py-8 desktop:py-8 overflow-visible"
+            className="group w-full transition-colors relative py-[12px] desktop:py-[12px] overflow-visible"
         >
             {/* Helix-Style Dual-Layer Bottom Border - Dash Pulse Animation */}
             <div className="absolute bottom-0 left-0 right-0 pointer-events-none z-50" style={{ overflow: 'visible' }}>

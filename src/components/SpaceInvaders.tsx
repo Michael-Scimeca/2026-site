@@ -444,8 +444,8 @@ export function SpaceInvaders({ isOpen, onToggle, hideCloseButton = false, onWin
                     {gameOver && "DEFEAT"}
                 </div>
                 <div>
-                    <span className="text-[9px]">TOTAL HUMAN WINS: {humanWins}</span><br />
-                    <span className="text-[9px]">TOTAL AI WINS: {invaderWins}</span>
+                    <span className="text-[9px]">Total Human Wins: {humanWins}</span><br />
+                    <span className="text-[9px]">Total Nash Wins: {invaderWins}</span>
                 </div>
             </div>
 

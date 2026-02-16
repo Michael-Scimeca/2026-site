@@ -12,8 +12,17 @@ export const structure: StructureResolver = (S) =>
             .schemaType('homePage')
             .documentId('homePage')
         ),
-      // Filter out the singleton type from the list of document types
+      S.divider(),
+      S.listItem()
+        .title('💬 Chat Visitors')
+        .child(
+          S.documentTypeList('chatVisitor')
+            .title('Chat Visitors')
+            .defaultOrdering([{ field: 'lastVisit', direction: 'desc' }])
+        ),
+      S.divider(),
+      // Filter out singleton and organized types from the auto-list
       ...S.documentTypeListItems().filter(
-        (listItem) => listItem.getId() !== 'homePage'
+        (listItem) => !['homePage', 'chatVisitor'].includes(listItem.getId() || '')
       ),
     ])

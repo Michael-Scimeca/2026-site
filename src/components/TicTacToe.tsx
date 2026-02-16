@@ -216,7 +216,7 @@ export function TicTacToe({ isOpen, onToggle, hideCloseButton, onWin, initialHum
                     {winner && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm rounded-lg animate-pulse pointer-events-none">
                             <span className="text-white font-medium tracking-widest text-sm uppercase">
-                                {winner === "Draw" ? "Draw" : winner === "O" ? "AI AGENT WINS" : "HUMAN WIN"}
+                                {winner === "Draw" ? "Draw" : winner === "O" ? "Nash Wins" : "Human Wins"}
                             </span>
                         </div>
                     )}
@@ -225,13 +225,13 @@ export function TicTacToe({ isOpen, onToggle, hideCloseButton, onWin, initialHum
                 <div className="flex flex-col items-center gap-1 text-[10px] md:text-xs text-white/80 tracking-[0.2em] font-medium uppercase text-center mt-[10px]">
                     <div>
                         {!winner && (
-                            isXNext ? "HUMAN" : "AI AGENT"
+                            isXNext ? "Human" : "Nash"
                         )}
                         {winner && "Game Over"}
                     </div>
                     <div>
-                        <span className="text-[9px]">TOTAL HUMAN WINS: {humanWins}</span><br />
-                        <span className="text-[9px]">TOTAL AI WINS: {losses}</span>
+                        <span className="text-[9px]">Total Human Wins: {humanWins}</span><br />
+                        <span className="text-[9px]">Total Nash Wins: {losses}</span>
                     </div>
 
                 </div>

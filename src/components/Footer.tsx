@@ -41,13 +41,15 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
         return () => observer.disconnect();
     }, []);
 
+    // Smooth video scrub — lerp toward target in rAF loop
+    const targetTimeRef = useRef(0);
+    const currentTimeRef = useRef(0);
+    const rafIdRef = useRef(0);
+
     useEffect(() => {
         const handleMouseMove = (e: MouseEvent) => {
             if (!emailRef.current || !videoRef.current) return;
-            const video = videoRef.current;
-
-            // Ensure video metadata is loaded
-            if (!isFinite(video.duration)) return;
+            if (!isFinite(videoRef.current.duration)) return;
 
             const rect = emailRef.current.getBoundingClientRect();
             const emailX = rect.left + rect.width / 2;
@@ -57,33 +59,37 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                 Math.pow(e.clientX - emailX, 2) + Math.pow(e.clientY - emailY, 2)
             );
 
-            // Dynamic radius: distance between email center and video center
-            const videoRect = video.getBoundingClientRect();
-            const videoX = videoRect.left + videoRect.width / 2;
-            const videoY = videoRect.top + videoRect.height / 2;
-            const radius = Math.sqrt(
-                Math.pow(videoX - emailX, 2) + Math.pow(videoY - emailY, 2)
-            );
-            let targetTime = 0;
+            const radius = 50;
 
             if (distance < radius) {
-                // progressive ease
+                // Closer = more progress
                 const progress = 1 - (distance / radius);
-                const easedProgress = Math.pow(progress, 1.5); // Slight ease-in
-                targetTime = easedProgress * video.duration;
+                targetTimeRef.current = progress * videoRef.current.duration;
+            } else {
+                targetTimeRef.current = 0;
             }
-
-            // Smoothly animate the video playhead
-            gsap.to(video, {
-                currentTime: targetTime,
-                duration: 0.6,
-                ease: "power2.out",
-                overwrite: true
-            });
         };
 
+        // Smooth lerp loop — runs independently of mousemove
+        const lerp = () => {
+            if (videoRef.current && isFinite(videoRef.current.duration) && videoRef.current.readyState >= 2) {
+                const diff = targetTimeRef.current - currentTimeRef.current;
+                // Only update if there's meaningful movement to avoid fighting the browser
+                if (Math.abs(diff) > 0.001) {
+                    currentTimeRef.current += diff * 0.15;
+                    videoRef.current.currentTime = currentTimeRef.current;
+                }
+            }
+            rafIdRef.current = requestAnimationFrame(lerp);
+        };
+
+        rafIdRef.current = requestAnimationFrame(lerp);
         window.addEventListener('mousemove', handleMouseMove);
-        return () => window.removeEventListener('mousemove', handleMouseMove);
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            cancelAnimationFrame(rafIdRef.current);
+        };
     }, [isInView]);
 
     useEffect(() => {
@@ -145,6 +151,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                             src="/video/footer-video.mp4"
                             muted
                             playsInline
+                            preload="auto"
                             className="w-full h-full object-cover"
                         />
                     )}

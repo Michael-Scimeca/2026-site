@@ -8,6 +8,7 @@ import { ModalProvider } from "@/context/ModalContext";
 import { ScheduleModal } from "@/components/ScheduleModal";
 import { CookieConsent } from "@/components/CookieConsent";
 import { OutboundLinkTracker } from "@/components/OutboundLinkTracker";
+import { ChatWidget } from "@/components/ChatWidget";
 import Script from "next/script";
 import "./globals.css"; // Global styles
 
@@ -164,6 +165,7 @@ export default function RootLayout({
           <ScheduleModal />
           <CookieConsent />
           <OutboundLinkTracker />
+          <ChatWidget />
           {children}
         </ModalProvider>
       </body>

@@ -302,7 +302,7 @@ export function Checkers({ isOpen, onToggle, hideCloseButton, onWin, initialHuma
                     {winner && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm z-50">
                             <span className="text-white font-bold text-xl uppercase tracking-widest">
-                                {winner === 'red' ? 'Human Wins!' : 'AI Wins!'}
+                                {winner === 'red' ? 'Human Wins!' : 'Nash Wins!'}
                             </span>
                         </div>
                     )}
@@ -311,12 +311,12 @@ export function Checkers({ isOpen, onToggle, hideCloseButton, onWin, initialHuma
                 <div className="flex flex-col items-center gap-1 text-[10px] md:text-xs text-white/80 tracking-[0.2em] font-medium uppercase text-center mt-[10px]">
                     <div>
                         {!winner && (
-                            turn === 'red' ? "YOUR TURN" : "AI THINKING..."
+                            turn === 'red' ? "Your Turn" : "Nash Thinking..."
                         )}
                     </div>
                     <div>
-                        <span className="text-[9px]">HUMAN WINS: {humanWins}</span><br />
-                        <span className="text-[9px]">AI WINS: {aiWins}</span>
+                        <span className="text-[9px]">Human Wins: {humanWins}</span><br />
+                        <span className="text-[9px]">Nash Wins: {aiWins}</span>
                     </div>
                 </div>
             </div>

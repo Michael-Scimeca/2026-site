@@ -163,7 +163,7 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
     return (
         <div
             ref={containerRef}
-            className={`group w-full transition-colors relative py-0 ${item.thumbnail ? 'desktop:py-0' : 'desktop:py-8'}`}
+            className={`group w-full transition-colors relative py-0 ${item.thumbnail ? 'desktop:py-0' : 'desktop:py-[12px]'}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >

@@ -49,7 +49,7 @@ export default function CustomCursor() {
             // Determine Target State
             const targetX = mouse.current.x;
             const targetY = mouse.current.y;
-            const targetSize = isPointer.current ? 44 : 10; // Radius 22 -> Dia 44, Radius 5 -> Dia 10
+            const targetSize = isPointer.current ? 15 : 10;
 
             // Lerp Physics
             const lerp = 0.15;
