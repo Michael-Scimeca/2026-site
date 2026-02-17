@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { Howl } from "howler";
 import { QUICK_REPLIES } from "@/lib/knowledge-base";
 import { GradientBackground } from "./GradientBackground";
 
@@ -130,7 +131,205 @@ export function ChatWidget() {
     const chatBodyRef = useRef<HTMLDivElement>(null);
     const panelRef = useRef<HTMLDivElement>(null);
     const toggleRef = useRef<HTMLButtonElement>(null);
+    const toggleVideoRef = useRef<HTMLVideoElement>(null);
+    const headerVideoRef = useRef<HTMLVideoElement>(null);
+    const isStreamingRef = useRef(false);
+    const streamingMsgRef = useRef<string | null>(null);
     const [isMobile, setIsMobile] = useState(false);
+
+    // Voice AI state
+    const [voiceEnabled, setVoiceEnabled] = useState(false);
+    const [isSpeaking, setIsSpeaking] = useState(false);
+    const lastSpokenMsgId = useRef<string | null>(null);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+    const voiceEnabledRef = useRef(false);
+    const speakTextRef = useRef<(text: string) => void>(() => { });
+
+    // Speech-to-text (mic) state
+    const [isListening, setIsListening] = useState(false);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const recognitionRef = useRef<any>(null);
+
+    // Speak text using ElevenLabs TTS API
+    const speakText = useCallback(async (text: string) => {
+        if (!voiceEnabled || typeof window === 'undefined') return;
+
+        // Stop any current audio
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current = null;
+        }
+
+        // Clean text — strip markdown, emojis, bullet formatting
+        const cleaned = text
+            .replace(/\*\*(.*?)\*\*/g, '$1')
+            .replace(/[\u{1F4CC}\u{1F4E7}\u{1F4B0}\u{23F1}\u{FE0F}\u{1F4C5}\u{1F550}\u{1F4F1}\u{1F4AC}\u{2705}\u{270F}\u{FE0F}\u{2709}\u{FE0F}\u{1F4DE}\u{1F389}\u{1F44B}\u{1F9E0}\u{26A1}\u{1F6E1}\u{FE0F}\u{1F3AF}]/gu, '')
+            .replace(/^[•\-]\s*/gm, '')
+            .replace(/\[UNKNOWN\]/g, '')
+            .replace(/\[FEATURE_REQUEST\]/g, '')
+            .trim();
+
+        if (!cleaned) return;
+
+        setIsSpeaking(true);
+
+        try {
+            const res = await fetch('/api/tts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: cleaned }),
+            });
+
+            if (!res.ok) {
+                console.error('TTS API error:', res.status);
+                setIsSpeaking(false);
+                return;
+            }
+
+            const audioBlob = await res.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            audioRef.current = audio;
+
+            audio.onended = () => {
+                setIsSpeaking(false);
+                audioRef.current = null;
+                URL.revokeObjectURL(audioUrl);
+            };
+
+            audio.onerror = () => {
+                setIsSpeaking(false);
+                audioRef.current = null;
+                URL.revokeObjectURL(audioUrl);
+            };
+
+            await audio.play();
+        } catch (err) {
+            console.error('TTS playback error:', err);
+            setIsSpeaking(false);
+        }
+    }, [voiceEnabled]);
+
+    // Keep refs in sync
+    useEffect(() => {
+        voiceEnabledRef.current = voiceEnabled;
+    }, [voiceEnabled]);
+
+    useEffect(() => {
+        speakTextRef.current = speakText;
+    }, [speakText]);
+
+    // Speech-to-text: toggle microphone
+    const micStoppedManuallyRef = useRef(false);
+    const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const toggleMic = useCallback(() => {
+        if (isListening) {
+            // User manually stopped — flag it so onend knows to send
+            micStoppedManuallyRef.current = true;
+            if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+            recognitionRef.current?.stop();
+            setIsListening(false);
+            return;
+        }
+
+        // Check browser support
+        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert('Speech recognition is not supported in your browser. Try Chrome or Edge.');
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'en-US';
+        recognition.interimResults = true;
+        recognition.continuous = true;
+        recognition.maxAlternatives = 1;
+        recognitionRef.current = recognition;
+        micStoppedManuallyRef.current = false;
+
+        let finalTranscript = '';
+
+        // Helper: start/restart the 3-second silence timer
+        const resetSilenceTimer = () => {
+            if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+            silenceTimerRef.current = setTimeout(() => {
+                // 3 seconds of silence — auto-send
+                micStoppedManuallyRef.current = true;
+                recognition.stop();
+                setIsListening(false);
+            }, 3000);
+        };
+
+        recognition.onresult = (event: any) => {
+            let interim = '';
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                const transcript = event.results[i][0].transcript;
+                if (event.results[i].isFinal) {
+                    finalTranscript += transcript;
+                } else {
+                    interim = transcript;
+                }
+            }
+            // Show interim results in the input while speaking
+            setInput(finalTranscript || interim);
+            // Reset the silence timer on every new speech result
+            resetSilenceTimer();
+        };
+
+        recognition.onend = () => {
+            if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+            if (micStoppedManuallyRef.current) {
+                // User tapped mic or silence timeout — send the message
+                setIsListening(false);
+                if (finalTranscript.trim()) {
+                    setInput(finalTranscript.trim());
+                    setTimeout(() => {
+                        const form = document.querySelector('form');
+                        if (form) form.requestSubmit();
+                    }, 100);
+                }
+            } else {
+                // Browser ended recognition (silence timeout) — restart to keep listening
+                try {
+                    recognition.start();
+                } catch {
+                    // If restart fails, just stop gracefully
+                    setIsListening(false);
+                }
+            }
+        };
+
+        recognition.onerror = (event: any) => {
+            console.error('Speech recognition error:', event.error);
+            if (event.error === 'not-allowed') {
+                setIsListening(false);
+                alert('Microphone access was denied. Please allow microphone access in your browser settings.');
+            } else if (event.error === 'no-speech') {
+                // No speech detected — silently continue listening
+                console.log('No speech detected, continuing...');
+            } else if (event.error === 'aborted') {
+                setIsListening(false);
+            }
+        };
+
+        recognition.start();
+        setIsListening(true);
+    }, [isListening]);
+
+    // Stop speaking/listening when chat closes or voice is disabled
+    useEffect(() => {
+        if (!isOpen || !voiceEnabled) {
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current = null;
+            }
+            setIsSpeaking(false);
+        }
+        if (!isOpen) {
+            recognitionRef.current?.stop();
+            setIsListening(false);
+        }
+    }, [isOpen, voiceEnabled]);
 
     // Track mobile breakpoint
     useEffect(() => {
@@ -138,6 +337,55 @@ export function ChatWidget() {
         check();
         window.addEventListener('resize', check);
         return () => window.removeEventListener('resize', check);
+    }, []);
+
+    // Pause/play Nash avatar videos based on chat visibility
+    // Only the visible video plays at any time — saves CPU/battery
+    useEffect(() => {
+        if (isOpen) {
+            // Chat open: pause toggle button video (hidden behind X), play header video
+            toggleVideoRef.current?.pause();
+            headerVideoRef.current?.play().catch(() => { });
+        } else {
+            // Chat closed: play toggle button video (visible), pause header video
+            toggleVideoRef.current?.play().catch(() => { });
+            headerVideoRef.current?.pause();
+        }
+    }, [isOpen]);
+
+    // Ambient background sound — plays when chat is open
+    const ambientRef = useRef<Howl | null>(null);
+    const ambientIdRef = useRef<number | undefined>(undefined);
+    const ambientTarget = 0.03;
+    const fadeInAmbient = useCallback(() => {
+        if (!ambientRef.current) {
+            ambientRef.current = new Howl({
+                src: ["/AI-NASH/nash-Ambient-bgsound.mp3"],
+                html5: true,
+                loop: true,
+                volume: 0,
+                preload: true,
+            });
+        }
+        const h = ambientRef.current;
+        // If already playing, just fade up
+        if (h.playing()) {
+            h.fade(h.volume(), ambientTarget, 1500);
+            return;
+        }
+        const id = h.play();
+        ambientIdRef.current = id;
+        h.volume(0, id);
+        h.fade(0, ambientTarget, 1500, id);
+    }, []);
+    const fadeOutAmbient = useCallback(() => {
+        const h = ambientRef.current;
+        if (!h || !h.playing()) return;
+        const id = ambientIdRef.current;
+        h.fade(h.volume(), 0, 1000, id);
+        setTimeout(() => {
+            h.pause(id);
+        }, 1050);
     }, []);
 
     // Lock body scroll on mobile when chat is open (robust for iOS Safari)
@@ -182,6 +430,7 @@ export function ChatWidget() {
                 !toggleRef.current.contains(e.target as Node)
             ) {
                 setIsOpen(false);
+                fadeOutAmbient();
             }
         };
 
@@ -189,8 +438,9 @@ export function ChatWidget() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, [isOpen]);
 
-    // Auto-scroll to bottom on new messages
+    // Auto-scroll to bottom on new messages (skip during streaming)
     useEffect(() => {
+        if (isStreamingRef.current) return; // Don't auto-scroll while streaming
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
@@ -202,6 +452,8 @@ export function ChatWidget() {
             setTimeout(() => inputRef.current?.focus(), 300);
         }
     }, [isOpen]);
+
+
 
 
 
@@ -294,7 +546,7 @@ export function ChatWidget() {
                     // Use saved info, skip to budget
                     setTimeout(() => {
                         addBotMessage(
-                            "Great, welcome back! 🎉\n\nWhat's your budget range for this project? (e.g. $5k-10k, $10k-25k, or just a rough idea)"
+                            "Great, welcome back! 🎉\n\nWhat's your budget range? Design starts around $3-6k, development from $6k+. (Just a rough idea works too)"
                         );
                         setContactStep("budget");
                     }, 400);
@@ -329,7 +581,7 @@ export function ChatWidget() {
                 setContactData((prev) => ({ ...prev, email: userInput.trim() }));
                 setTimeout(() => {
                     addBotMessage(
-                        "Thanks! What's your budget range for this project? (e.g. $5k-10k, $10k-25k, or just a rough idea)"
+                        "Thanks! What's your budget range? Design starts around $3-6k, development from $6k+. (Just a rough idea works too)"
                     );
                     setContactStep("budget");
                 }, 400);
@@ -369,10 +621,14 @@ export function ChatWidget() {
                     setIsLoading(true);
 
                     try {
+                        // Pull latest data from state to avoid stale closure
+                        let latestData = contactData;
+                        setContactData((prev) => { latestData = prev; return prev; });
+
                         const res = await fetch("/api/chat/contact", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify(contactData),
+                            body: JSON.stringify(latestData),
                         });
 
                         if (res.ok) {
@@ -556,6 +812,23 @@ export function ChatWidget() {
         setShowAboutNash(true);
     }, []);
 
+    // Cancel any active flow (contact/schedule/SMS)
+    const cancelFlow = useCallback(() => {
+        const wasInFlow = contactStep !== "idle" || scheduleStep !== "idle" || smsStep !== "idle";
+        setContactStep("idle");
+        setScheduleStep("idle");
+        setSmsStep("idle");
+        setContactData({ name: "", email: "", budget: "", timeline: "", startDate: "" });
+        setScheduleData({ name: "", email: "", budget: "", date: "", time: "" });
+        setSmsData({ name: "", phone: "", message: "" });
+        setInput("");
+        if (wasInFlow) {
+            setTimeout(() => {
+                addBotMessage("No problem — cancelled! Is there anything else I can help with?");
+            }, 200);
+        }
+    }, [contactStep, scheduleStep, smsStep, addBotMessage]);
+
     // Start the schedule-a-call flow
     const startScheduleFlow = useCallback(async () => {
         setShowQuickReplies(false);
@@ -590,7 +863,7 @@ export function ChatWidget() {
                 const lower = userInput.toLowerCase().trim();
                 if (lower === "yes" || lower === "y" || lower === "yep" || lower === "yeah" || lower === "that's me" || lower === "thats me") {
                     setTimeout(() => {
-                        addBotMessage("**What's your budget range?**\n\n• Under $5k\n• $5k–$10k\n• $10k–$25k\n• $25k–$50k\n• $50k+");
+                        addBotMessage("**What's your budget range?**\n\n• Under $6k (Design / simple site)\n• $6k–$12k\n• $12k–$18k\n• $18k–$36k\n• $36k+");
                         setScheduleStep("budget");
                     }, 400);
                 } else {
@@ -616,7 +889,7 @@ export function ChatWidget() {
                 }
                 setScheduleData((prev) => ({ ...prev, email: userInput.trim() }));
                 setTimeout(() => {
-                    addBotMessage("**What's your budget range?**\n\n• Under $5k\n• $5k–$10k\n• $10k–$25k\n• $25k–$50k\n• $50k+");
+                    addBotMessage("**What's your budget range?**\n\n• Under $6k (Design / simple site)\n• $6k–$12k\n• $12k–$18k\n• $18k–$36k\n• $36k+");
                     setScheduleStep("budget");
                 }, 400);
             } else if (scheduleStep === "budget") {
@@ -643,6 +916,11 @@ export function ChatWidget() {
                     return;
                 }
                 setScheduleData((prev) => ({ ...prev, date: parseNaturalDate(userInput) }));
+                const timeList = TIME_SLOTS.map(t => `• ${t}`).join('\n');
+                setTimeout(() => {
+                    addBotMessage(`**What time works?** (Central Time)\n\n${timeList}`);
+                    setScheduleStep("time");
+                }, 400);
             } else if (scheduleStep === "dateCustom") {
                 setScheduleData((prev) => ({ ...prev, date: parseNaturalDate(userInput) }));
                 const timeList = TIME_SLOTS.map(t => `• ${t}`).join('\n');
@@ -668,10 +946,14 @@ export function ChatWidget() {
                     setIsLoading(true);
 
                     try {
+                        // Pull latest data from state to avoid stale closure
+                        let latestData = scheduleData;
+                        setScheduleData((prev) => { latestData = prev; return prev; });
+
                         const res = await fetch("/api/schedule", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify(scheduleData),
+                            body: JSON.stringify(latestData),
                         });
 
                         if (res.ok) {
@@ -863,21 +1145,15 @@ export function ChatWidget() {
                     return;
                 }
 
-                // Create a placeholder assistant message for streaming
+                // Stream response word-by-word, scroll pinned to top of message
                 const assistantId = (Date.now() + 1).toString();
-                const assistantMessage: Message = {
-                    id: assistantId,
-                    role: "assistant",
-                    content: "",
-                    timestamp: new Date(),
-                };
-                setMessages((prev) => [...prev, assistantMessage]);
-                setIsLoading(false);
-
-                // Stream the response
+                isStreamingRef.current = true;
+                streamingMsgRef.current = assistantId;
                 const reader = res.body.getReader();
                 const decoder = new TextDecoder();
                 let buffer = "";
+                let fullContent = "";
+                let firstChunk = true;
 
                 while (true) {
                     const { done, value } = await reader.read();
@@ -894,19 +1170,67 @@ export function ChatWidget() {
                             try {
                                 const parsed = JSON.parse(data);
                                 if (parsed.text) {
-                                    setMessages((prev) =>
-                                        prev.map((m) =>
-                                            m.id === assistantId
-                                                ? { ...m, content: m.content + parsed.text }
-                                                : m
-                                        )
-                                    );
+                                    fullContent += parsed.text;
+                                    const streamedContent = fullContent;
+
+                                    if (firstChunk) {
+                                        // Add message, hide dots, scroll to top of this message
+                                        setMessages((prev) => [...prev, {
+                                            id: assistantId,
+                                            role: "assistant" as const,
+                                            content: streamedContent,
+                                            timestamp: new Date(),
+                                        }]);
+                                        setIsLoading(false);
+                                        firstChunk = false;
+                                        // Scroll to the top of Nash's new message after it renders
+                                        requestAnimationFrame(() => {
+                                            const msgEl = document.getElementById(`msg-${assistantId}`);
+                                            if (msgEl && chatBodyRef.current) {
+                                                const container = chatBodyRef.current;
+                                                const msgTop = msgEl.offsetTop - container.offsetTop;
+                                                container.scrollTo({ top: msgTop - 8, behavior: "smooth" });
+                                            }
+                                        });
+                                    } else {
+                                        // Update message in-place (no scroll)
+                                        setMessages((prev) => prev.map((m) =>
+                                            m.id === assistantId ? { ...m, content: streamedContent } : m
+                                        ));
+                                    }
                                 }
                             } catch {
                                 // skip malformed chunks
                             }
                         }
                     }
+                }
+
+                // Streaming complete — resume normal auto-scroll
+                isStreamingRef.current = false;
+                streamingMsgRef.current = null;
+
+                // Voice AI: speak the completed response (fire early, before marker checks)
+                if (voiceEnabledRef.current && fullContent.trim()) {
+                    const cleanedForSpeech = fullContent
+                        .replace(/\s*\[UNKNOWN\]\s*/g, "")
+                        .replace(/\s*\[FEATURE_REQUEST\]\s*/g, "")
+                        .trim();
+                    if (cleanedForSpeech) {
+                        speakTextRef.current(cleanedForSpeech);
+                    }
+                }
+
+                // Handle edge case: no content received
+                if (firstChunk) {
+                    const assistantMessage: Message = {
+                        id: assistantId,
+                        role: "assistant",
+                        content: "Sorry, I couldn't generate a response. Try again or reach Michael at mikeyscimeca.dev@gmail.com.",
+                        timestamp: new Date(),
+                    };
+                    setMessages((prev) => [...prev, assistantMessage]);
+                    setIsLoading(false);
                 }
 
                 // Check for [UNKNOWN] marker — Nash didn't know the answer
@@ -917,7 +1241,7 @@ export function ChatWidget() {
                         fetch("/api/unknown-question", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ question: input, type: "unknown" }),
+                            body: JSON.stringify({ question: userMessage.content, type: "unknown" }),
                         }).catch(console.error);
 
                         // Strip the [UNKNOWN] marker from the displayed message
@@ -933,7 +1257,7 @@ export function ChatWidget() {
                         fetch("/api/unknown-question", {
                             method: "POST",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ question: input, type: "feature_request" }),
+                            body: JSON.stringify({ question: userMessage.content, type: "feature_request" }),
                         }).catch(console.error);
 
                         // Strip the [FEATURE_REQUEST] marker from the displayed message
@@ -1002,7 +1326,7 @@ export function ChatWidget() {
             case "email":
                 return "Enter your email...";
             case "budget":
-                return "e.g. $5k-10k, $10k+...";
+                return "e.g. $3k-6k design, $6k-18k dev...";
             case "timeline":
                 return "e.g. 2 weeks, 1 month...";
             case "startDate":
@@ -1033,7 +1357,16 @@ export function ChatWidget() {
         <>
             {/* Chat Toggle Button */}
             <button
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={() => {
+                    const next = !isOpen;
+                    setIsOpen(next);
+                    // Fade ambient sound in/out
+                    if (next) {
+                        fadeInAmbient();
+                    } else {
+                        fadeOutAmbient();
+                    }
+                }}
                 className={`fixed z-[9998] w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 overflow-hidden ${isOpen ? '' : 'hover:scale-110 active:scale-95'} ${isMobile && isOpen ? 'bottom-3 right-[6px]' : 'bottom-7 right-[30px]'}`}
                 style={{
                     border: isOpen ? '1px solid rgba(255, 255, 255, 0.06)' : '7px solid #0150fe',
@@ -1044,8 +1377,9 @@ export function ChatWidget() {
                 id="chat-toggle"
                 ref={toggleRef}
             >
-                {/* Nash video — always present, never unmounts */}
+                {/* Nash video — always mounted, paused when chat is open */}
                 <video
+                    ref={toggleVideoRef}
                     className="w-full h-full object-cover"
                     src="/AI-NASH/NASH-VIDEO-AVATAR.mp4?v=3"
                     autoPlay
@@ -1121,38 +1455,55 @@ export function ChatWidget() {
                         position: "relative",
                     }}
                 >
-                    {/* Animated gradient background */}
-                    <div className={`absolute inset-0 z-0 pointer-events-none opacity-85 overflow-hidden ${isMobile ? "" : "rounded-2xl"}`}>
-                        <GradientBackground />
-                        {/* Subtle drifting blobs for gentle morphing effect */}
-                        <div className="absolute w-[200px] h-[200px] rounded-full opacity-30" style={{ background: "radial-gradient(circle, rgba(1, 80, 254, 0.5) 0%, transparent 70%)", top: "10%", left: "20%", animation: "chatBlobDrift1 22s ease-in-out infinite alternate" }} />
-                        <div className="absolute w-[180px] h-[180px] rounded-full opacity-25" style={{ background: "radial-gradient(circle, rgba(100, 50, 255, 0.4) 0%, transparent 70%)", bottom: "20%", right: "10%", animation: "chatBlobDrift2 26s ease-in-out infinite alternate" }} />
-                        <div className="absolute w-[150px] h-[150px] rounded-full opacity-28" style={{ background: "radial-gradient(circle, rgba(0, 200, 255, 0.35) 0%, transparent 70%)", top: "50%", left: "40%", animation: "chatBlobDrift3 30s ease-in-out infinite alternate" }} />
-                        <div className="absolute w-[220px] h-[220px] rounded-full opacity-20" style={{ background: "radial-gradient(circle, rgba(1, 50, 200, 0.4) 0%, transparent 70%)", bottom: "40%", left: "-5%", animation: "chatBlobDrift4 24s ease-in-out infinite alternate" }} />
-                        <div className="absolute w-[160px] h-[160px] rounded-full opacity-25" style={{ background: "radial-gradient(circle, rgba(80, 0, 255, 0.35) 0%, transparent 70%)", top: "60%", left: "15%", animation: "chatBlobDrift5 28s ease-in-out infinite alternate" }} />
-                    </div>
+                    {/* Animated gradient background — only renders when chat is open */}
+                    {isOpen && (
+                        <div className={`absolute inset-0 z-0 pointer-events-none opacity-85 overflow-hidden ${isMobile ? "" : "rounded-2xl"}`}>
+                            <GradientBackground />
+                            {/* Drifting goopy blobs */}
+                            <div className="absolute w-[200px] h-[200px] rounded-full opacity-50" style={{ background: "radial-gradient(circle, rgba(1, 80, 254, 0.7) 0%, transparent 60%)", filter: "blur(60px)", top: "10%", left: "20%", animation: "chatBlobDrift1 28s ease-in-out infinite alternate" }} />
+                            <div className="absolute w-[180px] h-[180px] rounded-full opacity-45" style={{ background: "radial-gradient(circle, rgba(100, 50, 255, 0.6) 0%, transparent 60%)", filter: "blur(60px)", bottom: "20%", right: "10%", animation: "chatBlobDrift2 32s ease-in-out infinite alternate" }} />
+                            <div className="absolute w-[150px] h-[150px] rounded-full opacity-45" style={{ background: "radial-gradient(circle, rgba(0, 200, 255, 0.55) 0%, transparent 60%)", filter: "blur(60px)", top: "50%", left: "40%", animation: "chatBlobDrift3 36s ease-in-out infinite alternate" }} />
+                            <div className="absolute w-[220px] h-[220px] rounded-full opacity-40" style={{ background: "radial-gradient(circle, rgba(1, 50, 200, 0.6) 0%, transparent 60%)", filter: "blur(60px)", bottom: "40%", left: "-5%", animation: "chatBlobDrift4 30s ease-in-out infinite alternate" }} />
+                            <div className="absolute w-[160px] h-[160px] rounded-full opacity-45" style={{ background: "radial-gradient(circle, rgba(80, 0, 255, 0.55) 0%, transparent 60%)", filter: "blur(60px)", top: "60%", left: "15%", animation: "chatBlobDrift5 34s ease-in-out infinite alternate" }} />
+                        </div>
+                    )}
                     {/* Header */}
                     <div className="relative z-10 flex items-center gap-3 px-4 py-3" >
-                        <video className="w-10 h-10 rounded-full object-contain bg-[#0150fe]" src="/AI-NASH/NASH-VIDEO-AVATAR.mp4?v=3" autoPlay loop muted playsInline />
+                        <div className="relative">
+                            <video ref={headerVideoRef} className={`w-10 h-10 rounded-full object-contain bg-[#0150fe] ${isSpeaking ? 'ring-2 ring-[#0150fe]/60' : ''}`} style={isSpeaking ? { animation: 'nashSpeakPulse 1.5s ease-in-out infinite' } : undefined} src="/AI-NASH/NASH-VIDEO-AVATAR.mp4?v=3" loop muted playsInline />
+                            {isSpeaking && (
+                                <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#0150fe] flex items-center justify-center">
+                                    <div className="flex items-end gap-[1px] h-2">
+                                        <div className="w-[2px] bg-white rounded-full" style={{ animation: 'voiceBar1 0.6s ease-in-out infinite', height: '4px' }} />
+                                        <div className="w-[2px] bg-white rounded-full" style={{ animation: 'voiceBar2 0.6s ease-in-out infinite 0.15s', height: '6px' }} />
+                                        <div className="w-[2px] bg-white rounded-full" style={{ animation: 'voiceBar3 0.6s ease-in-out infinite 0.3s', height: '3px' }} />
+                                    </div>
+                                </div>
+                            )}
+                        </div>
                         <div className="flex-1">
                             <div className="text-white font-semibold text-sm">Nash</div>
-                            <div className="text-white/40 text-[10px]">AI Assistant</div>
+                            <div className="text-white/40 text-[10px]">{isSpeaking ? 'Speaking...' : 'AI Assistant'}</div>
                         </div>
-                        <div className="flex items-baseline gap-1">
-                            <button
-                                onClick={() => setChatFontSize((prev) => Math.max(0, prev - 1) as 0 | 1 | 2)}
-                                className={`text-[11px] font-semibold transition-all duration-200 cursor-pointer pb-0.5 border-b ${chatFontSize === 0 ? 'text-white border-white/40' : 'text-white/40 border-transparent hover:text-white'}`}
-                                aria-label="Decrease font size"
-                            >
-                                A
-                            </button>
-                            <button
-                                onClick={() => setChatFontSize((prev) => Math.min(2, prev + 1) as 0 | 1 | 2)}
-                                className={`text-[15px] font-semibold transition-all duration-200 cursor-pointer pb-0.5 border-b ${chatFontSize >= 1 ? 'text-white border-white/40' : 'text-white/40 border-transparent hover:text-white'}`}
-                                aria-label="Increase font size"
-                            >
-                                A
-                            </button>
+                        <div className="flex items-center gap-2">
+
+
+                            <div className="flex items-baseline gap-1">
+                                <button
+                                    onClick={() => setChatFontSize((prev) => Math.max(0, prev - 1) as 0 | 1 | 2)}
+                                    className={`text-[11px] font-semibold transition-all duration-200 cursor-pointer pb-0.5 border-b ${chatFontSize === 0 ? 'text-white border-white/40' : 'text-white/40 border-transparent hover:text-white'}`}
+                                    aria-label="Decrease font size"
+                                >
+                                    A
+                                </button>
+                                <button
+                                    onClick={() => setChatFontSize((prev) => Math.min(2, prev + 1) as 0 | 1 | 2)}
+                                    className={`text-[15px] font-semibold transition-all duration-200 cursor-pointer pb-0.5 border-b ${chatFontSize >= 1 ? 'text-white border-white/40' : 'text-white/40 border-transparent hover:text-white'}`}
+                                    aria-label="Increase font size"
+                                >
+                                    A
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -1236,9 +1587,10 @@ export function ChatWidget() {
                                     </div>
                                 )}
                                 <div
+                                    id={`msg-${msg.id}`}
                                     className={`${msg.role === "user" ? "flex flex-col items-end" : ""}`}
                                     style={{
-                                        animation: `${msg.role === "assistant" ? "msgSlideInLeft" : "msgSlideInRight"} 0.3s ease-out both`,
+                                        animation: `${msg.role === "assistant" ? "chatMsgFadeIn" : "msgSlideInRight"} 0.3s ease-out both`,
                                     }}
                                 >
                                     <div
@@ -1275,27 +1627,25 @@ export function ChatWidget() {
                                             </React.Fragment>
                                         ))}
                                     </div>
-                                    <div className={`text-[11px] text-white/30 mt-1 ${msg.role === "user" ? "mr-1 text-right" : "ml-1"}`}>
+                                    <div className={`text-[11px] text-white/30 mt-[3px] leading-tight ${msg.role === "user" ? "mr-1 text-right" : "ml-1"}`}>
                                         {msg.role === "user" ? "You" : "Nash"}
+                                        {msg.role === "user" && (
+                                            <div
+                                                className="mt-[-1px]"
+                                                style={{ animation: "deliveredFade 0.8s ease-out both" }}
+                                            >
+                                                <span className="text-[9px] text-white/25">
+                                                    ✓ Delivered
+                                                </span>
+                                            </div>
+                                        )}
+                                        {idx === messages.length - 1 && msg.role === "assistant" && (
+                                            <div className="mt-[-1px]">
+                                                <span className="text-[9px] text-white/25">just now</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                                {/* Delivered indicator & timestamp for user messages */}
-                                {msg.role === "user" && (
-                                    <div
-                                        className="flex justify-end mt-0.5"
-                                        style={{ animation: "deliveredFade 0.8s ease-out both" }}
-                                    >
-                                        <span className="text-[9px] text-white/30 flex items-center gap-1">
-                                            ✓ Delivered
-                                        </span>
-                                    </div>
-                                )}
-                                {/* Just now timestamp for latest message */}
-                                {idx === messages.length - 1 && msg.role === "assistant" && (
-                                    <div className="mt-0.5">
-                                        <span className="text-[9px] text-white/25">just now</span>
-                                    </div>
-                                )}
                             </React.Fragment>
                         ))}
 
@@ -1349,32 +1699,49 @@ export function ChatWidget() {
                                     >
                                         <img src="/AI-NASH/nash-profile-img.jpg" alt="Nash" className="w-4 h-4 rounded-full object-cover" /> About Nash
                                     </button>
+                                    <button
+                                        onClick={() => {
+                                            setVoiceEnabled(prev => {
+                                                if (prev && audioRef.current) {
+                                                    audioRef.current.pause();
+                                                    audioRef.current = null;
+                                                    setIsSpeaking(false);
+                                                }
+                                                return !prev;
+                                            });
+                                        }}
+                                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 flex items-center gap-1.5 ${voiceEnabled
+                                            ? "border-cyan-400/50 text-cyan-300 bg-cyan-500/15 hover:bg-cyan-500/25"
+                                            : "border-white/15 text-white/40 hover:text-white/60 hover:border-white/30"
+                                            }`}
+                                    >
+                                        {voiceEnabled ? "🔊 Voice On" : "🔇 Voice Off"}
+                                    </button>
                                 </div>
                             )}
 
                         {/* Typing indicator */}
                         {isLoading && (
-                            <div>
+                            <div className="flex items-center gap-2" style={{ animation: 'chatMsgFadeIn 0.3s ease-out' }}>
                                 <div
-                                    className="rounded-2xl px-4 py-3 flex items-center gap-1.5"
+                                    className="rounded-2xl px-4 py-3 flex items-center gap-2"
                                     style={{ background: "rgba(255, 255, 255, 0.07)" }}
                                 >
-                                    <span
-                                        className="w-2 h-2 rounded-full bg-white/40"
-                                        style={{ animation: "chatBounce 1.4s infinite ease-in-out" }}
-                                    />
-                                    <span
-                                        className="w-2 h-2 rounded-full bg-white/40"
-                                        style={{
-                                            animation: "chatBounce 1.4s infinite ease-in-out 0.2s",
-                                        }}
-                                    />
-                                    <span
-                                        className="w-2 h-2 rounded-full bg-white/40"
-                                        style={{
-                                            animation: "chatBounce 1.4s infinite ease-in-out 0.4s",
-                                        }}
-                                    />
+                                    <div className="flex items-center gap-1.5">
+                                        <span
+                                            className="w-1.5 h-1.5 rounded-full bg-white/50"
+                                            style={{ animation: "chatBounce 1.4s infinite ease-in-out" }}
+                                        />
+                                        <span
+                                            className="w-1.5 h-1.5 rounded-full bg-white/50"
+                                            style={{ animation: "chatBounce 1.4s infinite ease-in-out 0.2s" }}
+                                        />
+                                        <span
+                                            className="w-1.5 h-1.5 rounded-full bg-white/50"
+                                            style={{ animation: "chatBounce 1.4s infinite ease-in-out 0.4s" }}
+                                        />
+                                    </div>
+                                    <span className="text-white/30 text-[10px] ml-1">Nash is thinking...</span>
                                 </div>
                             </div>
                         )}
@@ -1436,27 +1803,37 @@ export function ChatWidget() {
                                     {
                                         icon: "📞",
                                         title: "Schedule a Call",
-                                        description: "Book a strategy call with Michael directly through me. I'll walk you through picking a date, time, and collecting the details.",
+                                        description: "Book a strategy call with Michael directly through me. I'll walk you through picking a date, time, and collecting the details. Cancel anytime.",
                                     },
                                     {
                                         icon: "✉️",
                                         title: "Quick Email",
-                                        description: "Send Michael a project inquiry email right from the chat — including your budget, timeline, and start date.",
+                                        description: "Send Michael a project inquiry email right from the chat — including your budget, timeline, and start date. Cancel anytime.",
                                     },
                                     {
                                         icon: "📱",
                                         title: "Text Michael",
-                                        description: "Need a quick response? Send a text message directly to Michael through the chat.",
+                                        description: "Need a quick response? Send a text message directly to Michael through the chat. Cancel anytime.",
+                                    },
+                                    {
+                                        icon: "🎙️",
+                                        title: "Voice Input",
+                                        description: "Tap the microphone to speak your message. Uses speech recognition to convert your voice to text — perfect for hands-free interaction.",
+                                    },
+                                    {
+                                        icon: "🔊",
+                                        title: "Voice Output",
+                                        description: "Enable the speaker to hear Nash read responses aloud using AI-powered text-to-speech. Great for multitasking or accessibility.",
+                                    },
+                                    {
+                                        icon: "⚡",
+                                        title: "Real-Time Streaming",
+                                        description: "Responses stream in word-by-word with smart scroll — the view stays pinned to the top of the message so you can read naturally.",
                                     },
                                     {
                                         icon: "🧠",
                                         title: "Visitor Memory",
                                         description: "I remember returning visitors so you don't have to re-enter your info every time you reach out.",
-                                    },
-                                    {
-                                        icon: "⚡",
-                                        title: "Real-Time Streaming",
-                                        description: "Responses stream in word-by-word for a fast, natural conversation experience — no waiting for full replies.",
                                     },
                                     {
                                         icon: "🛡️",
@@ -1505,53 +1882,75 @@ export function ChatWidget() {
                         className="relative z-10 px-4 py-3 pr-16"
                         style={isMobile ? { paddingBottom: "calc(12px + env(safe-area-inset-bottom, 8px))" } : undefined}
                     >
-                        {/* Contact flow progress indicator */}
-                        {contactStep !== "idle" && contactStep !== "sent" && (
-                            <div className="flex items-center gap-1.5 mb-2 px-1">
-                                {["name", "email", "budget", "timeline", "startDate", "confirm"].map((step, i) => (
-                                    <React.Fragment key={step}>
-                                        <div
-                                            className={`w-2 h-2 rounded-full transition-all duration-300 ${["name", "email", "budget", "timeline", "startDate", "confirm"].indexOf(
-                                                contactStep
-                                            ) >= i
-                                                ? "bg-emerald-400 scale-100"
-                                                : "bg-white/15 scale-75"
-                                                }`}
-                                        />
-                                        {i < 5 && (
-                                            <div
-                                                className={`flex-1 h-[1px] transition-all duration-300 ${["name", "email", "budget", "timeline", "startDate", "confirm"].indexOf(
-                                                    contactStep
-                                                ) > i
-                                                    ? "bg-emerald-400/50"
-                                                    : "bg-white/10"
-                                                    }`}
-                                            />
-                                        )}
-                                    </React.Fragment>
-                                ))}
-                                <span className="ml-2 text-[10px] text-white/30">
-                                    {contactStep === "name" ? "1/6"
-                                        : contactStep === "email" ? "2/6"
-                                            : contactStep === "budget" ? "3/6"
-                                                : contactStep === "timeline" ? "4/6"
-                                                    : contactStep === "startDate" ? "5/6"
-                                                        : "6/6"}
-                                </span>
+                        {/* Flow cancel button — appears when any flow is active */}
+                        {(contactStep !== "idle" && contactStep !== "sent") || (scheduleStep !== "idle" && scheduleStep !== "sent") || (smsStep !== "idle" && smsStep !== "sent") ? (
+                            <div className="flex items-center justify-between mb-2 px-1">
+                                {/* Contact flow progress dots */}
+                                {contactStep !== "idle" && contactStep !== "sent" ? (
+                                    <div className="flex items-center gap-1.5 flex-1">
+                                        {["name", "email", "budget", "timeline", "startDate", "confirm"].map((step, i) => (
+                                            <React.Fragment key={step}>
+                                                <div
+                                                    className={`w-2 h-2 rounded-full transition-all duration-300 ${["name", "email", "budget", "timeline", "startDate", "confirm"].indexOf(
+                                                        contactStep
+                                                    ) >= i
+                                                        ? "bg-emerald-400 scale-100"
+                                                        : "bg-white/15 scale-75"
+                                                        }`}
+                                                />
+                                                {i < 5 && (
+                                                    <div
+                                                        className={`flex-1 h-[1px] transition-all duration-300 ${["name", "email", "budget", "timeline", "startDate", "confirm"].indexOf(
+                                                            contactStep
+                                                        ) > i
+                                                            ? "bg-emerald-400/50"
+                                                            : "bg-white/10"
+                                                            }`}
+                                                    />
+                                                )}
+                                            </React.Fragment>
+                                        ))}
+                                        <span className="ml-2 text-[10px] text-white/30">
+                                            {contactStep === "name" ? "1/6"
+                                                : contactStep === "email" ? "2/6"
+                                                    : contactStep === "budget" ? "3/6"
+                                                        : contactStep === "timeline" ? "4/6"
+                                                            : contactStep === "startDate" ? "5/6"
+                                                                : "6/6"}
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <span className="text-[10px] text-white/30">
+                                        {scheduleStep !== "idle" && scheduleStep !== "sent"
+                                            ? "📞 Scheduling..."
+                                            : "📱 Texting..."}
+                                    </span>
+                                )}
+                                {/* Cancel X button */}
+                                <button
+                                    type="button"
+                                    onClick={cancelFlow}
+                                    className="ml-2 w-5 h-5 rounded-full flex items-center justify-center bg-white/5 hover:bg-white/10 text-white/30 hover:text-white/70 transition-all duration-200 flex-shrink-0"
+                                    aria-label="Cancel flow"
+                                    title="Cancel"
+                                >
+                                    <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+                                        <path d="M18 6L6 18M6 6l12 12" />
+                                    </svg>
+                                </button>
                             </div>
-                        )}
+                        ) : null}
                         <div
-                            className="flex items-center gap-2 rounded-xl px-4 py-2.5"
-                            style={{ background: "rgba(255, 255, 255, 0)", border: "1px solid rgba(255, 255, 255, 0.06)" }}
+                            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 border transition-[border-color] duration-200 hover:border-white/[0.16] ${input.trim() ? 'border-white/[0.16]' : 'border-white/[0.06]'}`}
                         >
                             <input
                                 ref={inputRef}
                                 type="search"
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
-                                placeholder={getPlaceholder()}
-                                className="flex-1 bg-transparent text-white text-sm placeholder:text-white/30 outline-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden"
-                                disabled={isLoading}
+                                placeholder={isListening ? "Listening..." : getPlaceholder()}
+                                className={`flex-1 bg-transparent text-sm placeholder:text-white/30 outline-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden ${isListening ? "text-cyan-300 placeholder:text-cyan-400/50" : "text-white"}`}
+                                disabled={isLoading || isListening}
                                 id="chat-input"
                                 name="chat-search"
                                 autoComplete="off"
@@ -1565,6 +1964,35 @@ export function ChatWidget() {
                                 data-protonpass-ignore="true"
                                 role="presentation"
                             />
+                            {/* Mic button */}
+                            <button
+                                type="button"
+                                onClick={toggleMic}
+                                disabled={isLoading}
+                                className={`transition-all duration-200 p-1 ${isListening
+                                    ? "text-red-400"
+                                    : "text-white/30 hover:text-white/60"
+                                    }`}
+                                aria-label={isListening ? "Stop listening" : "Start voice input"}
+                                title={isListening ? "Tap to stop" : "Speak to Nash"}
+                            >
+                                <svg
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    style={isListening ? { animation: "micPulse 1s ease-in-out infinite" } : undefined}
+                                >
+                                    <rect x="9" y="1" width="6" height="11" rx="3" />
+                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                                    <line x1="12" y1="19" x2="12" y2="23" />
+                                    <line x1="8" y1="23" x2="16" y2="23" />
+                                </svg>
+                            </button>
                             <button
                                 type="submit"
                                 disabled={!input.trim() || isLoading}

@@ -68,9 +68,18 @@ You're involved at every step, and everything is kept transparent. No surprises.
 
 ## Pricing & Budget
 - Pricing varies by project scope and complexity
-- **Simple landing page:** $2,000–$5,000
-- **Full website:** $5,000–$15,000
-- **Complex web application:** $10,000–$30,000+
+
+### Design
+- **UI/UX Design (landing page):** $3,000–$6,000
+- **UI/UX Design (full website):** $6,000–$12,000
+- **Brand + Design System:** $9,000–$18,000
+
+### Development
+- **Simple landing page:** $2,400–$6,000
+- **Full website:** $6,000–$18,000
+- **Complex web application:** $12,000–$36,000+
+
+### Other
 - **AI automation & workflows:** Varies by complexity — book a call to discuss
 - Michael works within your budget and provides transparent quotes upfront
 - Both fixed-price and hourly arrangements are available
@@ -196,7 +205,7 @@ Michael builds custom AI-powered automation systems, including:
 
 ## This Website's Interactive Features
 This portfolio site itself demonstrates Michael's capabilities:
-- **Nash AI Assistant** — A custom AI chatbot (that's me!) powered by Claude AI with streaming responses, visitor memory, smart intent detection, and guided flows for email, SMS, and call scheduling
+- **Nash AI Assistant** — A custom AI chatbot (that's me!) powered by Claude AI with streaming responses, visitor memory, smart intent detection, voice output powered by ElevenLabs, and guided flows for email, SMS, and call scheduling. Visitors can enable Nash's voice by clicking the speaker icon in the chat header — Nash will read his responses out loud using a natural-sounding AI voice.
 - **Interactive Games** — Fully playable Tic-Tac-Toe, Pong, Checkers, and Space Invaders games, all custom-built with AI opponents
 - **Advanced Animations** — GSAP-powered scroll animations, parallax effects, and micro-interactions throughout
 - **DNA Helix Tool Ticker** — A 3D-style double-helix animation showcasing the tools used
@@ -254,7 +263,7 @@ Yes. Stripe, HubSpot, Salesforce, Resend, SendGrid, custom APIs — if it has an
 `;
 
 export const SYSTEM_PROMPT = [
-    "You are Nash, Michael Scimeca's AI assistant on his portfolio website. You're friendly, knowledgeable, and slightly witty. You help visitors learn about Michael's work, skills, and services. Always refer to yourself as Nash when introducing yourself.",
+    "You are Nash, Michael Scimeca's AI assistant on his portfolio website. You're friendly, knowledgeable, and slightly witty. You help visitors learn about Michael's work, skills, and services. Always refer to yourself as Nash when introducing yourself. You have a voice feature — visitors can click the speaker icon in the chat header to hear you speak your responses out loud using a natural AI voice powered by ElevenLabs.",
     "",
     "PERSONALITY:",
     "- Professional but friendly and approachable",

@@ -5,9 +5,11 @@ import { useModal } from '../context/ModalContext';
 
 const BUDGET_OPTIONS = [
     { label: 'Select budget range...', value: '' },
-    { label: 'Under $5,000', value: '<$5k' },
-    { label: '$5,000 – $15,000', value: '$5k-$15k' },
-    { label: '$15,000+', value: '$15k+' },
+    { label: 'Under $6,000 (Design or simple site)', value: '<$6k' },
+    { label: '$6,000 – $12,000', value: '$6k-$12k' },
+    { label: '$12,000 – $18,000', value: '$12k-$18k' },
+    { label: '$18,000 – $36,000', value: '$18k-$36k' },
+    { label: '$36,000+', value: '$36k+' },
 ];
 
 const TIME_SLOTS = [

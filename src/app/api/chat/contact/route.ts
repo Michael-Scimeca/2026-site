@@ -17,10 +17,30 @@ interface ContactPayload {
   startDate: string;
 }
 
+// Sanitize user input for safe HTML embedding
+function sanitizeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
+function sanitizeField(value: string | undefined, maxLength: number): string {
+  return sanitizeHtml(String(value || '').trim().slice(0, maxLength));
+}
+
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, budget, timeline, startDate } =
-      (await req.json()) as ContactPayload;
+    const body = (await req.json()) as ContactPayload;
+
+    const name = sanitizeField(body.name, 100);
+    const email = sanitizeField(body.email, 150);
+    const budget = sanitizeField(body.budget, 50);
+    const timeline = sanitizeField(body.timeline, 100);
+    const startDate = sanitizeField(body.startDate, 50);
+    const cleanEmail = String(body.email || '').trim().slice(0, 150);
 
     if (!name || !email) {
       return NextResponse.json(
@@ -29,9 +49,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Basic email validation
+    // Basic email validation (use raw input for regex)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    if (!emailRegex.test(cleanEmail)) {
       return NextResponse.json(
         { error: "Invalid email address" },
         { status: 400 }

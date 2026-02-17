@@ -6,8 +6,9 @@ import { Redis } from "@upstash/redis";
 const upstashUrl = process.env.UPSTASH_REDIS_REST_URL;
 const upstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
 
-// Create a new ratelimiter, that allows 10 requests per 10 seconds
-let ratelimit: Ratelimit | null = null;
+// Create rate limiters with different tiers
+let gameRateLimit: Ratelimit | null = null;
+let apiRateLimit: Ratelimit | null = null;
 
 if (upstashUrl && upstashToken) {
     const redis = new Redis({
@@ -15,40 +16,57 @@ if (upstashUrl && upstashToken) {
         token: upstashToken,
     });
 
-    ratelimit = new Ratelimit({
-        redis: redis,
+    // Game stats: 10 requests per 10 seconds
+    gameRateLimit = new Ratelimit({
+        redis,
         limiter: Ratelimit.slidingWindow(10, "10 s"),
         analytics: true,
+        prefix: "rl:game",
+    });
+
+    // General API: 30 requests per minute
+    apiRateLimit = new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(30, "60 s"),
+        analytics: true,
+        prefix: "rl:api",
     });
 }
 
+// Security headers applied to all responses
+const securityHeaders: Record<string, string> = {
+    "X-Frame-Options": "DENY",
+    "X-Content-Type-Options": "nosniff",
+    "X-XSS-Protection": "1; mode=block",
+    "Referrer-Policy": "strict-origin-when-cross-origin",
+    "Permissions-Policy": "camera=(), microphone=(self), geolocation=(), interest-cohort=()",
+    "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+};
+
+function getIp(request: NextRequest): string {
+    return (
+        (request as any).ip ??
+        request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+        request.headers.get("x-real-ip") ??
+        "127.0.0.1"
+    );
+}
+
 export async function middleware(request: NextRequest) {
-    // Only apply to /api/game-stats
-    if (request.nextUrl.pathname.startsWith("/api/game-stats")) {
+    const { pathname } = request.nextUrl;
 
-        // Allow GET requests without strict limits (or higher limits), 
-        // but strictly limit POST (writes)
-        if (request.method === "POST") {
-            if (!ratelimit) {
-                console.warn("Rate limiting is not set up: Missing UPSTASH_REDIS_REST_URL or UPSTASH_REDIS_REST_TOKEN");
-                return NextResponse.next();
-            }
-
-            // Use IP as identifier (with fallback to headers)
-            const ip =
-                (request as any).ip ??
-                request.headers.get("x-forwarded-for")?.split(",")[0] ??
-                request.headers.get("x-real-ip") ??
-                "127.0.0.1";
-
-            const { success, limit, reset, remaining } = await ratelimit.limit(ip);
-
+    // --- Rate limit: /api/game-stats POST ---
+    if (pathname.startsWith("/api/game-stats") && request.method === "POST") {
+        if (gameRateLimit) {
+            const ip = getIp(request);
+            const { success, limit, reset, remaining } = await gameRateLimit.limit(ip);
             if (!success) {
                 return NextResponse.json(
                     { error: "Too many requests" },
                     {
                         status: 429,
                         headers: {
+                            ...securityHeaders,
                             "X-RateLimit-Limit": limit.toString(),
                             "X-RateLimit-Remaining": remaining.toString(),
                             "X-RateLimit-Reset": reset.toString(),
@@ -59,9 +77,41 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    return NextResponse.next();
+    // --- Rate limit: /api/chat, /api/sms, /api/schedule, /api/chat/contact POST ---
+    const rateLimitedPaths = ["/api/chat", "/api/sms", "/api/schedule", "/api/chat/contact", "/api/unknown-question"];
+    if (request.method === "POST" && rateLimitedPaths.some((p) => pathname === p)) {
+        if (apiRateLimit) {
+            const ip = getIp(request);
+            const { success, limit, reset, remaining } = await apiRateLimit.limit(ip);
+            if (!success) {
+                return NextResponse.json(
+                    { error: "Too many requests. Please try again later." },
+                    {
+                        status: 429,
+                        headers: {
+                            ...securityHeaders,
+                            "X-RateLimit-Limit": limit.toString(),
+                            "X-RateLimit-Remaining": remaining.toString(),
+                            "X-RateLimit-Reset": reset.toString(),
+                        },
+                    }
+                );
+            }
+        }
+    }
+
+    // Apply security headers to all responses
+    const response = NextResponse.next();
+    for (const [key, value] of Object.entries(securityHeaders)) {
+        response.headers.set(key, value);
+    }
+
+    return response;
 }
 
 export const config = {
-    matcher: "/api/game-stats/:path*",
+    matcher: [
+        // Match all routes except static files and _next internals
+        "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|mp4|webm|ico)).*)",
+    ],
 };

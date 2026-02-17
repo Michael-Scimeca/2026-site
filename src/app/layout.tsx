@@ -138,6 +138,53 @@ export default function RootLayout({
     ]
   };
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What makes you different from other developers?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "I build interactive experiences—not just websites. From AI-powered games to automation systems, I blend design, code, and creativity to make things that stand out."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How much does a project cost?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Design: $3-6k for a landing page, $6-12k for a full site, $9-18k for brand + design system. Development: $2.4-6k landing page, $6-18k full site, $12-36k+ complex app. Transparent quotes upfront."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How long does a project take?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Simple site: 2-4 weeks. Complex app: 2-3 months. Realistic timelines are given upfront—no surprises."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do you work with AI and automation?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Absolutely. I build chatbots, workflow automation (n8n), predictive tools, and systems that save teams hours every week."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Do you offer ongoing support after launch?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes! I offer maintenance packages for updates and bug fixes. Also available for one-off tweaks as needed."
+        }
+      }
+    ]
+  };
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -148,6 +195,10 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
         />
       </head>
       <body

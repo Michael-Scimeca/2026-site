@@ -27,7 +27,7 @@ const faqs: FaqItem[] = [
     },
     {
         question: "How much does a project cost?",
-        answer: "Simple landing page: $2-5k. Full web app: $10-30k+. I work within your budget and give transparent quotes upfront.",
+        answer: "Design: $3-6k for a landing page, $6-12k for a full site, $9-18k for brand + design system. Development: $2.4-6k landing page, $6-18k full site, $12-36k+ complex app. I work within your budget and give transparent quotes upfront.",
         category: "Pricing"
     },
     {
