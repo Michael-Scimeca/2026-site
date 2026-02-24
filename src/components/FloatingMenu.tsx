@@ -8,7 +8,7 @@ export function FloatingMenu() {
     const [isVisible, setIsVisible] = useState(false);
     const [isAtBottom, setIsAtBottom] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
-    const menuRef = useRef<HTMLDivElement>(null);
+    const menuRef = useRef<HTMLElement>(null);
     const { openModal } = useModal();
 
     useEffect(() => {
@@ -50,8 +50,9 @@ export function FloatingMenu() {
     };
 
     return (
-        <div
+        <nav
             ref={menuRef}
+            aria-label="Quick actions"
             className={`group fixed right-4 md:right-6 desktop:right-8 top-4 md:top-6 desktop:top-8 z-50 flex flex-col items-center rounded-3xl backdrop-blur-md transition-all duration-500 ${isVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
         >
             {/* SVG Border Overlay */}
@@ -153,6 +154,6 @@ export function FloatingMenu() {
                     </svg>
                 </a>
             </div>
-        </div>
+        </nav>
     );
 }

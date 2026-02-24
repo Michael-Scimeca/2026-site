@@ -118,13 +118,13 @@ That's it — he'll handle the rest and guide you through each step.
 ## Industries & Verticals
 Michael has worked across a wide range of industries:
 - **Tech & Media:** Flipboard, Patreon
-- **Food & CPG:** Snickers (Mars, Inc.), Optimum Nutrition, Foosackly's
-- **Finance & Wealth Management:** Kovitz, 68 Ventures
+- **Food & CPG:** Snickers (Mars, Inc.), Optimum Nutrition
+- **Finance & Wealth Management:** Kovitz
 - **NFT / Web3:** Twix NFT (#NFTwix) via Mars, Inc.
 - **Nonprofit & Social Impact:** Out Leadership (LGBTQ+ business), NYC Pride, SEIU
 - **Real Estate:** RIPCO Real Estate
 - **Gaming & Entertainment:** Nether Realm Studios (Mortal Kombat)
-- **Luxury & Retail:** Gabbanelli (silver & jewelry), Optimo (premium hats)
+- **Luxury & Retail:** Optimo (premium hats)
 - **Innovation & Startups:** Longview Innovation
 
 ## Notable Projects & Experience
@@ -173,17 +173,9 @@ Tools: WordPress, Browserstack, Foundation Framework, GSAP
 Contributed development support on SEIU.org for the Service Employees International Union, working on site updates for the organization's goals, mission, and key initiatives.
 Tools: WordPress, Browserstack, Foundation Framework
 
-### 68 Ventures — Developer
-Front-end development for the 68 Ventures website, translating design into a fully responsive, polished online experience.
-Tools: WordPress, Browserstack, Foundation Framework
 
-### Foosackly's — CSS Theme Developer
-Developed a new website theme entirely through CSS for Foosackly's, a fast-growing restaurant brand. The CSS theme served as both a visual system and technical guide for future development.
-Tools: Photoshop, Custom SCSS Guide
 
-### Gabbanelli — Designer
-Collaborated with the agency We Can't Stop Thinking on the Gabbanelli.com website (heritage silver, jewelry & gifts brand). Handled visual asset preparation and website design.
-Tools: Photoshop
+
 
 ### Nether Realm Studios — Designer
 Designed a 6-page website and blog experience for the creators of Mortal Kombat. The design focused on dark, high-contrast visuals and cinematic pacing to reflect the franchise's intensity.
@@ -205,7 +197,7 @@ Michael builds custom AI-powered automation systems, including:
 
 ## This Website's Interactive Features
 This portfolio site itself demonstrates Michael's capabilities:
-- **Nash AI Assistant** — A custom AI chatbot (that's me!) powered by Claude AI with streaming responses, visitor memory, smart intent detection, voice output powered by ElevenLabs, and guided flows for email, SMS, and call scheduling. Visitors can enable Nash's voice by clicking the speaker icon in the chat header — Nash will read his responses out loud using a natural-sounding AI voice.
+- **Nash AI Assistant** — A custom AI chatbot (that's me!) powered by Claude AI with streaming responses, visitor memory, smart intent detection, voice output powered by ElevenLabs, voice input via microphone (speech-to-text), and guided flows for email, SMS, and call scheduling. Visitors can enable Nash's voice by clicking the speaker icon in the chat header — Nash will read his responses out loud using a natural-sounding AI voice. Visitors can also click the microphone button to speak to Nash directly — their speech is transcribed to text and sent as a message. After Nash finishes speaking a question, the mic auto-activates so the visitor can respond naturally.
 - **Interactive Games** — Fully playable Tic-Tac-Toe, Pong, Checkers, and Space Invaders games, all custom-built with AI opponents
 - **Advanced Animations** — GSAP-powered scroll animations, parallax effects, and micro-interactions throughout
 - **DNA Helix Tool Ticker** — A 3D-style double-helix animation showcasing the tools used
@@ -263,7 +255,7 @@ Yes. Stripe, HubSpot, Salesforce, Resend, SendGrid, custom APIs — if it has an
 `;
 
 export const SYSTEM_PROMPT = [
-    "You are Nash, Michael Scimeca's AI assistant on his portfolio website. You're friendly, knowledgeable, and slightly witty. You help visitors learn about Michael's work, skills, and services. Always refer to yourself as Nash when introducing yourself. You have a voice feature — visitors can click the speaker icon in the chat header to hear you speak your responses out loud using a natural AI voice powered by ElevenLabs.",
+    "You are Nash, Michael Scimeca's AI assistant on his portfolio website. You're friendly, knowledgeable, and slightly witty. You help visitors learn about Michael's work, skills, and services. Always refer to yourself as Nash when introducing yourself. You have both voice input and voice output capabilities. Visitors can click the speaker icon in the chat header to hear you speak your responses out loud using a natural AI voice powered by ElevenLabs. They can also click the microphone button to talk to you — their speech is transcribed to text and sent as a message. When you finish speaking a question out loud, the mic automatically activates so they can respond naturally, creating a real conversation. If a visitor speaks to you via the mic, acknowledge that you can hear them — never say you can't hear audio input.",
     "",
     "PERSONALITY:",
     "- Professional but friendly and approachable",
@@ -314,9 +306,8 @@ export const SYSTEM_PROMPT = [
 ].join("\n");
 
 export const QUICK_REPLIES = [
-    { label: "What do you do?", message: "What does Michael do and what services does he offer?" },
-    { label: "See projects", message: "Can you tell me about some of Michael's recent projects?" },
-    { label: "Tech stack", message: "What technologies and tools does Michael work with?" },
-    { label: "Book a call", message: "How can I book a strategy call with Michael?" },
-    { label: "Availability", message: "Is Michael available for new projects?" },
+    { label: "👨‍💼 What he does", message: "What does Michael do and what services does he offer?" },
+    { label: "📁 Projects", message: "Can you tell me about some of Michael's recent projects?" },
+    { label: "⚙️ Tech stack", message: "What technologies and tools does Michael work with?" },
+    { label: "📞 Book a call", message: "How can I book a strategy call with Michael?" },
 ];

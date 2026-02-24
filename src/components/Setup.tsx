@@ -5,9 +5,10 @@ import { Container } from "@/components/Container";
 import Image from "next/image";
 import { SweetPunkText } from "@/components/SweetPunkText";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 
-gsap.registerPlugin(useGSAP);
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 interface SetupItem {
     id: string;
@@ -16,48 +17,26 @@ interface SetupItem {
     logo?: string;
     tools?: string[];
     themeColor?: string;
+    badge?: string;
+    badgeEmoji?: string;
+    headline?: string;
+    role?: string;
+    abbreviation?: string;
+    parentCompany?: string;
 }
 
 const setupItems: SetupItem[] = [
-    {
-        id: "optimum-nutrition",
-        company: "Optimum Nutrition",
-        description: "I contributed to the development of the Optimum Nutrition website (optimumnutrition.com), teaming up with We Can’t Stop Thinking to implement front-end features, responsive layouts, and interactive enhancements. My work helped bring design concepts to life while ensuring the site performed reliably across devices and reflected Optimum Nutrition’s strong, performance-driven brand presence.",
-        logo: "/logos/on.png",
-        tools: ["Photoshop", "Custom CMS", "Browserstack", "Foundation Framework"],
-        themeColor: "#3c468c" // Blue
-    },
-    {
-        id: "68ventures",
-        company: "68 Ventures",
-        description: "I handled the front-end development for the 68 Ventures website, translating the design into a fully responsive, polished online experience. My work focused on implementing clean structure, interactive elements, and performance-oriented code to support the firm’s dynamic brand presence and clearly communicate their investment focus.",
-        logo: "/logos/78venatures.png",
-        tools: ["Wordpress", "Browserstack", "Foundation Framework"],
-        themeColor: "#ef4444" // Red
-    },
-    {
-        id: "flipboard",
-        company: "Flipboard",
-        description: "I provided front-end development and animation implementation for Flipboard’s website, supporting a responsive, engaging online presence.",
-        logo: "/logos/flipboard-logo.png",
-        tools: ["Custom SCSS", "Foundation Framework", "Javascript Interactions", "Browserstack"],
-        themeColor: "#ef4444" // Red
-    },
-    {
-        id: "snickers",
-        company: "Snickers",
-        description: "One Million SNICKERS was a campaign website created to celebrate the brand in an exciting, playful, and highly interactive way. Snickers came to us with the challenge of building a digital experience that felt fun, bold, and instantly engaging. I contributed to the website development and interactive execution, helping bring the concept to life through dynamic visuals, responsive layouts, and engaging interactions that reinforced Snickers’ energetic, irreverent brand personality.",
-        logo: "/logos/snickers.png",
-        tools: ["Wordpress", "Browserstack", "Foundation Framework", "Gsap"],
-        themeColor: "#f59e0b" // Amber
-    },
     {
         id: "nycpride",
         company: "NYC Pride",
         description: "I worked as part of RSQ on building the NYC Pride website, contributing to development and implementation to ensure the site launched successfully in time for Pride Day. The work focused on delivering a responsive, accessible, and visually engaging experience under a fixed deadline, supporting one of New York City’s most high-profile annual events and its large, diverse audience.",
         logo: "/logos/nycpride.png",
         tools: ["Wordpress", "Browserstack", "Foundation Framework", "Gsap"],
-        themeColor: "#f59e0b" // Amber
+        themeColor: "#5575f6",
+        role: "Front-End Development",
+        badge: "High-profile event launch",
+        badgeEmoji: "🌈",
+        headline: "Delivered a responsive, accessible site for one of NYC’s biggest annual events",
     },
     {
         id: "seiu",
@@ -65,23 +44,11 @@ const setupItems: SetupItem[] = [
         description: "Service Employees International Union (SEIU) is one of North America’s largest labor unions, representing millions of workers across healthcare, public services, and property services. I contributed development support on SEIU.org, working on site updates that helped clearly present the organization’s goals, mission, and key initiatives, ensuring core messaging was accessible, well-structured, and aligned with SEIU’s advocacy efforts.",
         logo: "/logos/seiu.png",
         tools: ["Wordpress", "Browserstack", "Foundation Framework"],
-        themeColor: "#a855f7" // Purple
-    },
-    {
-        id: "foo",
-        company: "Foosackly's",
-        description: "Foosackly’s is a fast-growing restaurant brand with a strong, recognizable personality. For this project, the goal was to modernize the website’s visual direction while ensuring the work could be cleanly handed off to another developer for full implementation.\n\n We developed a new website theme entirely through CSS, using it as both a visual system and technical guide for the future site build. Rather than rebuilding the website end- to - end, the focus was on creating a flexible, well - structured theme layer that another developer could easily pick up and extend.",
-        logo: "/logos/foo.png",
-        tools: ["Photoshop", "Custom SCSS Guide"],
-        themeColor: "#4f46e5" // Indigo
-    },
-    {
-        id: "gabbanelli",
-        company: "Gabbanelli",
-        description: "Gabbanelli is a heritage brand known for handcrafted silver, jewelry, and premium gifts. I collaborated with the agency We Can’t Stop Thinking to support the Gabbanelli.com website, handling visual asset preparation and contributing to the overall website design.\n\n Similar to my work on Optimo, this project focused on cutting and isolating product imagery, refining visual assets for web use, and designing layouts that highlighted craftsmanship and material detail. Assets were carefully prepared and organized to ensure consistency across the site and allow for a smooth transition between designers as the project evolved.",
-        logo: "/logos/gab.png",
-        tools: ["Photoshop"],
-        themeColor: "#c11427" // Deep Red (Gabbanelli theme)
+        themeColor: "#a855f7",
+        role: "Front-End Development",
+        badge: "Mission-driven platform",
+        badgeEmoji: "✊",
+        headline: "Structured advocacy messaging for North America\u2019s largest labor union",
     },
     {
         id: "nether-realm",
@@ -89,7 +56,11 @@ const setupItems: SetupItem[] = [
         description: "NetherRealm Studios, creators of the iconic Mortal Kombat franchise, are known for bold visuals, cinematic intensity, and unmistakable atmosphere. I collaborated with the agency We Can’t Stop Thinking to design a 6-page website and blog experience, with the goal of staying as close as possible to the essence of Mortal Kombat.\n\nThe design focused on immediate recognition — creating an experience where the moment you land on the site, you feel Mortal Kombat. Dark, high-contrast visuals, dramatic typography, and cinematic pacing were used to echo the franchise’s intensity, lore, and legacy, while still supporting a clear, modern web experience.",
         logo: "/logos/nether.png",
         tools: ["Photoshop"],
-        themeColor: "#f7973b" // Orange/Mortal Kombat themed
+        themeColor: "#f7973b",
+        role: "Design & Creative Direction",
+        badge: "Iconic franchise experience",
+        badgeEmoji: "🐉",
+        headline: "Designed a cinematic web presence true to the Mortal Kombat legacy",
     },
     {
         id: "optimo",
@@ -97,7 +68,11 @@ const setupItems: SetupItem[] = [
         description: "Optimo is a premium hat brand known for exceptional craftsmanship and timeless design. I teamed up with the agency We Can’t Stop Thinking to support the Shop Optimo e-commerce experience, creating and organizing digital assets while ensuring a seamless handoff to additional designers as the project evolved.",
         logo: "/logos/logo-hat.png",
         tools: ["Photoshop"],
-        themeColor: "#14b8a6" // Teal
+        themeColor: "#14b8a6",
+        role: "Design & Asset Production",
+        badge: "Premium e-commerce brand",
+        badgeEmoji: "🎩",
+        headline: "Crafted digital assets for a timeless luxury hat brand",
     },
 ];
 
@@ -111,33 +86,78 @@ const getPseudoRandom = (seed: string, min: number, max: number) => {
     return Math.floor(normalized * (max - min + 1)) + min;
 };
 
-function SetupRow({ item, isLast }: { item: SetupItem; isLast?: boolean }) {
+function SetupRow({ item, index, isLast }: { item: SetupItem; index: number; isLast?: boolean }) {
     const containerRef = useRef<HTMLDivElement>(null);
     const pulseRef = useRef<SVGPathElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
 
+    const activeThemeColor = item.themeColor || '#0158ff';
     const pulseLength = React.useMemo(() => getPseudoRandom(item.id + 'pulse', 40, 150), [item.id]);
     const cycleLength = 2000;
 
+    const displayNumber = String(index + 1);
+    const abbreviation = item.abbreviation || item.company.split(' ').map(w => w[0]).join('').toUpperCase();
+
     useGSAP(() => {
-        if (pulseRef.current) {
-            gsap.fromTo(pulseRef.current,
-                { strokeDashoffset: 0 },
+        if (pulseRef.current && containerRef.current) {
+            const pulseTl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: containerRef.current,
+                    start: "top 85%",
+                    toggleActions: "play none none none",
+                    fastScrollEnd: true,
+                    once: true
+                }
+            });
+
+            pulseTl.fromTo(pulseRef.current,
+                { opacity: 0, strokeDashoffset: 0 },
                 {
-                    strokeDashoffset: -cycleLength,
-                    duration: 4 + (pulseLength / 100),
-                    repeat: -1,
-                    ease: "linear"
+                    opacity: 1,
+                    strokeDashoffset: -cycleLength * 0.3,
+                    duration: 0.8,
+                    ease: "power2.out"
+                },
+                0
+            );
+
+            pulseTl.to(pulseRef.current,
+                {
+                    opacity: 0,
+                    strokeDashoffset: -cycleLength * 0.6,
+                    duration: 1.2,
+                    ease: "power2.inOut"
+                }
+            );
+        }
+    }, { scope: containerRef });
+
+    useGSAP(() => {
+        if (contentRef.current && containerRef.current) {
+            gsap.fromTo(contentRef.current,
+                { opacity: 0, y: 30 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.8,
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: containerRef.current,
+                        start: "top 80%",
+                        toggleActions: "play none none none",
+                        once: true
+                    }
                 }
             );
         }
     }, { scope: containerRef });
 
     return (
-        <div
+        <article
             ref={containerRef}
-            className="group w-full transition-colors relative py-[12px] desktop:py-[12px] overflow-visible"
+            className="group w-full relative py-10 desktop:py-14"
         >
-            {/* Helix-Style Dual-Layer Bottom Border - Dash Pulse Animation */}
+            {/* Bottom Border with Pulse */}
             <div className="absolute bottom-0 left-0 right-0 pointer-events-none z-50" style={{ overflow: 'visible' }}>
                 <svg
                     width="100%"
@@ -166,78 +186,116 @@ function SetupRow({ item, isLast }: { item: SetupItem; isLast?: boolean }) {
                             </linearGradient>
                         )}
                     </defs>
-                    {/* Static Base Line */}
-                    <path
-                        d="M 0 5 H 1000"
-                        stroke="rgba(255,255,255,0.15)"
-                        strokeWidth="1"
-                        vectorEffect="non-scaling-stroke"
-                    />
-                    {/* Moving Pulse Line */}
+                    <path d="M 0 5 H 1000" stroke="rgba(255,255,255,0.08)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
                     <path
                         ref={pulseRef}
                         d="M 0 5 H 1000"
-                        stroke={item.id === 'nycpride' ? 'url(#rainbow-pulse-gradient)' : (item.themeColor || '#0158ff')}
+                        stroke={item.id === 'nycpride' ? 'url(#rainbow-pulse-gradient)' : activeThemeColor}
                         strokeWidth="1.5"
                         strokeDasharray={`${pulseLength} ${cycleLength - pulseLength}`}
                         strokeLinecap="round"
                         vectorEffect="non-scaling-stroke"
-                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                        style={{
-                            filter: item.id === 'nycpride'
-                                ? 'drop-shadow(0 0 4px #ef4444) drop-shadow(0 0 4px #3b82f6)'
-                                : `drop-shadow(0 0 4px ${item.themeColor || '#0158ff'})`
-                        }}
+                        className="opacity-0"
                     />
                 </svg>
             </div>
 
-            {/* Dynamic Background Hover Glow */}
+            {/* Hover Glow */}
             <div
-                className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none"
-                style={{
-                    background: `radial-gradient(circle at center, ${item.themeColor || '#0158ff'} 0%, transparent 70%)`
-                }}
+                className="absolute inset-0 opacity-0 group-hover:opacity-[0.03] transition-opacity duration-700 pointer-events-none"
+                style={{ background: `radial-gradient(ellipse at 60% 50%, ${activeThemeColor} 0%, transparent 70%)` }}
             />
 
-            {/* Vertical Accent Glow Border */}
-            <div
-                className="absolute left-0 top-0 bottom-0 w-[3px] opacity-0 group-hover:opacity-100 transition-all duration-500 scale-y-90 group-hover:scale-y-100 origin-center"
-                style={{
-                    background: item.id === 'nycpride'
-                        ? 'linear-gradient(to bottom, #ef4444, #3b82f6, #a855f7)'
-                        : (item.themeColor || '#0158ff'),
-                    boxShadow: item.id === 'nycpride'
-                        ? `0 0 20px 2px #3b82f680`
-                        : `0 0 20px 2px ${item.themeColor || '#0158ff'}80`
-                }}
-            />
+            <div ref={contentRef} className="relative z-10 px-4 md:px-6 desktop:px-8 max-w-[1440px] mx-auto">
+                <div className="flex flex-col desktop:grid desktop:grid-cols-12 desktop:gap-8 desktop:items-start">
 
-            <Container className="relative z-10">
-                <div className="grid grid-cols-1 md:grid-cols-[150px_1fr] gap-y-6 md:gap-x-6 items-center">
-                    {/* Left: Logo & Company Name */}
-                    <div className="flex items-center justify-center md:justify-start">
-                        {item.logo && (
-                            <div className="relative w-20 h-10 md:w-28 md:h-28 flex-shrink-0 flex items-center justify-center">
-                                <img
-                                    src={`${item.logo}?v=2`}
-                                    alt={`${item.company} Logo`}
-                                    loading="lazy"
-                                    className="w-full h-full object-contain brightness-0 invert opacity-100 transition-opacity duration-500"
+                    {/* Left Column — Client Info */}
+                    <div className="desktop:col-span-3 flex flex-col gap-2 mb-6 desktop:mb-0 relative">
+                        {item.logo ? (
+                            <div
+                                className="relative h-10 desktop:h-12 max-w-[180px]"
+                                style={{
+                                    background: item.id === 'nycpride'
+                                        ? 'linear-gradient(135deg, #3b82f6, #8b5cf6, #f59e0b)'
+                                        : activeThemeColor,
+                                    maskImage: `url(${item.logo})`,
+                                    WebkitMaskImage: `url(${item.logo})`,
+                                    maskSize: 'contain',
+                                    WebkitMaskSize: 'contain',
+                                    maskRepeat: 'no-repeat',
+                                    WebkitMaskRepeat: 'no-repeat',
+                                    maskPosition: 'left center',
+                                    WebkitMaskPosition: 'left center',
+                                    width: '180px',
+                                }}
+                            />
+                        ) : (
+                            <div className="text-3xl desktop:text-4xl font-black tracking-tight leading-none" style={{ color: activeThemeColor }}>
+                                <SweetPunkText
+                                    text={abbreviation}
+                                    startColor="#52525b"
+                                    midColor={activeThemeColor}
+                                    endColor={activeThemeColor}
+                                    colorDuration={2.0}
+                                    stagger={0.005}
+                                    enableMotion={false}
                                 />
                             </div>
                         )}
+
+                        <p className="text-[11px] uppercase tracking-[0.2em] font-semibold leading-tight mt-1" style={{ color: `${activeThemeColor}99` }}>
+                            {item.parentCompany || item.company}
+                        </p>
+
+                        {item.role && (
+                            <p className="text-[11px] uppercase tracking-[0.15em] font-medium text-zinc-400 leading-tight">
+                                {item.role}
+                            </p>
+                        )}
+
+                        {/* Large Background Number */}
+                        <div
+                            className="hidden desktop:block absolute -bottom-6 -left-2 text-[12rem] font-black leading-none pointer-events-none select-none"
+                            style={{ color: 'transparent', WebkitTextStroke: '1px rgba(255, 255, 255, 0.04)' }}
+                            aria-hidden="true"
+                        >
+                            {displayNumber}
+                        </div>
                     </div>
 
-                    {/* Right: Description & Tools */}
-                    <div className="flex flex-col justify-center gap-6">
+                    {/* Right Column — Content */}
+                    <div className="desktop:col-span-9 flex flex-col gap-5">
+                        {item.badge && (
+                            <div className="flex">
+                                <span
+                                    className="inline-flex items-center gap-1.5 px-4 py-1.5 text-[12px] font-semibold tracking-wide rounded-full border"
+                                    style={{
+                                        borderColor: item.id === 'nycpride' ? '#8b5cf650' : `${activeThemeColor}50`,
+                                        color: item.id === 'nycpride' ? '#a78bfa' : activeThemeColor,
+                                        background: item.id === 'nycpride'
+                                            ? 'linear-gradient(135deg, #3b82f612, #8b5cf612)'
+                                            : `${activeThemeColor}12`,
+                                    }}
+                                >
+                                    {item.badgeEmoji && <span className="text-sm">{item.badgeEmoji}</span>}
+                                    {item.badge}
+                                </span>
+                            </div>
+                        )}
+
+                        {item.headline && (
+                            <h3 className="text-lg desktop:text-xl font-bold text-white/90 leading-snug max-w-2xl">
+                                {item.headline}
+                            </h3>
+                        )}
+
                         {item.description.split('\n\n').map((paragraph, i) => (
-                            <div key={i} className="text-sm leading-relaxed font-medium">
+                            <div key={i} className="text-sm desktop:text-[15px] leading-relaxed font-medium">
                                 <SweetPunkText
                                     text={paragraph}
                                     startColor="#52525b"
-                                    midColor={item.id === 'nycpride' ? '#ef4444' : (item.themeColor || '#0158ff')}
-                                    endColor="#ffffff"
+                                    midColor={activeThemeColor}
+                                    endColor="#a1a1aa"
                                     colorDuration={2.0}
                                     stagger={0.005}
                                     enableMotion={false}
@@ -246,51 +304,59 @@ function SetupRow({ item, isLast }: { item: SetupItem; isLast?: boolean }) {
                         ))}
 
                         {item.tools && item.tools.length > 0 && (
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 mt-4">
-                                {item.tools.map((tool, index) => (
-                                    <div key={tool} className="flex items-center gap-x-3">
-                                        {index !== 0 && (
+                            <div className="flex flex-wrap items-center gap-2 mt-4">
+                                {item.tools.map((tool, idx) => (
+                                    <React.Fragment key={tool}>
+                                        {idx !== 0 && (
                                             <span
                                                 className="text-[10px] font-bold"
                                                 style={{
                                                     color: item.id === 'nycpride'
-                                                        ? ['#ef4444', '#3b82f6', '#a855f7'][(index - 1) % 3]
-                                                        : (item.themeColor || '#0158ff')
+                                                        ? ['#ef4444', '#3b82f6', '#a855f7'][(idx - 1) % 3]
+                                                        : activeThemeColor
                                                 }}
                                             >
                                                 ⌁
                                             </span>
                                         )}
-                                        <SweetPunkText
-                                            text={tool}
-                                            className="text-[10px] uppercase font-bold tracking-wider whitespace-nowrap"
-                                            startColor="#52525b"
-                                            midColor={item.id === 'nycpride' ? '#ef4444' : (item.themeColor || '#0158ff')}
-                                            endColor="#52525b"
-                                            colorDuration={2.0}
-                                            stagger={0.005}
-                                            enableMotion={false}
-                                        />
-                                    </div>
+                                        {(() => {
+                                            const prideColors = ['#ef4444', '#f97316', '#3b82f6', '#8b5cf6', '#ec4899'];
+                                            const pillColor = item.id === 'nycpride' ? prideColors[idx % prideColors.length] : activeThemeColor;
+                                            return (
+                                                <span
+                                                    className="px-3 py-1 text-[11px] uppercase font-bold tracking-wider rounded-full border transition-colors duration-300 group-hover:border-opacity-60"
+                                                    style={{
+                                                        borderColor: `${pillColor}30`,
+                                                        color: `${pillColor}cc`,
+                                                        background: `${pillColor}08`,
+                                                    }}
+                                                >
+                                                    {tool}
+                                                </span>
+                                            );
+                                        })()}
+                                    </React.Fragment>
                                 ))}
                             </div>
                         )}
                     </div>
                 </div>
-            </Container>
-        </div>
+            </div>
+        </article>
     );
 }
 
 export function Setup() {
     return (
 
-        <section className="bg-black text-white relative">
+        <section id="setup" className="bg-black text-white relative" aria-label="Development setup">
+            <h2 className="sr-only">Setup</h2>
             <div className="flex flex-col">
                 {setupItems.map((item, index) => (
                     <SetupRow
                         key={item.id}
                         item={item}
+                        index={index}
                         isLast={index === setupItems.length - 1}
                     />
                 ))}

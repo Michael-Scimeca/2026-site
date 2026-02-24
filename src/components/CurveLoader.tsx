@@ -115,9 +115,9 @@ export function CurveLoader() {
                     loop
                     muted
                     playsInline
-                    className="hidden md:block absolute top-0 left-0 w-full h-full object-cover pointer-events-none z-0 opacity-90"
+                    className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none z-0 opacity-90"
                 >
-                    <source src="/video/404-bg.mp4" type="video/mp4" />
+                    <source src="/videos/landing.mp4" type="video/mp4" />
                 </video>
 
                 <div className="relative z-10 text-white text-4xl md:text-6xl font-medium tracking-tight text-center">

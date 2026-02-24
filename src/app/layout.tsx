@@ -78,6 +78,17 @@ export const metadata: Metadata = {
   verification: {
     google: "G-K1EFNGT352",
   },
+  icons: {
+    icon: [
+      { url: "/favicons/favicon.ico", sizes: "32x32" },
+      { url: "/favicons/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicons/favicon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/favicons/favicon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/favicons/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
   category: "Technology",
 };
 
@@ -92,7 +103,7 @@ export default function RootLayout({
     "name": "Michael Scimeca",
     "alternateName": "Mikey Scimeca",
     "url": "https://michaelscimeca.com",
-    "image": "https://michaelscimeca.com/hero-portrait.png",
+    "image": "https://michaelscimeca.com/hero/hero-portrait.png",
     "jobTitle": "Full-Stack Web Developer & AI Automation Specialist",
     "worksFor": {
       "@type": "Organization",
@@ -118,7 +129,7 @@ export default function RootLayout({
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
     "name": "Michael Scimeca - Web Development & AI Automation",
-    "image": "https://michaelscimeca.com/hero-portrait.png",
+    "image": "https://michaelscimeca.com/hero/hero-portrait.png",
     "url": "https://michaelscimeca.com",
     "telephone": "",
     "email": "mikeyscimeca.dev@gmail.com",

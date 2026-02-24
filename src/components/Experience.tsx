@@ -25,6 +25,11 @@ interface ExperienceItem {
     tools?: string[];
     themeColor?: string;
     logo?: string;
+    abbreviation?: string;
+    parentCompany?: string;
+    headline?: string;
+    badge?: string;
+    badgeEmoji?: string;
 }
 
 interface ExperienceProps {
@@ -41,7 +46,290 @@ const getPseudoRandom = (seed: string, min: number, max: number) => {
     return Math.floor(normalized * (max - min + 1)) + min;
 };
 
-function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirst?: boolean; isLast?: boolean }) {
+/* ─────────────────────────────────────────────
+   TEXT-ONLY ROW  (items WITHOUT a thumbnail)
+   Matches the new card design from the mockup
+   ───────────────────────────────────────────── */
+function TextExperienceRow({ item, index, isFirst }: { item: ExperienceItem; index: number; isFirst?: boolean }) {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const pulseRef = useRef<SVGPathElement>(null);
+    const contentRef = useRef<HTMLDivElement>(null);
+
+    const activeThemeColor = React.useMemo(() => {
+        if (item.themeColor) return item.themeColor;
+        return '#0158ff';
+    }, [item.themeColor]);
+
+    const pulseLength = React.useMemo(() => getPseudoRandom(item._key + 'pulse', 40, 150), [item._key]);
+    const cycleLength = 2000;
+
+    useGSAP(() => {
+        if (pulseRef.current && containerRef.current) {
+            const pulseTl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: containerRef.current,
+                    start: "top 85%",
+                    toggleActions: "play none none none",
+                    fastScrollEnd: true,
+                    once: true
+                }
+            });
+
+            pulseTl.fromTo(pulseRef.current,
+                { opacity: 0, strokeDashoffset: 0 },
+                {
+                    opacity: 1,
+                    strokeDashoffset: -cycleLength * 0.3,
+                    duration: 0.8,
+                    ease: "power2.out"
+                },
+                0
+            );
+
+            pulseTl.to(pulseRef.current,
+                {
+                    opacity: 0,
+                    strokeDashoffset: -cycleLength * 0.6,
+                    duration: 1.2,
+                    ease: "power2.inOut"
+                }
+            );
+        }
+    }, { scope: containerRef });
+
+    useGSAP(() => {
+        if (contentRef.current && containerRef.current) {
+            gsap.fromTo(contentRef.current,
+                { opacity: 0, y: 30 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.8,
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: containerRef.current,
+                        start: "top 80%",
+                        toggleActions: "play none none none",
+                        once: true
+                    }
+                }
+            );
+        }
+    }, { scope: containerRef, dependencies: [] });
+
+    const displayNumber = String(index + 1);
+    const abbreviation = item.abbreviation || item.company.split(' ').map(w => w[0]).join('').toUpperCase();
+
+    return (
+        <article
+            ref={containerRef}
+            className="group w-full relative py-10 desktop:py-14"
+        >
+            {/* Bottom Border with Pulse */}
+            <div className="absolute bottom-0 left-0 right-0 pointer-events-none z-50" style={{ overflow: 'visible' }}>
+                <svg
+                    width="100%"
+                    height="10"
+                    viewBox="0 0 1000 10"
+                    preserveAspectRatio="none"
+                    style={{ display: 'block', position: 'absolute', bottom: '-5px', left: 0, right: 0, overflow: 'visible' }}
+                >
+                    <path d="M 0 5 H 1000" stroke="rgba(255,255,255,0.08)" strokeWidth="1" vectorEffect="non-scaling-stroke" />
+                    <path
+                        ref={pulseRef}
+                        d="M 0 5 H 1000"
+                        stroke={activeThemeColor}
+                        strokeWidth="1.5"
+                        strokeDasharray={`${pulseLength} ${cycleLength - pulseLength}`}
+                        strokeLinecap="round"
+                        vectorEffect="non-scaling-stroke"
+                        className="opacity-0"
+                    />
+                </svg>
+            </div>
+
+            {isFirst && <div className="absolute top-0 left-0 w-full h-[1px] bg-white/[0.08]" />}
+
+            {/* Hover Glow */}
+            <div
+                className="absolute inset-0 opacity-0 group-hover:opacity-[0.03] transition-opacity duration-700 pointer-events-none"
+                style={{ background: `radial-gradient(ellipse at 60% 50%, ${activeThemeColor} 0%, transparent 70%)` }}
+            />
+
+            <div ref={contentRef} className="relative z-10 px-4 md:px-6 desktop:px-8 max-w-[1440px] mx-auto">
+                <div className="flex flex-col desktop:grid desktop:grid-cols-12 desktop:gap-8 desktop:items-start">
+
+                    {/* Left Column — Client Info */}
+                    <div className="desktop:col-span-3 flex flex-col gap-2 mb-6 desktop:mb-0 relative">
+                        {item.logo ? (
+                            <div
+                                className="relative h-10 desktop:h-12 max-w-[180px]"
+                                style={{
+                                    backgroundColor: activeThemeColor,
+                                    maskImage: `url(${item.logo})`,
+                                    WebkitMaskImage: `url(${item.logo})`,
+                                    maskSize: 'contain',
+                                    WebkitMaskSize: 'contain',
+                                    maskRepeat: 'no-repeat',
+                                    WebkitMaskRepeat: 'no-repeat',
+                                    maskPosition: 'left center',
+                                    WebkitMaskPosition: 'left center',
+                                    width: '180px',
+                                }}
+                            />
+                        ) : (
+                            <div className="text-3xl desktop:text-4xl font-black tracking-tight leading-none" style={{ color: activeThemeColor }}>
+                                <SweetPunkText
+                                    text={abbreviation}
+                                    startColor="#52525b"
+                                    midColor={activeThemeColor}
+                                    endColor={activeThemeColor}
+                                    colorDuration={2.0}
+                                    stagger={0.005}
+                                    enableMotion={false}
+                                />
+                            </div>
+                        )}
+
+                        <p className="text-[11px] uppercase tracking-[0.2em] font-semibold leading-tight mt-1" style={{ color: `${activeThemeColor}99` }}>
+                            {item.parentCompany || item.company}
+                        </p>
+
+                        <p className="text-[11px] uppercase tracking-[0.15em] font-medium text-zinc-400 leading-tight">
+                            {item.role}
+                        </p>
+
+                        {/* Large Background Number */}
+                        <div
+                            className="hidden desktop:block absolute -bottom-6 -left-2 text-[12rem] font-black leading-none pointer-events-none select-none"
+                            style={{ color: 'transparent', WebkitTextStroke: '1px rgba(255, 255, 255, 0.04)' }}
+                            aria-hidden="true"
+                        >
+                            {displayNumber}
+                        </div>
+                    </div>
+
+                    {/* Right Column — Content */}
+                    <div className="desktop:col-span-9 flex flex-col gap-5">
+                        {item.badge && (
+                            <div className="flex">
+                                <span
+                                    className="inline-flex items-center gap-1.5 px-4 py-1.5 text-[12px] font-semibold tracking-wide rounded-full border"
+                                    style={{
+                                        borderColor: `${activeThemeColor}50`,
+                                        color: activeThemeColor,
+                                        background: `${activeThemeColor}12`,
+                                    }}
+                                >
+                                    {item.badgeEmoji && <span className="text-sm">{item.badgeEmoji}</span>}
+                                    {item.badge}
+                                </span>
+                            </div>
+                        )}
+
+                        {item.headline && (
+                            <h3 className="text-lg desktop:text-xl font-bold text-white/90 leading-snug max-w-2xl">
+                                {item.headline}
+                            </h3>
+                        )}
+
+                        <div className="text-sm desktop:text-[15px] text-zinc-400 leading-relaxed max-w-2xl font-medium">
+                            {(() => {
+                                const ptComponents = {
+                                    block: {
+                                        normal: ({ children }: any) => (
+                                            <div className="mb-3 last:mb-0 text-sm desktop:text-[15px] leading-relaxed font-medium">
+                                                {React.Children.map(children, child => {
+                                                    if (typeof child === 'string') {
+                                                        return <SweetPunkText text={child} startColor="#52525b" midColor={activeThemeColor} endColor="#a1a1aa" colorDuration={2.0} stagger={0.005} enableMotion={false} />;
+                                                    }
+                                                    return child;
+                                                })}
+                                            </div>
+                                        ),
+                                    },
+                                    marks: {
+                                        link: ({ children, value }: any) => (
+                                            <a href={value.href} target="_blank" rel="noopener noreferrer" className="hover:underline underline-offset-2 decoration-white/40 transition-all hover:decoration-white/80">
+                                                {React.Children.map(children, child => {
+                                                    if (typeof child === 'string') {
+                                                        return <SweetPunkText text={child} startColor="#52525b" midColor={activeThemeColor} endColor="#a1a1aa" colorDuration={2.0} stagger={0.005} enableMotion={false} />;
+                                                    }
+                                                    return child;
+                                                })}
+                                            </a>
+                                        ),
+                                        strong: ({ children }: any) => (
+                                            <strong className="font-bold text-white">
+                                                {React.Children.map(children, child => {
+                                                    if (typeof child === 'string') {
+                                                        return <SweetPunkText text={child} startColor="#52525b" midColor={activeThemeColor} endColor="#ffffff" colorDuration={2.0} stagger={0.005} enableMotion={false} />;
+                                                    }
+                                                    return child;
+                                                })}
+                                            </strong>
+                                        ),
+                                    }
+                                };
+
+                                if (Array.isArray(item.description) && item.description.length > 0) {
+                                    if (typeof item.description[0] === 'string') {
+                                        return (item.description as string[]).map((p, i) => (
+                                            <div key={i} className={`text-sm desktop:text-[15px] leading-relaxed font-medium ${i !== 0 ? "mt-3" : ""}`}>
+                                                <SweetPunkText text={p} startColor="#52525b" midColor={activeThemeColor} endColor="#a1a1aa" colorDuration={2.0} stagger={0.005} enableMotion={false} />
+                                            </div>
+                                        ));
+                                    }
+                                    return <PortableText value={item.description} components={ptComponents} />;
+                                }
+
+                                if (typeof item.description === 'string') {
+                                    return <SweetPunkText text={item.description as string} startColor="#52525b" midColor={activeThemeColor} endColor="#a1a1aa" colorDuration={2.0} stagger={0.005} enableMotion={false} />;
+                                }
+
+                                return null;
+                            })()}
+                        </div>
+
+                        {item.tools && item.tools.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-2 mt-4">
+                                {item.tools.map((tool, idx) => (
+                                    <React.Fragment key={tool}>
+                                        {idx !== 0 && (
+                                            <span
+                                                className="text-[10px] font-bold"
+                                                style={{ color: activeThemeColor }}
+                                            >
+                                                ⌁
+                                            </span>
+                                        )}
+                                        <span
+                                            className="px-3 py-1 text-[11px] uppercase font-bold tracking-wider rounded-full border transition-colors duration-300 group-hover:border-opacity-60"
+                                            style={{
+                                                borderColor: `${activeThemeColor}30`,
+                                                color: `${activeThemeColor}cc`,
+                                                background: `${activeThemeColor}08`,
+                                            }}
+                                        >
+                                            {tool}
+                                        </span>
+                                    </React.Fragment>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </article>
+    );
+}
+
+
+/* ─────────────────────────────────────────────
+   VIDEO ROW  (items WITH a thumbnail / video)
+   Original layout preserved exactly as-is
+   ───────────────────────────────────────────── */
+function VideoExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirst?: boolean; isLast?: boolean }) {
     const videoRef = useRef<HTMLVideoElement>(null);
     const thumbnailRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -55,10 +343,10 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
             ([entry]) => {
                 if (entry.isIntersecting) {
                     setIsInView(true);
-                    observer.disconnect(); // Only need to trigger once
+                    observer.disconnect();
                 }
             },
-            { rootMargin: '800px' } // Load significantly before it enters the viewport
+            { rootMargin: '800px' }
         );
 
         if (containerRef.current) observer.observe(containerRef.current);
@@ -68,20 +356,38 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
 
     const pulseRef = useRef<SVGPathElement>(null);
 
-    // Generate stable random length for this item (40px - 150px)
-    // We use a deterministic random based on item ID so it's consistent between server/client re-renders
     const pulseLength = React.useMemo(() => getPseudoRandom(item._key + 'pulse', 40, 150), [item._key]);
-    const cycleLength = 2000; // Longer cycle for smoother, less frequent appearance
+    const cycleLength = 2000;
 
     useGSAP(() => {
-        if (pulseRef.current) {
-            gsap.fromTo(pulseRef.current,
-                { strokeDashoffset: 0 },
+        if (pulseRef.current && containerRef.current) {
+            const pulseTl = gsap.timeline({
+                scrollTrigger: {
+                    trigger: containerRef.current,
+                    start: "top 85%",
+                    toggleActions: "play none none none",
+                    fastScrollEnd: true,
+                    once: true
+                }
+            });
+
+            pulseTl.fromTo(pulseRef.current,
+                { opacity: 0, strokeDashoffset: 0 },
                 {
-                    strokeDashoffset: -cycleLength,
-                    duration: 4 + (pulseLength / 100), // Slight duration variance based on length
-                    repeat: -1,
-                    ease: "linear"
+                    opacity: 1,
+                    strokeDashoffset: -cycleLength * 0.3,
+                    duration: 0.8,
+                    ease: "power2.out"
+                },
+                0
+            );
+
+            pulseTl.to(pulseRef.current,
+                {
+                    opacity: 0,
+                    strokeDashoffset: -cycleLength * 0.6,
+                    duration: 1.2,
+                    ease: "power2.inOut"
                 }
             );
         }
@@ -93,12 +399,13 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                 { y: "-10%" },
                 {
                     y: "10%",
+                    force3D: true,
                     ease: "none",
                     scrollTrigger: {
                         trigger: containerRef.current,
                         start: "top bottom",
                         end: "bottom top",
-                        scrub: true
+                        scrub: 0.5
                     }
                 }
             );
@@ -111,7 +418,6 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
             videoRef.current.play().then(() => setIsPlaying(true)).catch((e) => console.log("Mobile autoplay error:", e));
         }
 
-        // Cleanup function to ensure loop is removed
         return () => {
             if (gsapTickerRef.current) {
                 gsap.ticker.remove(gsapTickerRef.current);
@@ -129,8 +435,6 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                     const currentTime = videoRef.current.currentTime;
                     const progress = currentTime / duration;
 
-                    // Update circle stroke-dashoffset
-                    // Circumference of r=8 is ~50.27
                     const circumference = 50.27;
                     const offset = circumference - (progress * circumference);
                     progressCircleRef.current.style.strokeDashoffset = offset.toString();
@@ -161,7 +465,7 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
     }, [item.company, item.themeColor, item._key]);
 
     return (
-        <div
+        <article
             ref={containerRef}
             className={`group w-full transition-colors relative py-0 ${item.thumbnail ? 'desktop:py-0' : 'desktop:py-[12px]'}`}
             onMouseEnter={handleMouseEnter}
@@ -204,10 +508,7 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                             strokeDasharray={`${pulseLength} ${cycleLength - pulseLength}`}
                             strokeLinecap="round"
                             vectorEffect="non-scaling-stroke"
-                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                            style={{
-                                filter: `drop-shadow(0 0 4px ${activeThemeColor})`
-                            }}
+                            className="opacity-0"
                         />
                     </svg>
                 </div>
@@ -215,7 +516,6 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
 
             {/* Top Border for First Item */}
             {isFirst && <div className="absolute top-0 left-0 w-full h-[1px] bg-zinc-800" />}
-            {/* Dynamic Background Hover Glow */}
             {/* Dynamic Background Hover Glow */}
             <div
                 className="absolute inset-0 opacity-0 group-hover:opacity-5 transition-opacity duration-500 pointer-events-none"
@@ -352,27 +652,44 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                                 </div>
                             </div>
 
+                            {item.badge && (
+                                <div className="flex mt-4 desktop:mt-2">
+                                    <span
+                                        className="inline-flex items-center gap-1.5 px-4 py-1.5 text-[12px] font-semibold tracking-wide rounded-full border"
+                                        style={{
+                                            borderColor: `${activeThemeColor}50`,
+                                            color: activeThemeColor,
+                                            background: `${activeThemeColor}12`,
+                                        }}
+                                    >
+                                        {item.badgeEmoji && <span className="text-sm">{item.badgeEmoji}</span>}
+                                        {item.badge}
+                                    </span>
+                                </div>
+                            )}
+
                             {item.tools && item.tools.length > 0 && (
-                                <div className="flex flex-wrap items-center mt-8 desktop:mt-3 pb-8 desktop:pb-2">
+                                <div className="flex flex-wrap items-center gap-2 mt-8 desktop:mt-3 pb-8 desktop:pb-2">
                                     {item.tools.map((tool, index) => (
                                         <React.Fragment key={tool}>
                                             {index !== 0 && (
                                                 <span
-                                                    className="pr-[5px] text-[10px] font-bold"
+                                                    className="text-[10px] font-bold"
                                                     style={{ color: activeThemeColor }}
                                                 >
                                                     ⌁
                                                 </span>
                                             )}
-                                            <SweetPunkText
-                                                text={tool}
-                                                className="pl-0 pr-[5px] py-1 text-[10px] uppercase font-bold tracking-wider whitespace-nowrap"
-                                                startColor="#52525b"
-                                                midColor={activeThemeColor}
-                                                endColor="#52525b"
-                                                colorDuration={2.0}
-                                                stagger={0.005} enableMotion={false}
-                                            />
+                                            <span
+                                                className="px-3 py-1 text-[11px] uppercase font-bold tracking-wider rounded-full border transition-colors duration-300 group-hover:border-opacity-60"
+                                                style={{
+                                                    borderColor: `${activeThemeColor}30`,
+                                                    color: `${activeThemeColor}cc`,
+                                                    background: `${activeThemeColor}08`,
+                                                }}
+                                            >
+                                                {tool}
+                                            </span>
                                         </React.Fragment>
                                     ))}
                                 </div>
@@ -381,11 +698,11 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                     </div>
 
                     {/* Column 4: Thumbnail (5 cols) */}
-                    <div className="desktop:col-span-7 w-full flex flex-col relative max-desktop:mb-8">
+                    <div className="desktop:col-span-7 w-full relative max-desktop:mb-8" style={{ height: '100%', background: activeThemeColor, display: 'flex', flexDirection: 'row', alignContent: 'center', justifyContent: 'center', alignItems: 'center' }}>
 
                         <ExperienceContainer>
                             <div
-                                className="relative aspect-video overflow-hidden shadow-sm"
+                                className="relative aspect-video overflow-hidden"
                                 style={{ backgroundColor: activeThemeColor }}
                             >
                                 {/* Shimmer Loading Overlay */}
@@ -457,7 +774,7 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                                             videoRef.current.play().then(() => setIsPlaying(true)).catch(console.error);
                                         }
                                     }}
-                                    className={`p-1.5 text-white rounded-full backdrop-blur-sm transition-all transform active:scale-95 ${isPlaying ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+                                    className={`p-1.5 text-white rounded-full transition-all transform active:scale-95 ${isPlaying ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
                                     aria-label="Replay video"
                                     title="Replay"
                                 >
@@ -467,7 +784,7 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                                 </button>
 
                                 {/* Circular Progress Indicator */}
-                                <div className="relative w-8 h-8 flex items-center justify-center rounded-full backdrop-blur-sm p-1">
+                                <div className="relative w-8 h-8 flex items-center justify-center rounded-full p-1">
                                     <svg className="w-full h-full -rotate-90" viewBox="0 0 20 20">
                                         {/* Track */}
                                         <circle
@@ -501,14 +818,17 @@ function ExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; isFirs
                     </div>
                 </div>
             </div>
-        </div >
+        </article >
     );
 }
 
 export function Experience({ items }: ExperienceProps) {
+    // Track the index for text-only items separately (for the big background numbers)
+    let textIndex = 0;
+
     return (
-        <section className="bg-black text-white relative">
-            {/* Global SVG Definitions - Guaranteed visibility */}
+        <section id="experience" className="bg-black text-white relative" aria-label="Work experience">
+            <h2 className="sr-only">Experience</h2>
             <svg className="absolute w-0 h-0 pointer-events-none overflow-hidden" aria-hidden="true">
                 <defs>
                     <filter id="experience-helix-glow" x="-50%" y="-50%" width="200%" height="200%">
@@ -530,14 +850,30 @@ export function Experience({ items }: ExperienceProps) {
             </svg>
 
             <div className="flex flex-col">
-                {items.map((item, index) => (
-                    <ExperienceRow
-                        key={item._key}
-                        item={item}
-                        isFirst={index === 0}
-                        isLast={index === items.length - 1}
-                    />
-                ))}
+                {items.map((item, i) => {
+                    const hasVideo = !!item.thumbnail;
+                    if (hasVideo) {
+                        return (
+                            <VideoExperienceRow
+                                key={item._key}
+                                item={item}
+                                isFirst={i === 0}
+                                isLast={i === items.length - 1}
+                            />
+                        );
+                    } else {
+                        const currentTextIndex = textIndex;
+                        textIndex++;
+                        return (
+                            <TextExperienceRow
+                                key={item._key}
+                                item={item}
+                                index={currentTextIndex}
+                                isFirst={i === 0}
+                            />
+                        );
+                    }
+                })}
             </div>
         </section>
     );

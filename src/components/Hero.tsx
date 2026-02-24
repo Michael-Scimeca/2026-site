@@ -78,12 +78,13 @@ export function Hero(props: HeroProps) {
         // Background opacity fade out (starts at top, ends halfway through)
         gsap.to(bgRef.current, {
             opacity: 0,
+            force3D: true,
             ease: "none",
             scrollTrigger: {
                 trigger: containerRef.current,
                 start: "top top",
                 end: "center top",
-                scrub: true
+                scrub: 0.5
             }
         });
 
@@ -93,48 +94,52 @@ export function Hero(props: HeroProps) {
             // Background parallax
             gsap.to(bgRef.current, {
                 y: "15%",
+                force3D: true,
                 ease: "none",
                 scrollTrigger: {
                     trigger: containerRef.current,
                     start: "top top",
                     end: "bottom top",
-                    scrub: true
+                    scrub: 0.5
                 }
             });
 
             // Portrait moves down (parallax effect)
             gsap.to(portraitRef.current, {
                 y: "45%",
+                force3D: true,
                 ease: "none",
                 scrollTrigger: {
                     trigger: containerRef.current,
                     start: "top top",
                     end: "bottom top",
-                    scrub: true
+                    scrub: 0.5
                 }
             });
 
             // Content moves up (subtle parallax)
             gsap.to(contentRef.current, {
                 y: "-75%",
+                force3D: true,
                 ease: "none",
                 scrollTrigger: {
                     trigger: containerRef.current,
                     start: "top top",
                     end: "bottom top",
-                    scrub: true
+                    scrub: 0.5
                 }
             });
 
             // Marquee parallax - moves up slightly to feel "on top"
             gsap.to(marqueeRef.current, {
                 y: "-25%",
+                force3D: true,
                 ease: "none",
                 scrollTrigger: {
                     trigger: containerRef.current,
                     start: "top top",
                     end: "bottom top",
-                    scrub: true
+                    scrub: 0.5
                 }
             });
         });
@@ -143,19 +148,18 @@ export function Hero(props: HeroProps) {
         if (marqueeInnerRef.current) {
             const tl = gsap.to(marqueeInnerRef.current, {
                 xPercent: -50,
+                force3D: true,
                 ease: "none",
                 duration: 20,
                 repeat: -1
             });
 
             ScrollTrigger.create({
-                trigger: document.body, // Watch global scroll for velocity, or container? Global is better for continuous effect.
+                trigger: document.body,
                 start: "top top",
                 end: "bottom bottom",
                 onUpdate: (self) => {
                     const vel = Math.abs(self.getVelocity());
-                    // Base timescale 1. Adjust divisor to tune sensitivity. lower = more sensitive.
-                    // Wanaka is quite fast. Try / 200.
                     const boost = vel / 200;
                     gsap.to(tl, {
                         timeScale: 1 + boost,
@@ -174,7 +178,7 @@ export function Hero(props: HeroProps) {
         <section
             ref={containerRef}
             className="hero relative h-screen w-full overflow-hidden bg-black border-b border-white/20"
-            style={heroHeight ? { height: heroHeight, minHeight: heroHeight, maxHeight: heroHeight } : undefined}
+            style={{ height: heroHeight || '100dvh', minHeight: heroHeight || '100dvh', maxHeight: heroHeight || '100dvh' }}
         >
             <div className="relative h-full w-full overflow-hidden bg-black">
                 {/* Semantic Header for Top Elements */}
@@ -198,9 +202,9 @@ export function Hero(props: HeroProps) {
                 </header>
 
                 {/* Background Texture Layer - Increased height for parallax bleed */}
-                <div ref={bgRef} className="absolute -top-[20%] inset-x-0 h-[140%] z-0 opacity-100 will-change-transform">
+                <div ref={bgRef} className="absolute -top-[20%] inset-x-0 h-[140%] z-0 opacity-100 will-change-transform" style={{ transform: 'translateZ(0)' }}>
                     <Image
-                        src="/hero-background.jpg?v=new"
+                        src="/hero/hero-background.jpg?v=new"
                         alt="Background Texture"
                         fill
                         className="object-cover pointer-events-none scale-100 md:scale-110"
@@ -215,7 +219,7 @@ export function Hero(props: HeroProps) {
 
 
                 {/* Scrolling Marquee Layer */}
-                <div ref={marqueeRef} className="absolute bottom-0 w-full z-20 md:z-0 overflow-hidden pointer-events-none pb-0 will-change-transform">
+                <div ref={marqueeRef} className="absolute bottom-0 w-full z-20 md:z-0 overflow-hidden pointer-events-none pb-0 will-change-transform" role="presentation" aria-hidden="true">
                     <div ref={marqueeInnerRef} className="flex w-fit whitespace-nowrap">
                         {[...Array(2)].map((_, i) => (
                             <span
@@ -231,9 +235,9 @@ export function Hero(props: HeroProps) {
 
                 {/* Foreground Portrait Layer - Increased height for bleed */}
                 <div className="absolute top-0 left-0 w-full h-full z-30 flex items-center justify-center pointer-events-none">
-                    <div ref={portraitRef} className="relative w-full h-full top-0 md:h-[110%] md:top-[10%] max-w-4xl flex items-end will-change-transform">
+                    <div ref={portraitRef} className="relative w-full h-full top-0 md:h-[110%] md:top-[10%] max-w-4xl flex items-end will-change-transform" style={{ transform: 'translateZ(0)' }}>
                         <Image
-                            src="/hero-portrait.png"
+                            src="/hero/hero-portrait.png"
                             alt="Michael Scimeca"
                             fill
                             className="object-contain object-bottom"
@@ -243,7 +247,7 @@ export function Hero(props: HeroProps) {
                             sizes="(max-width: 768px) 100vw, 80vw"
                         />
                         <div ref={contentRef} className="absolute z-50 flex flex-col items-start gap-1 pointer-events-auto
-                            left-5 bottom-6 right-auto top-auto md:top-[calc(38%-50px)] md:left-[max(20px,calc(50%-220px))] lg:left-[calc(40%-100px)] xl:left-[calc(55%-100px)] md:right-auto md:bottom-auto
+                            left-5 bottom-[150px] right-auto top-auto md:top-[calc(38%-50px)] md:left-[max(20px,calc(50%-220px))] lg:left-[calc(40%-100px)] xl:left-[calc(55%-100px)] md:right-auto md:bottom-auto
                             max-w-[85vw] md:min-w-[700px] 
                             md:rotate-[-2deg]
                             transition-[left,transform] duration-500 ease-out
@@ -252,12 +256,10 @@ export function Hero(props: HeroProps) {
                             {/* Mobile Scrim for Legibility */}
                             <div className="absolute -inset-6 bg-gradient-to-r from-black/80 via-black/40 to-transparent -z-10 rounded-xl blur-xl md:hidden" />
 
-                            <h2 className="text-[clamp(26px,5vw,44px)] font-medium font-sans text-white leading-[1.1] tracking-tight whitespace-normal drop-shadow-lg md:drop-shadow-none">
+                            <h1 className="text-[clamp(26px,5vw,44px)] font-medium font-sans text-white leading-[1.2] tracking-tight whitespace-normal drop-shadow-lg md:drop-shadow-none">
                                 🌟 I build high-impact<br className="hidden md:block" />{' '}
-                                digital products, AI workflows,<br className="hidden md:block" />{' '}
-                                and automation systems that<br className="hidden md:block" />{' '}
-                                help teams grow and scale.
-                            </h2>
+                                digital products & AI workflows.<br className="hidden md:block" />{' '}
+                            </h1>
 
                             <p className="text-white/90 md:text-white/70 text-[clamp(15px,4vw,18px)] mt-4 max-w-[600px] leading-relaxed drop-shadow-md md:drop-shadow-none">
                                 Senior Web Developer & AI Automation Specialist — I help startups and brands ship intelligent solutions that save time and increase conversions.
@@ -275,10 +277,10 @@ export function Hero(props: HeroProps) {
 
                                     <span className="relative z-10">Email Me</span>
                                     <Image
-                                        src="/Icon/email-icon.svg"
+                                        src="/Icon/at-icon.svg"
                                         alt="Email"
-                                        width={24}
-                                        height={24}
+                                        width={20}
+                                        height={20}
                                         className="relative z-10 invert"
                                     />
                                 </a>

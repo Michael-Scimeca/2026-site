@@ -239,7 +239,7 @@ export function ScheduleModal() {
 
                 <button
                     onClick={handleClose}
-                    className="absolute top-8 right-4 md:right-8 z-20 text-zinc-500 hover:text-white transition-colors"
+                    className="absolute top-6 right-6 md:top-8 md:right-8 z-20 text-zinc-500 hover:text-white transition-colors"
                     aria-label="Close modal"
                 >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

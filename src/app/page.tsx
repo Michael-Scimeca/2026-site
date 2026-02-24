@@ -72,8 +72,10 @@ export default async function Home() {
       description: "I handled the development and animation implementation for the Longview Innovation website, using interactive motion and thoughtful transitions to support a modern, engaging digital experience.",
       tools: ["SPA", "Wordpress", "Browserstack", "GSAP", 'locomotive', 'Highway.js'],
       thumbnail: '/clips/longview.mp4',
-      themeColor: '#031b3a',
-      logo: '/logos/longview-innovation-logo.svg'
+      themeColor: '#da6c40',
+      logo: '/logos/longview-innovation-logo.svg',
+      badge: 'Motion-driven experience',
+      badgeEmoji: '🚀',
     },
     {
       _key: 'twix',
@@ -83,7 +85,9 @@ export default async function Home() {
       tools: ["Wordpress", "Browserstack", "GSAP", 'Lenis', 'Barba.js'],
       thumbnail: '/clips/twix.mp4',
       themeColor: '#f59e0b',
-      logo: '/logos/nfttwix-logo.png'
+      logo: '/logos/nfttwix-logo.png',
+      badge: 'NFT campaign launch',
+      badgeEmoji: '🎨',
     },
     {
       _key: 'outleadership',
@@ -92,8 +96,10 @@ export default async function Home() {
       description: "Out Leadership is a global platform for LGBTQ+ business leaders. I led the technical development of their digital presence, focusing on the animation strategy and front-end implementation to create a high-performance, cinematic experience that celebrates the community and their mission.",
       tools: ["Wordpress", "Browserstack", "Lottie", "GSAP - Scroll Trigger"],
       thumbnail: '/clips/outleadership.mp4?v=1',
-      themeColor: '#35687e',
-      logo: '/logos/outleadship-logo.png'
+      themeColor: '#20587a',
+      logo: '/logos/outleadship-logo.png',
+      badge: 'LGBTQ+ business platform',
+      badgeEmoji: '🌈',
     },
     {
       _key: 'kovitz',
@@ -103,7 +109,9 @@ export default async function Home() {
       tools: ["Wordpress", "Browserstack", "GSAP", 'locomotive'],
       thumbnail: '/clips/kovitz.mp4',
       themeColor: '#76817a',
-      logo: '/logos/kovitz-logo.svg'
+      logo: '/logos/kovitz-logo.svg',
+      badge: 'Wealth management platform',
+      badgeEmoji: '📊',
     },
     {
       _key: 'patreon',
@@ -113,7 +121,9 @@ export default async function Home() {
       tools: ["SPA", "Browserstack", "Lottie", "Sanity CMS", "GSAP"],
       thumbnail: '/clips/patreon.mp4',
       themeColor: '#e45253',
-      logo: '/logos/patreon-logo.svg'
+      logo: '/logos/patreon-logo.svg',
+      badge: 'Interactive microsite',
+      badgeEmoji: '🎃',
     },
     {
       _key: 'ripco',
@@ -123,20 +133,71 @@ export default async function Home() {
       tools: ["Wordpress", "Browserstack", "GSAP", "Google Maps API", "Ripco Database"],
       thumbnail: '/clips/ripco.mp4?v=1',
       themeColor: '#e13c46',
-      logo: '/logos/ripco-logo.svg'
+      logo: '/logos/ripco-logo.svg',
+      badge: 'Real-time property listings',
+      badgeEmoji: '🏢',
     },
-    ...(data.experience?.filter((item: any) =>
-      item.company !== 'Apple' &&
-      item.company !== 'Meta Reality Labs' &&
-      item.company !== 'Patreon' &&
-      item.company !== 'Spotify' &&
-      item.company !== 'Twix NFT' &&
-      item.company !== 'Kovitz' &&
-      item.company !== 'Longview Innovation'
+    // ── Text-only items (no video) ──
+    {
+      _key: 'optimumnutrition',
+      company: 'Optimum Nutrition',
+      abbreviation: 'ON',
+      role: 'Front-End Development',
+      dateRange: '2022',
+      description: "Built responsive layouts and interactive enhancements for optimumnutrition.com alongside We Can't Stop Thinking agency — ensuring cross-device reliability and on-brand execution at scale.",
+      tools: ["Photoshop", "Custom CMS", "Browserstack", "Foundation"],
+      themeColor: '#3c468c',
+      logo: '/logos/on.png',
+      badge: 'Performance-critical brand site',
+      badgeEmoji: '🏋',
+      headline: 'Brought a performance-driven brand to life across all devices',
+    },
+    {
+      _key: 'flipboard',
+      company: 'Flipboard',
+      abbreviation: 'F',
+      role: 'Frontend + Animation',
+      dateRange: '2021',
+      description: "Delivered front-end development and animation implementation for Flipboard's marketing site — creating a visually engaging, responsive presence for one of the world's largest content apps.",
+      tools: ["Custom SCSS", "Foundation", "JS Interactions", "Browserstack"],
+      themeColor: '#e04040',
+      logo: '/logos/flipboard-logo.png',
+      badge: 'Motion-driven marketing site',
+      badgeEmoji: '🎬',
+      headline: 'Animation-first development for a global content platform',
+    },
+    {
+      _key: 'snickers',
+      company: 'Snickers',
+      abbreviation: 'SNICKERS',
+      parentCompany: 'Mars Inc.',
+      role: 'Campaign Development',
+      dateRange: '2020',
+      description: "Built a campaign site celebrating the Snickers brand with dynamic visuals, GSAP animations, and responsive interactive layouts — matching the brand's irreverent, high-energy personality at every scroll.",
+      tools: ["Wordpress", "GSAP", "Foundation", "Browserstack"],
+      themeColor: '#d4820a',
+      logo: '/logos/snickers.png',
+      badge: 'High-energy interactive campaign',
+      badgeEmoji: '🍬',
+      headline: 'One Million SNICKERS — bold, playful, and deeply interactive',
+    },
+    ...(data.experience?.filter((item: any) => {
+      const name = (item.company || '').toLowerCase().trim();
+      const key = (item._key || '').toLowerCase();
+      const excluded = ['apple', 'meta reality labs', 'patreon', 'spotify', 'twix', 'kovitz', 'longview', 'optimum', 'flipboard', 'snickers', 'one million'];
+      return !excluded.some(
+        (ex) => name.includes(ex) || key.includes(ex)
+      );
+    }
     ).map((item: any, index: number) => ({
       ...item,
       tools: item.tools?.length > 0 ? item.tools : mockToolSets[index % mockToolSets.length],
-      themeColor: PROJECT_COLORS[(index + 1) % PROJECT_COLORS.length]
+      themeColor: PROJECT_COLORS[(index + 1) % PROJECT_COLORS.length],
+      // Text-card fields for items without thumbnails
+      ...(!item.thumbnail ? {
+        abbreviation: item.company?.split(' ').map((w: string) => w[0]).join('').toUpperCase(),
+        headline: typeof item.description === 'string' ? undefined : undefined,
+      } : {})
     })) || [])
   ];
 
@@ -161,7 +222,7 @@ export default async function Home() {
 
       <div
         className="relative z-20 bg-black"
-        style={{ boxShadow: '-9px -2px 52px 19px rgb(0 0 0 / 80%)' }}
+        style={{ transform: 'translateZ(0)' }}
       >
         <Hero
           title={data.title}

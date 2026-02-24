@@ -76,13 +76,12 @@ const HELIX_Sep = 0.5;
 function HelixItem({ tool, className, style }: { tool: typeof TOOLS[0], className?: string, style?: React.CSSProperties }) {
     return (
         <div
-            className={`absolute flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-black/40 backdrop-blur-sm rounded-full border border-white/10 ${className}`}
+            className={`absolute flex items-center justify-center w-12 h-12 md:w-16 md:h-16 bg-black/60 rounded-full border border-white/10 ${className}`}
             data-color={tool.color}
             data-custom-filter={tool.customFilter}
             style={{
                 ...style,
-                boxShadow: `0 0 15px 1px ${tool.color}30`,
-                borderColor: `${tool.color}50`
+                willChange: 'transform, opacity'
             }}
         >
             <Image
@@ -90,9 +89,9 @@ function HelixItem({ tool, className, style }: { tool: typeof TOOLS[0], classNam
                 alt={tool.name}
                 width={60}
                 height={60}
-                className={`w-3/4 h-3/4 object-contain transition-all duration-500`}
+                className={`w-3/4 h-3/4 object-contain transition-[filter] duration-500`}
                 style={{
-                    filter: tool.customFilter && !tool.customFilter.includes('brightness(0)') ? tool.customFilter : 'none'
+                    filter: 'brightness(0) invert(1)'
                 }}
             />
         </div>
@@ -142,21 +141,25 @@ export function LogoTicker() {
             const path1Pulse = document.getElementById('helix-path-1-pulse') as unknown as SVGPathElement;
             const path2Pulse = document.getElementById('helix-path-2-pulse') as unknown as SVGPathElement;
 
+            // Track foreground state to avoid redundant filter changes
+            const prevForeground1 = new Array(items1.length).fill(false);
+            const prevForeground2 = new Array(items2.length).fill(false);
+            let frameCount = 0;
+
             const updateStrands = () => {
+                // Throttle: only run every other frame
+                frameCount++;
+                if (frameCount % 2 !== 0) return;
+
                 const points1: { x: number, y: number }[] = [];
                 const points2: { x: number, y: number }[] = [];
 
                 const containerW = containerRef.current?.offsetWidth || 1000;
-                const paddingX = 80; // Desktop padding
+                const paddingX = 80;
                 const innerWidth = containerW - (paddingX * 2);
-                /* 
-                   The gap distribution in `justify-between` is (width / (n-1)).
-                   Dynamically based on strand size.
-                */
                 const itemCount = items1.length;
                 const step = innerWidth / Math.max(itemCount - 1, 1);
 
-                // Loop with bleed-off on both ends
                 for (let i = -3; i <= itemCount + 2; i++) {
                     const angle = time.value + (i * HELIX_Sep);
 
@@ -185,6 +188,7 @@ export function LogoTicker() {
                             });
                         }
 
+                        // GPU-compositable only: y, scale, opacity, zIndex
                         if (item1) {
                             const cos1 = Math.cos(angle);
                             const scale1 = cos1 * 0.4 + 0.8;
@@ -197,16 +201,14 @@ export function LogoTicker() {
                                 scale: scale1,
                                 opacity: 0.3 + (opacity1 * 0.7),
                                 zIndex: zIndex1,
-                                borderColor: isForeground1 ? item1.dataset.color + '50' : 'rgba(255,255,255,0.1)',
-                                boxShadow: isForeground1 ? `0 0 15px 1px ${item1.dataset.color}30` : 'none'
                             });
 
-                            if (img1) {
-                                gsap.set(img1, {
-                                    filter: isForeground1
-                                        ? (item1.dataset.customFilter && !item1.dataset.customFilter.includes('brightness(0)') ? item1.dataset.customFilter : 'none')
-                                        : 'brightness(0) invert(1)'
-                                });
+                            // Only update filter when foreground state changes (CSS transition handles smoothing)
+                            if (img1 && isForeground1 !== prevForeground1[i]) {
+                                prevForeground1[i] = isForeground1;
+                                img1.style.filter = isForeground1
+                                    ? (item1.dataset.customFilter && !item1.dataset.customFilter.includes('brightness(0)') ? item1.dataset.customFilter : 'none')
+                                    : 'brightness(0) invert(1)';
                             }
                         }
 
@@ -222,16 +224,13 @@ export function LogoTicker() {
                                 scale: scale2,
                                 opacity: 0.3 + (opacity2 * 0.7),
                                 zIndex: zIndex2,
-                                borderColor: isForeground2 ? item2.dataset.color + '50' : 'rgba(255,255,255,0.1)',
-                                boxShadow: isForeground2 ? `0 0 15px 1px ${item2.dataset.color}30` : 'none'
                             });
 
-                            if (img2) {
-                                gsap.set(img2, {
-                                    filter: isForeground2
-                                        ? (item2.dataset.customFilter && !item2.dataset.customFilter.includes('brightness(0)') ? item2.dataset.customFilter : 'none')
-                                        : 'brightness(0) invert(1)'
-                                });
+                            if (img2 && isForeground2 !== prevForeground2[i]) {
+                                prevForeground2[i] = isForeground2;
+                                img2.style.filter = isForeground2
+                                    ? (item2.dataset.customFilter && !item2.dataset.customFilter.includes('brightness(0)') ? item2.dataset.customFilter : 'none')
+                                    : 'brightness(0) invert(1)';
                             }
                         }
                     }
@@ -249,7 +248,8 @@ export function LogoTicker() {
                 if (path2Pulse) path2Pulse.setAttribute("d", drawPath(points2));
             };
 
-            // Initial Update
+            // Initial Update (force first frame)
+            frameCount = 1; // ensure first call runs
             updateStrands();
 
             // Scroll Trigger
@@ -265,7 +265,7 @@ export function LogoTicker() {
                 onUpdate: updateStrands
             });
 
-            // Pulse
+            // Pulse (no SVG filter — just color + dashoffset)
             gsap.to(['#helix-path-1-pulse', '#helix-path-2-pulse'], {
                 strokeDashoffset: -800,
                 duration: 4,
@@ -277,12 +277,12 @@ export function LogoTicker() {
     }, { scope: containerRef });
 
     return (
-        <section ref={containerRef} className="w-full bg-black pt-10 pb-0 md:py-12 overflow-hidden border-b border-white/10 relative">
+        <section ref={containerRef} id="tools" className="w-full bg-black pt-10 pb-0 md:pt-12 overflow-hidden border-b border-white/10 relative" aria-labelledby="tools-heading">
             <Container className="mb-8">
                 <div className="text-left">
-                    <span className="text-zinc-500 text-sm md:text-base block">
+                    <h2 id="tools-heading" className="text-zinc-500 text-sm md:text-base block">
                         Tools
-                    </span>
+                    </h2>
                 </div>
             </Container>
 
@@ -300,14 +300,6 @@ export function LogoTicker() {
                 {/* SVG Overlay */}
                 <svg className="absolute inset-0 w-full h-full pointer-events-none z-0 overflow-visible">
                     <defs>
-                        <filter id="glow-pulse" x="-50%" y="-50%" width="200%" height="200%">
-                            <feGaussianBlur stdDeviation="4" result="blur" />
-                            <feMerge>
-                                <feMergeNode in="blur" />
-                                <feMergeNode in="blur" />
-                                <feMergeNode in="SourceGraphic" />
-                            </feMerge>
-                        </filter>
                         <linearGradient id="pulse-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                             <stop offset="0%" stopColor="#60a9ff" />
                             <stop offset="25%" stopColor="#6500ff" />
@@ -319,8 +311,8 @@ export function LogoTicker() {
                     <path id="helix-path-1" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
                     <path id="helix-path-2" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1" />
 
-                    <path id="helix-path-1-pulse" fill="none" stroke="url(#pulse-gradient)" strokeWidth="2" strokeOpacity="1" strokeDasharray="20 380" filter="url(#glow-pulse)" />
-                    <path id="helix-path-2-pulse" fill="none" stroke="url(#pulse-gradient)" strokeWidth="2" strokeOpacity="1" strokeDasharray="20 380" filter="url(#glow-pulse)" />
+                    <path id="helix-path-1-pulse" fill="none" stroke="url(#pulse-gradient)" strokeWidth="2" strokeOpacity="1" strokeDasharray="20 380" />
+                    <path id="helix-path-2-pulse" fill="none" stroke="url(#pulse-gradient)" strokeWidth="2" strokeOpacity="1" strokeDasharray="20 380" />
                 </svg>
 
                 {/* Helix Items Column Layout */}

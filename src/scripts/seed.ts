@@ -17,7 +17,7 @@ const MOCK_DATA = {
     title: "Michael Scimeca",
     headline: "Creative Developer & Designer",
     subHeadline: "Building polished digital experiences with a focus on motion and interaction.",
-    heroImage: "hero-portrait.png", // In public
+    heroImage: "hero/hero-portrait.png", // In public/hero
     about: [
         {
             _key: "block1",

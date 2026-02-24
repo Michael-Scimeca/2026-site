@@ -5,6 +5,57 @@ import { Howl } from "howler";
 import { QUICK_REPLIES } from "@/lib/knowledge-base";
 import { GradientBackground } from "./GradientBackground";
 
+/* ─── Reusable sub-components ─── */
+
+const SpeakerButton = ({ isSpeaking, onToggle }: { isSpeaking: boolean; onToggle: () => void }) => (
+    <button
+        onClick={(e) => { e.stopPropagation(); onToggle(); }}
+        className="absolute bottom-1.5 right-2 flex items-center justify-center w-5 h-5 rounded-full hover:bg-white/10 transition-all duration-200"
+        aria-label={isSpeaking ? "Stop speaking" : "Listen to this message"}
+        title={isSpeaking ? "Stop" : "Listen"}
+    >
+        {isSpeaking ? (
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="text-cyan-400">
+                <rect x="6" y="4" width="4" height="16" rx="1" />
+                <rect x="14" y="4" width="4" height="16" rx="1" />
+            </svg>
+        ) : (
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" className="text-white/40 hover:text-white/70">
+                <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+            </svg>
+        )}
+    </button>
+);
+
+const FlowProgressDots = ({ steps, currentStep, color }: { steps: string[]; currentStep: string; color: "emerald" | "blue" }) => {
+    const currentIdx = steps.indexOf(currentStep);
+    const colorClasses = color === "emerald"
+        ? { active: "bg-emerald-400", line: "bg-emerald-400/50" }
+        : { active: "bg-blue-400", line: "bg-blue-400/50" };
+    return (
+        <div className="flex items-center gap-1.5 flex-1">
+            {steps.map((step, i) => (
+                <React.Fragment key={step}>
+                    <div className={`w-2 h-2 rounded-full transition-all duration-300 ${currentIdx >= i ? `${colorClasses.active} scale-100` : "bg-white/15 scale-75"}`} />
+                    {i < steps.length - 1 && (
+                        <div className={`flex-1 h-[1px] transition-all duration-300 ${currentIdx > i ? colorClasses.line : "bg-white/10"}`} />
+                    )}
+                </React.Fragment>
+            ))}
+            <span className="ml-2 text-[10px] text-white/30">{Math.max(1, currentIdx + 1)}/{steps.length}</span>
+        </div>
+    );
+};
+
+const CHAT_BLOBS: { size: number; opacity: number; color: string; anim: string; top?: string; left?: string; bottom?: string; right?: string }[] = [
+    { size: 200, opacity: 0.50, color: "rgba(1, 80, 254, 0.7)", top: "10%", left: "20%", anim: "chatBlobDrift1 28s" },
+    { size: 180, opacity: 0.45, color: "rgba(100, 50, 255, 0.6)", bottom: "20%", right: "10%", anim: "chatBlobDrift2 32s" },
+    { size: 150, opacity: 0.45, color: "rgba(0, 200, 255, 0.55)", top: "50%", left: "40%", anim: "chatBlobDrift3 36s" },
+    { size: 220, opacity: 0.40, color: "rgba(1, 50, 200, 0.6)", bottom: "40%", left: "-5%", anim: "chatBlobDrift4 30s" },
+    { size: 160, opacity: 0.45, color: "rgba(80, 0, 255, 0.55)", top: "60%", left: "15%", anim: "chatBlobDrift5 34s" },
+];
+
+
 interface Message {
     id: string;
     role: "user" | "assistant";
@@ -101,6 +152,7 @@ interface ScheduleData {
 
 export function ChatWidget() {
     const [isOpen, setIsOpen] = useState(false);
+    const [openCount, setOpenCount] = useState(0);
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
@@ -130,7 +182,7 @@ export function ChatWidget() {
     const inputRef = useRef<HTMLInputElement>(null);
     const chatBodyRef = useRef<HTMLDivElement>(null);
     const panelRef = useRef<HTMLDivElement>(null);
-    const toggleRef = useRef<HTMLButtonElement>(null);
+    const toggleRef = useRef<HTMLDivElement>(null);
     const toggleVideoRef = useRef<HTMLVideoElement>(null);
     const headerVideoRef = useRef<HTMLVideoElement>(null);
     const isStreamingRef = useRef(false);
@@ -145,14 +197,39 @@ export function ChatWidget() {
     const voiceEnabledRef = useRef(false);
     const speakTextRef = useRef<(text: string) => void>(() => { });
 
+    // Message notification sounds
+    const nashSoundRef = useRef<Howl | null>(null);
+    const userSoundRef = useRef<Howl | null>(null);
+    const playNashSound = useCallback(() => {
+        if (!nashSoundRef.current) {
+            nashSoundRef.current = new Howl({
+                src: ["/sounds/nash-message.wav"],
+                volume: 0.5,
+                preload: true,
+            });
+        }
+        nashSoundRef.current.play();
+    }, []);
+    const playUserSound = useCallback(() => {
+        if (!userSoundRef.current) {
+            userSoundRef.current = new Howl({
+                src: ["/sounds/user-message.wav"],
+                volume: 0.4,
+                preload: true,
+            });
+        }
+        userSoundRef.current.play();
+    }, []);
+
     // Speech-to-text (mic) state
     const [isListening, setIsListening] = useState(false);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const recognitionRef = useRef<any>(null);
+    const toggleMicRef = useRef<() => void>(() => { });
 
     // Speak text using ElevenLabs TTS API
-    const speakText = useCallback(async (text: string) => {
-        if (!voiceEnabled || typeof window === 'undefined') return;
+    const speakText = useCallback(async (text: string, force = false) => {
+        if ((!force && !voiceEnabled) || typeof window === 'undefined') return;
 
         // Stop any current audio
         if (audioRef.current) {
@@ -195,6 +272,11 @@ export function ChatWidget() {
                 setIsSpeaking(false);
                 audioRef.current = null;
                 URL.revokeObjectURL(audioUrl);
+                lastInputWasVoiceRef.current = false;
+                // Auto-start mic after Nash asks a question
+                if (cleaned.trim().endsWith('?')) {
+                    setTimeout(() => toggleMicRef.current(), 400);
+                }
             };
 
             audio.onerror = () => {
@@ -220,6 +302,7 @@ export function ChatWidget() {
     }, [speakText]);
 
     // Speech-to-text: toggle microphone
+    const lastInputWasVoiceRef = useRef(false);
     const micStoppedManuallyRef = useRef(false);
     const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const toggleMic = useCallback(() => {
@@ -282,6 +365,7 @@ export function ChatWidget() {
                 // User tapped mic or silence timeout — send the message
                 setIsListening(false);
                 if (finalTranscript.trim()) {
+                    lastInputWasVoiceRef.current = true;
                     setInput(finalTranscript.trim());
                     setTimeout(() => {
                         const form = document.querySelector('form');
@@ -314,7 +398,17 @@ export function ChatWidget() {
 
         recognition.start();
         setIsListening(true);
+
+        // Auto-enable voice so Nash speaks his response back
+        if (!voiceEnabledRef.current) {
+            setVoiceEnabled(true);
+        }
     }, [isListening]);
+
+    // Keep toggleMicRef in sync
+    useEffect(() => {
+        toggleMicRef.current = toggleMic;
+    }, [toggleMic]);
 
     // Stop speaking/listening when chat closes or voice is disabled
     useEffect(() => {
@@ -326,10 +420,29 @@ export function ChatWidget() {
             setIsSpeaking(false);
         }
         if (!isOpen) {
+            micStoppedManuallyRef.current = true;
+            if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
             recognitionRef.current?.stop();
             setIsListening(false);
+            // Stop all sounds when chat is closed
+            fadeOutAmbient();
+            nashSoundRef.current?.stop();
+            userSoundRef.current?.stop();
         }
     }, [isOpen, voiceEnabled]);
+
+    // Close chat on page scroll (desktop only — mobile has body scroll locked)
+    useEffect(() => {
+        if (!isOpen || isMobile) return;
+        let startY = window.scrollY;
+        const handleScroll = () => {
+            if (Math.abs(window.scrollY - startY) > 50) {
+                setIsOpen(false);
+            }
+        };
+        window.addEventListener('scroll', handleScroll, { passive: true });
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [isOpen, isMobile]);
 
     // Track mobile breakpoint
     useEffect(() => {
@@ -465,7 +578,8 @@ export function ChatWidget() {
             timestamp: new Date(),
         };
         setMessages((prev) => [...prev, msg]);
-    }, []);
+        playNashSound();
+    }, [playNashSound]);
 
     const addUserMessage = useCallback((content: string) => {
         const msg: Message = {
@@ -475,7 +589,8 @@ export function ChatWidget() {
             timestamp: new Date(),
         };
         setMessages((prev) => [...prev, msg]);
-    }, []);
+        playUserSound();
+    }, [playUserSound]);
 
     // Save visitor info via cookie + server DB
     const saveVisitorMemory = useCallback(async (name: string, email: string) => {
@@ -1116,6 +1231,7 @@ export function ChatWidget() {
             };
 
             setMessages((prev) => [...prev, userMessage]);
+            playUserSound();
             setInput("");
             setShowQuickReplies(false);
             setIsLoading(true);
@@ -1183,6 +1299,7 @@ export function ChatWidget() {
                                         }]);
                                         setIsLoading(false);
                                         firstChunk = false;
+                                        playNashSound();
                                         // Scroll to the top of Nash's new message after it renders
                                         requestAnimationFrame(() => {
                                             const msgEl = document.getElementById(`msg-${assistantId}`);
@@ -1211,7 +1328,7 @@ export function ChatWidget() {
                 streamingMsgRef.current = null;
 
                 // Voice AI: speak the completed response (fire early, before marker checks)
-                if (voiceEnabledRef.current && fullContent.trim()) {
+                if (lastInputWasVoiceRef.current && fullContent.trim()) {
                     const cleanedForSpeech = fullContent
                         .replace(/\s*\[UNKNOWN\]\s*/g, "")
                         .replace(/\s*\[FEATURE_REQUEST\]\s*/g, "")
@@ -1356,59 +1473,85 @@ export function ChatWidget() {
     return (
         <>
             {/* Chat Toggle Button */}
-            <button
+            <div
+                ref={toggleRef}
                 onClick={() => {
                     const next = !isOpen;
                     setIsOpen(next);
                     // Fade ambient sound in/out
                     if (next) {
                         fadeInAmbient();
+                        setOpenCount(c => {
+                            // Only play the sound on the very first open (welcome message)
+                            if (c === 0) {
+                                setTimeout(() => playNashSound(), 400);
+                            }
+                            return c + 1;
+                        });
                     } else {
                         fadeOutAmbient();
                     }
                 }}
-                className={`fixed z-[9998] w-14 h-14 rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 overflow-hidden ${isOpen ? '' : 'hover:scale-110 active:scale-95'} ${isMobile && isOpen ? 'bottom-3 right-[6px]' : 'bottom-7 right-[30px]'}`}
+                className={`fixed z-[9998] w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 ${isOpen ? '' : ''} ${isMobile && isOpen ? 'bottom-3 right-[6px]' : 'bottom-6 right-[26px]'}`}
                 style={{
-                    border: isOpen ? '1px solid rgba(255, 255, 255, 0.06)' : '7px solid #0150fe',
-                    transition: 'border-color 0.4s, transform 0.3s',
-                    boxShadow: "rgba(1, 90, 255, 0) 0px 0px 0px 3px, rgba(0, 0, 0, 0.4) 0px 8px 32px",
+                    background: isOpen ? 'transparent' : '#0150fe',
+                    transition: 'background 0.4s, transform 0.3s',
+                    boxShadow: isOpen ? 'none' : '0 0 20px rgba(1, 80, 254, 0.4), 0 8px 32px rgba(0, 0, 0, 0.4)',
                 }}
+                role="button"
+                tabIndex={0}
                 aria-label={isOpen ? "Close chat" : "Open chat"}
                 id="chat-toggle"
-                ref={toggleRef}
             >
-                {/* Nash video — always mounted, paused when chat is open */}
-                <video
-                    ref={toggleVideoRef}
-                    className="w-full h-full object-cover"
-                    src="/AI-NASH/NASH-VIDEO-AVATAR.mp4?v=3"
-                    autoPlay
-                    loop
-                    muted
-                    playsInline
-                />
+                {/* Pulse ring — only when closed */}
+                {!isOpen && (
+                    <div
+                        className="absolute inset-0 rounded-full"
+                        style={{
+                            border: '2px solid rgba(1, 80, 254, 0.6)',
+                            animation: 'chatPulseRing 2s ease-out infinite',
+                        }}
+                    />
+                )}
                 <div
-                    className="group/close absolute inset-0 flex items-center justify-center transition-opacity duration-300"
+                    className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center relative"
                     style={{
-                        background: "#0c0b31ff",
-                        opacity: isOpen ? 1 : 0,
-                        pointerEvents: isOpen ? "auto" : "none",
+                        border: isOpen ? '1px solid rgba(255, 255, 255, 0.06)' : 'none',
                     }}
                 >
-                    <svg
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="#57576c"
-                        strokeWidth="2.5"
-                        strokeLinecap="round"
-                        className="transition-colors duration-200 group-hover/close:[stroke:white]"
+                    {/* Nash video — always mounted, paused when chat is open */}
+                    <video
+                        ref={toggleVideoRef}
+                        className="w-full h-full object-cover"
+                        src="/AI-NASH/NASH-VIDEO-AVATAR.mp4?v=3"
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                    />
+                    <div
+                        className="group/close absolute inset-0 flex items-center justify-center transition-opacity duration-300"
+                        style={{
+                            background: "#0c0b31ff",
+                            opacity: isOpen ? 1 : 0,
+                            pointerEvents: isOpen ? "auto" : "none",
+                        }}
                     >
-                        <path d="M18 6L6 18M6 6l12 12" />
-                    </svg>
+                        <svg
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="#57576c"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                            className="transition-colors duration-200 group-hover/close:[stroke:white]"
+                        >
+                            <path d="M18 6L6 18M6 6l12 12" />
+                        </svg>
+                    </div>
                 </div>
-            </button>
+            </div>
 
             {/* "I'M NASH" label */}
             {!isOpen && (
@@ -1437,12 +1580,25 @@ export function ChatWidget() {
                     : "opacity-0 pointer-events-none"
                     }`}
                 style={{
-                    bottom: "0px",
-                    right: "0px",
-                    width: isMobile ? "100vw" : "min(400px, calc(100vw - 24px))",
-                    height: isMobile ? "100dvh" : "min(620px, calc(100vh - 24px))",
-                    paddingBottom: isMobile ? "0px" : "20px",
-                    paddingRight: isMobile ? "0px" : "24px",
+                    ...(isMobile
+                        ? {
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            width: "100%",
+                            height: "100%",
+                            maxHeight: "100dvh",
+                            overflow: "hidden",
+                        }
+                        : {
+                            bottom: "0px",
+                            right: "0px",
+                            width: "min(455px, calc(100vw - 24px))",
+                            height: "min(620px, calc(100vh - 24px))",
+                            paddingBottom: "20px",
+                            paddingRight: "24px",
+                        }),
                 }}
             >
                 <div
@@ -1457,18 +1613,26 @@ export function ChatWidget() {
                 >
                     {/* Animated gradient background — only renders when chat is open */}
                     {isOpen && (
-                        <div className={`absolute inset-0 z-0 pointer-events-none opacity-85 overflow-hidden ${isMobile ? "" : "rounded-2xl"}`}>
-                            <GradientBackground />
-                            {/* Drifting goopy blobs */}
-                            <div className="absolute w-[200px] h-[200px] rounded-full opacity-50" style={{ background: "radial-gradient(circle, rgba(1, 80, 254, 0.7) 0%, transparent 60%)", filter: "blur(60px)", top: "10%", left: "20%", animation: "chatBlobDrift1 28s ease-in-out infinite alternate" }} />
-                            <div className="absolute w-[180px] h-[180px] rounded-full opacity-45" style={{ background: "radial-gradient(circle, rgba(100, 50, 255, 0.6) 0%, transparent 60%)", filter: "blur(60px)", bottom: "20%", right: "10%", animation: "chatBlobDrift2 32s ease-in-out infinite alternate" }} />
-                            <div className="absolute w-[150px] h-[150px] rounded-full opacity-45" style={{ background: "radial-gradient(circle, rgba(0, 200, 255, 0.55) 0%, transparent 60%)", filter: "blur(60px)", top: "50%", left: "40%", animation: "chatBlobDrift3 36s ease-in-out infinite alternate" }} />
-                            <div className="absolute w-[220px] h-[220px] rounded-full opacity-40" style={{ background: "radial-gradient(circle, rgba(1, 50, 200, 0.6) 0%, transparent 60%)", filter: "blur(60px)", bottom: "40%", left: "-5%", animation: "chatBlobDrift4 30s ease-in-out infinite alternate" }} />
-                            <div className="absolute w-[160px] h-[160px] rounded-full opacity-45" style={{ background: "radial-gradient(circle, rgba(80, 0, 255, 0.55) 0%, transparent 60%)", filter: "blur(60px)", top: "60%", left: "15%", animation: "chatBlobDrift5 34s ease-in-out infinite alternate" }} />
+                        <div className={`absolute inset-0 z-0 pointer-events-none opacity-95 overflow-hidden ${isMobile ? "" : "rounded-2xl"}`}>
+                            <GradientBackground disableInteractive />
+                            {CHAT_BLOBS.map((blob, i) => (
+                                <div
+                                    key={i}
+                                    className="absolute rounded-full"
+                                    style={{
+                                        width: blob.size, height: blob.size,
+                                        opacity: blob.opacity,
+                                        background: `radial-gradient(circle, ${blob.color} 0%, transparent 60%)`,
+                                        filter: "blur(60px)",
+                                        top: blob.top, left: blob.left, bottom: blob.bottom, right: blob.right,
+                                        animation: `${blob.anim} ease-in-out infinite alternate`,
+                                    }}
+                                />
+                            ))}
                         </div>
                     )}
                     {/* Header */}
-                    <div className="relative z-10 flex items-center gap-3 px-4 py-3" >
+                    <div className="relative z-10 flex items-center gap-3 px-4 py-3" style={isMobile ? { paddingTop: 'calc(12px + env(safe-area-inset-top, 0px))' } : undefined} >
                         <div className="relative">
                             <video ref={headerVideoRef} className={`w-10 h-10 rounded-full object-contain bg-[#0150fe] ${isSpeaking ? 'ring-2 ring-[#0150fe]/60' : ''}`} style={isSpeaking ? { animation: 'nashSpeakPulse 1.5s ease-in-out infinite' } : undefined} src="/AI-NASH/NASH-VIDEO-AVATAR.mp4?v=3" loop muted playsInline />
                             {isSpeaking && (
@@ -1511,55 +1675,74 @@ export function ChatWidget() {
                     <div
                         ref={chatBodyRef}
                         data-lenis-prevent
-                        className="relative z-10 flex-1 overflow-y-auto px-4 py-3 space-y-3"
+                        className="relative z-10 flex-1 overflow-y-auto px-4 py-3 space-y-[24px] after:content-['']"
                         style={{ scrollBehavior: "smooth", overscrollBehavior: "contain" }}
                     >
                         {/* Welcome message - always visible */}
-                        <div className="space-y-4">
-                            <div>
+                        <div className="space-y-4" key={`welcome-${openCount}`}>
+                            <div style={{ animation: "chatMsgFadeIn 0.4s ease-out 0.3s both" }}>
                                 <div
-                                    className={`rounded-2xl px-4 py-3 ${fontSizeClass} text-white/90 leading-relaxed max-w-[85%]`}
+                                    className={`relative rounded-2xl px-4 py-3 pb-7 ${fontSizeClass} text-white/90 leading-relaxed max-w-[85%]`}
                                     style={{ background: "rgba(255, 255, 255, 0.07)", boxShadow: "0 2px 12px rgba(0, 0, 0, 0.25)" }}
                                 >
                                     Hi, I&apos;m Nash — Mikey&apos;s AI partner. I can tell you
                                     about his work, skills, services, or help you get in touch.
                                     What would you like to know?
+                                    <SpeakerButton
+                                        isSpeaking={isSpeaking}
+                                        onToggle={() => {
+                                            if (isSpeaking) {
+                                                if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+                                                setIsSpeaking(false);
+                                            } else {
+                                                speakText("Hi, I'm Nash — Mikey's AI partner. I can tell you about his work, skills, services, or help you get in touch. What would you like to know?", true);
+                                            }
+                                        }}
+                                    />
                                 </div>
                                 <div className="text-[11px] text-white/30 mt-1 ml-1">Nash</div>
                             </div>
 
-                            {/* Quick Replies - always visible */}
-                            <div className="flex flex-wrap gap-2">
-                                {QUICK_REPLIES.map((qr) => (
+                            {/* Quick Replies - Jump to a Topic */}
+                            <div className="mt-2">
+                                <div
+                                    className="text-[10px] font-semibold tracking-[0.15em] text-white/25 uppercase mb-3 ml-1"
+                                    style={{ animation: `chatMsgFadeIn 0.3s ease-out 0.55s both` }}
+                                >
+                                    Jump to a topic
+                                </div>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {QUICK_REPLIES.map((qr, i) => (
+                                        <button
+                                            key={qr.label}
+                                            onClick={() => handleQuickReply(qr.message)}
+                                            className={`px-3 py-2.5 rounded-full text-xs font-medium border transition-all duration-200 ${qr.label.includes('Book')
+                                                ? 'border-[#544fd4]/50 text-[#a78bfa] hover:border-[#544fd4]/70 hover:bg-[#544fd4]/10'
+                                                : 'border-white/10 text-white/60 hover:text-white hover:border-white/25 hover:bg-white/[0.04]'
+                                                }`}
+                                            style={{ animation: `chatMsgFadeIn 0.3s ease-out ${0.6 + i * 0.08}s both` }}
+                                        >
+                                            {qr.label}
+                                        </button>
+                                    ))}
+                                </div>
+                                {/* Action buttons — separate row */}
+                                <div className="grid grid-cols-2 gap-2 mt-2">
                                     <button
-                                        key={qr.label}
-                                        onClick={() => handleQuickReply(qr.message)}
-                                        className="px-3 py-1.5 rounded-full text-xs font-medium border border-white/15 text-white/70 hover:text-white hover:border-[#0158ff]/50 hover:bg-[#0158ff]/10 transition-all duration-200"
+                                        onClick={startContactFlow}
+                                        className="px-3 py-2.5 rounded-full text-xs font-bold border border-emerald-500/40 text-emerald-400 bg-emerald-500/[0.08] hover:bg-emerald-500/15 hover:border-emerald-400/60 transition-all duration-200"
+                                        style={{ animation: `chatMsgFadeIn 0.3s ease-out ${0.6 + QUICK_REPLIES.length * 0.08}s both` }}
                                     >
-                                        {qr.label}
+                                        ✉️ Quick email
                                     </button>
-                                ))}
-                                {/* Send a message button */}
-                                <button
-                                    onClick={startContactFlow}
-                                    className="px-3 py-1.5 rounded-full text-xs font-medium border border-emerald-500/30 text-emerald-400/80 hover:text-emerald-300 hover:border-emerald-400/50 hover:bg-emerald-500/10 transition-all duration-200"
-                                >
-                                    ✉️ Quick email
-                                </button>
-                                {/* Text me button */}
-                                <button
-                                    onClick={startSmsFlow}
-                                    className="px-3 py-1.5 rounded-full text-xs font-medium border border-blue-500/30 text-blue-400/80 hover:text-blue-300 hover:border-blue-400/50 hover:bg-blue-500/10 transition-all duration-200"
-                                >
-                                    📱 Text me
-                                </button>
-                                {/* About Nash button */}
-                                <button
-                                    onClick={handleAboutNash}
-                                    className="px-3 py-1.5 rounded-full text-xs font-medium border border-amber-500/30 text-amber-400/80 hover:text-amber-300 hover:border-amber-400/50 hover:bg-amber-500/10 transition-all duration-200 flex items-center gap-1.5"
-                                >
-                                    <img src="/AI-NASH/nash-profile-img.jpg" alt="Nash" className="w-4 h-4 rounded-full object-cover" /> About Nash
-                                </button>
+                                    <button
+                                        onClick={handleAboutNash}
+                                        className="px-3 py-2.5 rounded-full text-xs font-bold border border-amber-500/40 text-amber-400 bg-amber-500/[0.08] hover:bg-amber-500/15 hover:border-amber-400/60 transition-all duration-200 flex items-center justify-center gap-1.5"
+                                        style={{ animation: `chatMsgFadeIn 0.3s ease-out ${0.6 + (QUICK_REPLIES.length + 1) * 0.08}s both` }}
+                                    >
+                                        <img src="/AI-NASH/nash-profile-img.jpg" alt="Nash" className="w-4 h-4 rounded-full object-cover" /> About Nash
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -1594,7 +1777,7 @@ export function ChatWidget() {
                                     }}
                                 >
                                     <div
-                                        className={`relative rounded-2xl px-3 py-2 ${fontSizeClass} leading-relaxed max-w-[85%] ${msg.role === "user"
+                                        className={`relative rounded-2xl px-3 py-2 ${msg.role === "assistant" ? "pb-7" : ""} ${fontSizeClass} leading-relaxed max-w-[85%] ${msg.role === "user"
                                             ? "text-white"
                                             : "text-white/90"
                                             }`}
@@ -1626,22 +1809,35 @@ export function ChatWidget() {
                                                 {!line.startsWith("• ") && i < msg.content.split("\n").length - 1 && <br />}
                                             </React.Fragment>
                                         ))}
+                                        {msg.role === "assistant" && (
+                                            <SpeakerButton
+                                                isSpeaking={isSpeaking}
+                                                onToggle={() => {
+                                                    if (isSpeaking) {
+                                                        if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+                                                        setIsSpeaking(false);
+                                                    } else {
+                                                        speakText(msg.content, true);
+                                                    }
+                                                }}
+                                            />
+                                        )}
                                     </div>
-                                    <div className={`text-[11px] text-white/30 mt-[3px] leading-tight ${msg.role === "user" ? "mr-1 text-right" : "ml-1"}`}>
+                                    <div className={`text-[11px] mt-[8px] leading-tight ${msg.role === "user" ? "mr-1 text-right text-[#a78bfa]" : "ml-1 text-[#60a5fa]"}`}>
                                         {msg.role === "user" ? "You" : "Nash"}
                                         {msg.role === "user" && (
                                             <div
                                                 className="mt-[-1px]"
                                                 style={{ animation: "deliveredFade 0.8s ease-out both" }}
                                             >
-                                                <span className="text-[9px] text-white/25">
+                                                <span className="text-[11px] text-white/45">
                                                     ✓ Delivered
                                                 </span>
                                             </div>
                                         )}
                                         {idx === messages.length - 1 && msg.role === "assistant" && (
                                             <div className="mt-[-1px]">
-                                                <span className="text-[9px] text-white/25">just now</span>
+                                                <span className="text-[11px] text-white/45">just now</span>
                                             </div>
                                         )}
                                     </div>
@@ -1675,47 +1871,17 @@ export function ChatWidget() {
                             !isLoading &&
                             messages[messages.length - 1]?.role === "assistant" && (
                                 <div className="flex justify-start gap-2 flex-wrap">
-                                    <button
-                                        onClick={startScheduleFlow}
-                                        className="px-3 py-1.5 rounded-full text-xs font-medium border border-blue-500/30 text-blue-400/80 hover:text-blue-300 hover:border-blue-400/50 hover:bg-blue-500/10 transition-all duration-200"
-                                    >
+                                    <button onClick={startScheduleFlow} className="px-3 py-1.5 rounded-full text-xs font-medium border border-blue-500/30 text-blue-400/80 hover:text-blue-300 hover:border-blue-400/50 hover:bg-blue-500/10 transition-all duration-200">
                                         📞 Schedule a call
                                     </button>
-                                    <button
-                                        onClick={startContactFlow}
-                                        className="px-3 py-1.5 rounded-full text-xs font-medium border border-emerald-500/30 text-emerald-400/80 hover:text-emerald-300 hover:border-emerald-400/50 hover:bg-emerald-500/10 transition-all duration-200"
-                                    >
+                                    <button onClick={startContactFlow} className="px-3 py-1.5 rounded-full text-xs font-medium border border-emerald-500/30 text-emerald-400/80 hover:text-emerald-300 hover:border-emerald-400/50 hover:bg-emerald-500/10 transition-all duration-200">
                                         ✉️ Quick email
                                     </button>
-                                    <button
-                                        onClick={startSmsFlow}
-                                        className="px-3 py-1.5 rounded-full text-xs font-medium border border-purple-500/30 text-purple-400/80 hover:text-purple-300 hover:border-purple-400/50 hover:bg-purple-500/10 transition-all duration-200"
-                                    >
+                                    <button onClick={startSmsFlow} className="px-3 py-1.5 rounded-full text-xs font-medium border border-purple-500/30 text-purple-400/80 hover:text-purple-300 hover:border-purple-400/50 hover:bg-purple-500/10 transition-all duration-200">
                                         📱 Text me
                                     </button>
-                                    <button
-                                        onClick={handleAboutNash}
-                                        className="px-3 py-1.5 rounded-full text-xs font-medium border border-amber-500/30 text-amber-400/80 hover:text-amber-300 hover:border-amber-400/50 hover:bg-amber-500/10 transition-all duration-200 flex items-center gap-1.5"
-                                    >
+                                    <button onClick={handleAboutNash} className="px-3 py-1.5 rounded-full text-xs font-medium border border-amber-500/30 text-amber-400/80 hover:text-amber-300 hover:border-amber-400/50 hover:bg-amber-500/10 transition-all duration-200 flex items-center gap-1.5">
                                         <img src="/AI-NASH/nash-profile-img.jpg" alt="Nash" className="w-4 h-4 rounded-full object-cover" /> About Nash
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setVoiceEnabled(prev => {
-                                                if (prev && audioRef.current) {
-                                                    audioRef.current.pause();
-                                                    audioRef.current = null;
-                                                    setIsSpeaking(false);
-                                                }
-                                                return !prev;
-                                            });
-                                        }}
-                                        className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-200 flex items-center gap-1.5 ${voiceEnabled
-                                            ? "border-cyan-400/50 text-cyan-300 bg-cyan-500/15 hover:bg-cyan-500/25"
-                                            : "border-white/15 text-white/40 hover:text-white/60 hover:border-white/30"
-                                            }`}
-                                    >
-                                        {voiceEnabled ? "🔊 Voice On" : "🔇 Voice Off"}
                                     </button>
                                 </div>
                             )}
@@ -1873,58 +2039,30 @@ export function ChatWidget() {
                         </div>
                     )}
 
-                    {/* Blur fade between messages and input */}
-
-
                     {/* Input */}
                     <form
                         onSubmit={handleSubmit}
-                        className="relative z-10 px-4 py-3 pr-16"
-                        style={isMobile ? { paddingBottom: "calc(12px + env(safe-area-inset-bottom, 8px))" } : undefined}
+                        className="relative z-10 px-4 pb-3 pr-16"
+                        style={{ boxShadow: '#0f0c2a -20px -1px 10px', ...(isMobile ? { paddingBottom: "calc(12px + env(safe-area-inset-bottom, 8px))" } : {}) }}
                     >
                         {/* Flow cancel button — appears when any flow is active */}
                         {(contactStep !== "idle" && contactStep !== "sent") || (scheduleStep !== "idle" && scheduleStep !== "sent") || (smsStep !== "idle" && smsStep !== "sent") ? (
                             <div className="flex items-center justify-between mb-2 px-1">
                                 {/* Contact flow progress dots */}
                                 {contactStep !== "idle" && contactStep !== "sent" ? (
-                                    <div className="flex items-center gap-1.5 flex-1">
-                                        {["name", "email", "budget", "timeline", "startDate", "confirm"].map((step, i) => (
-                                            <React.Fragment key={step}>
-                                                <div
-                                                    className={`w-2 h-2 rounded-full transition-all duration-300 ${["name", "email", "budget", "timeline", "startDate", "confirm"].indexOf(
-                                                        contactStep
-                                                    ) >= i
-                                                        ? "bg-emerald-400 scale-100"
-                                                        : "bg-white/15 scale-75"
-                                                        }`}
-                                                />
-                                                {i < 5 && (
-                                                    <div
-                                                        className={`flex-1 h-[1px] transition-all duration-300 ${["name", "email", "budget", "timeline", "startDate", "confirm"].indexOf(
-                                                            contactStep
-                                                        ) > i
-                                                            ? "bg-emerald-400/50"
-                                                            : "bg-white/10"
-                                                            }`}
-                                                    />
-                                                )}
-                                            </React.Fragment>
-                                        ))}
-                                        <span className="ml-2 text-[10px] text-white/30">
-                                            {contactStep === "name" ? "1/6"
-                                                : contactStep === "email" ? "2/6"
-                                                    : contactStep === "budget" ? "3/6"
-                                                        : contactStep === "timeline" ? "4/6"
-                                                            : contactStep === "startDate" ? "5/6"
-                                                                : "6/6"}
-                                        </span>
-                                    </div>
+                                    <FlowProgressDots
+                                        steps={["name", "email", "budget", "timeline", "startDate", "confirm"]}
+                                        currentStep={contactStep}
+                                        color="emerald"
+                                    />
+                                ) : scheduleStep !== "idle" && scheduleStep !== "sent" ? (
+                                    <FlowProgressDots
+                                        steps={["name", "email", "budget", "date", "time", "confirm"]}
+                                        currentStep={scheduleStep === "dateCustom" ? "date" : scheduleStep === "returning" ? "name" : scheduleStep}
+                                        color="blue"
+                                    />
                                 ) : (
-                                    <span className="text-[10px] text-white/30">
-                                        {scheduleStep !== "idle" && scheduleStep !== "sent"
-                                            ? "📞 Scheduling..."
-                                            : "📱 Texting..."}
-                                    </span>
+                                    <span className="text-[10px] text-white/30">📱 Texting...</span>
                                 )}
                                 {/* Cancel X button */}
                                 <button
@@ -1941,7 +2079,7 @@ export function ChatWidget() {
                             </div>
                         ) : null}
                         <div
-                            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 border transition-[border-color] duration-200 hover:border-white/[0.16] ${input.trim() ? 'border-white/[0.16]' : 'border-white/[0.06]'}`}
+                            className={`flex items-center gap-2 rounded-full h-12 pl-4 pr-1 border transition-[border-color] duration-200 hover:border-white/[0.16] ${input.trim() ? 'border-white/[0.16]' : 'border-white/[0.06]'}`}
                         >
                             <input
                                 ref={inputRef}
@@ -1969,16 +2107,16 @@ export function ChatWidget() {
                                 type="button"
                                 onClick={toggleMic}
                                 disabled={isLoading}
-                                className={`transition-all duration-200 p-1 ${isListening
-                                    ? "text-red-400"
-                                    : "text-white/30 hover:text-white/60"
+                                className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200 ${isListening
+                                    ? "text-red-400 bg-red-500/15"
+                                    : "text-white/30 bg-white/[0.06] hover:text-white/60 hover:bg-white/[0.1]"
                                     }`}
                                 aria-label={isListening ? "Stop listening" : "Start voice input"}
                                 title={isListening ? "Tap to stop" : "Speak to Nash"}
                             >
                                 <svg
-                                    width="18"
-                                    height="18"
+                                    width="15"
+                                    height="15"
                                     viewBox="0 0 24 24"
                                     fill="none"
                                     stroke="currentColor"
@@ -1995,18 +2133,46 @@ export function ChatWidget() {
                             </button>
                             <button
                                 type="submit"
-                                disabled={!input.trim() || isLoading}
-                                className="text-white/40 hover:text-white disabled:opacity-30 disabled:hover:text-white/40 transition-colors p-1"
+                                disabled={(!input.trim() && !isLoading) || isLoading}
+                                className="relative flex items-center justify-center gap-1.5 h-10 px-4 rounded-full transition-all duration-300 flex-shrink-0 overflow-hidden"
+                                style={{
+                                    background: input.trim()
+                                        ? 'linear-gradient(135deg, #544fd4 0%, #5673fa 40%, #6262bf 70%, #544fd4 100%)'
+                                        : 'rgba(84, 79, 212, 0.15)',
+                                    backgroundSize: input.trim() ? '300% 300%' : '100% 100%',
+                                    animation: input.trim() ? 'sendBtnGradient 4s ease infinite' : 'none',
+                                    boxShadow: input.trim() ? '0 0 16px rgba(86, 115, 250, 0.5)' : 'none',
+                                }}
                                 aria-label="Send message"
                                 id="chat-send"
                             >
-                                <img
-                                    src="/Icon/MESSAGE-THINKING-ICON.svg"
-                                    alt="Send"
-                                    width={20}
-                                    height={20}
-                                    style={input.trim() ? { animation: 'pulse 2.5s ease-in-out infinite' } : undefined}
-                                />
+                                {isLoading ? (
+                                    <img
+                                        src="/Icon/MESSAGE-THINKING-ICON.svg"
+                                        alt="Thinking"
+                                        width={20}
+                                        height={20}
+                                        style={{ animation: 'brainPulse 1.8s ease-in-out infinite' }}
+                                    />
+                                ) : (
+                                    <>
+                                        <span className={`text-xs font-semibold transition-all duration-200 ${input.trim() ? 'text-white' : 'text-white/40'}`}>Send</span>
+                                        <svg
+                                            width="14"
+                                            height="14"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2.5"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            className={`transition-all duration-200 ${input.trim() ? 'text-white' : 'text-white/40'}`}
+                                        >
+                                            <line x1="22" y1="2" x2="11" y2="13" />
+                                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                                        </svg>
+                                    </>
+                                )}
                             </button>
                         </div>
                     </form>

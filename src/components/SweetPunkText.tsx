@@ -50,7 +50,9 @@ export function SweetPunkText({
             scrollTrigger: {
                 trigger: containerRef.current,
                 start: "top 85%",
-                toggleActions: "play none none reverse"
+                toggleActions: "play none none none",
+                fastScrollEnd: true,
+                once: true
             }
         });
 
@@ -108,7 +110,7 @@ export function SweetPunkText({
                     <span
                         key={i}
                         ref={(el) => { wordsRef.current[i] = el; }}
-                        className="inline-block will-change-transform"
+                        className="inline-block"
                         style={{
                             opacity: (enableMotion && animate) ? 0 : 1,
                             color: startColor

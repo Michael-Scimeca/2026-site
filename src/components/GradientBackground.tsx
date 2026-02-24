@@ -5,12 +5,15 @@ interface GradientBackgroundProps {
     themeColor?: string;
     className?: string;
     style?: React.CSSProperties;
+    disableInteractive?: boolean;
 }
 
-export function GradientBackground({ themeColor, className = "", style = {} }: GradientBackgroundProps) {
+export function GradientBackground({ themeColor, className = "", style = {}, disableInteractive = false }: GradientBackgroundProps) {
     const interBubbleRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        if (disableInteractive) return;
+
         let curX = 0;
         let curY = 0;
         let tgX = 0;
@@ -38,7 +41,7 @@ export function GradientBackground({ themeColor, className = "", style = {} }: G
             window.removeEventListener('mousemove', handleMouseMove);
             if (animationFrameId) cancelAnimationFrame(animationFrameId);
         };
-    }, []);
+    }, [disableInteractive]);
 
     const hexToRgb = (hex: string) => {
         // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
@@ -73,7 +76,7 @@ export function GradientBackground({ themeColor, className = "", style = {} }: G
                     '--gm-color4': rgbString,
                     '--gm-color5': darkRgbString,
                     '--gm-color-interactive': rgbString,
-                    '--gm-color-bg2': themeColor // Use theme color for gradient ending if needed, or stick to dark
+                    '--gm-color-bg2': themeColor
                 } as React.CSSProperties;
             }
         }
@@ -102,7 +105,7 @@ export function GradientBackground({ themeColor, className = "", style = {} }: G
                 <div className="gm-blob gm-g8"></div>
                 <div className="gm-blob gm-g9"></div>
                 <div className="gm-blob gm-g10"></div>
-                <div className="gm-interactive" ref={interBubbleRef}></div>
+                {!disableInteractive && <div className="gm-interactive" ref={interBubbleRef}></div>}
             </div>
         </div>
     );
