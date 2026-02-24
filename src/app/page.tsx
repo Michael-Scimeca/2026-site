@@ -235,7 +235,6 @@ export default async function Home() {
 
         {experienceWithTools && <Experience items={experienceWithTools} />}
         <Setup />
-        <LogoTicker />
       </div>
 
 

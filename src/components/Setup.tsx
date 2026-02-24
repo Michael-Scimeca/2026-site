@@ -40,7 +40,7 @@ const setupItems: SetupItem[] = [
     },
     {
         id: "seiu",
-        company: "SEIU",
+        company: "Service Employees International Union",
         description: "Service Employees International Union (SEIU) is one of North America’s largest labor unions, representing millions of workers across healthcare, public services, and property services. I contributed development support on SEIU.org, working on site updates that helped clearly present the organization’s goals, mission, and key initiatives, ensuring core messaging was accessible, well-structured, and aligned with SEIU’s advocacy efforts.",
         logo: "/logos/seiu.png",
         tools: ["Wordpress", "Browserstack", "Foundation Framework"],
@@ -90,6 +90,7 @@ function SetupRow({ item, index, isLast }: { item: SetupItem; index: number; isL
     const containerRef = useRef<HTMLDivElement>(null);
     const pulseRef = useRef<SVGPathElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
+    const toolsRef = useRef<HTMLDivElement>(null);
 
     const activeThemeColor = item.themeColor || '#0158ff';
     const pulseLength = React.useMemo(() => getPseudoRandom(item.id + 'pulse', 40, 150), [item.id]);
@@ -152,10 +153,66 @@ function SetupRow({ item, index, isLast }: { item: SetupItem; index: number; isL
         }
     }, { scope: containerRef });
 
+    // Animate tool pills from grey to theme color on scroll
+    useGSAP(() => {
+        if (toolsRef.current && containerRef.current) {
+            const pills = toolsRef.current.querySelectorAll('.tool-pill');
+            const bolts = toolsRef.current.querySelectorAll('.tool-bolt');
+
+            pills.forEach((pill, i) => {
+                const targetColor = (pill as HTMLElement).dataset.themeColor || `${activeThemeColor}99`;
+                gsap.fromTo(pill,
+                    { borderColor: '#52525b', color: '#52525b' },
+                    {
+                        borderColor: targetColor,
+                        color: targetColor,
+                        duration: 1,
+                        delay: i * 0.08,
+                        ease: 'power2.out',
+                        scrollTrigger: {
+                            trigger: toolsRef.current,
+                            start: 'top 90%',
+                            toggleActions: 'play none none none',
+                        }
+                    }
+                );
+            });
+
+            bolts.forEach((bolt, i) => {
+                const targetColor = (bolt as HTMLElement).dataset.themeColor || activeThemeColor;
+                gsap.fromTo(bolt,
+                    { color: '#52525b' },
+                    {
+                        color: targetColor,
+                        duration: 1,
+                        delay: i * 0.08,
+                        ease: 'power2.out',
+                        scrollTrigger: {
+                            trigger: toolsRef.current,
+                            start: 'top 90%',
+                            toggleActions: 'play none none none',
+                        }
+                    }
+                );
+            });
+        }
+    }, { scope: containerRef });
+
     return (
         <article
             ref={containerRef}
-            className="group w-full relative py-10 desktop:py-14"
+            className="group w-full relative py-10 desktop:py-14 transition-all"
+            style={{
+                borderLeft: '3px solid transparent',
+            }}
+            onMouseOver={(e) => {
+                (e.currentTarget as HTMLElement).style.borderLeftColor = item.id === 'nycpride'
+                    ? '#8b5cf6'
+                    : activeThemeColor;
+            }}
+            onMouseOut={(e) => {
+                (e.currentTarget as HTMLElement).style.borderLeftColor = 'transparent';
+            }}
         >
             {/* Bottom Border with Pulse */}
             <div className="absolute bottom-0 left-0 right-0 pointer-events-none z-50" style={{ overflow: 'visible' }}>
@@ -284,8 +341,16 @@ function SetupRow({ item, index, isLast }: { item: SetupItem; index: number; isL
                         )}
 
                         {item.headline && (
-                            <h3 className="text-lg desktop:text-xl font-bold text-white/90 leading-snug max-w-2xl">
-                                {item.headline}
+                            <h3 className="text-lg desktop:text-xl font-bold leading-snug max-w-2xl text-pretty">
+                                <SweetPunkText
+                                    text={item.headline}
+                                    startColor="#52525b"
+                                    midColor={activeThemeColor}
+                                    endColor="#e4e4e7"
+                                    colorDuration={2.0}
+                                    stagger={0.005}
+                                    enableMotion={false}
+                                />
                             </h3>
                         )}
 
@@ -304,39 +369,38 @@ function SetupRow({ item, index, isLast }: { item: SetupItem; index: number; isL
                         ))}
 
                         {item.tools && item.tools.length > 0 && (
-                            <div className="flex flex-wrap items-center gap-2 mt-4">
-                                {item.tools.map((tool, idx) => (
-                                    <React.Fragment key={tool}>
-                                        {idx !== 0 && (
-                                            <span
-                                                className="text-[10px] font-bold"
-                                                style={{
-                                                    color: item.id === 'nycpride'
-                                                        ? ['#ef4444', '#3b82f6', '#a855f7'][(idx - 1) % 3]
-                                                        : activeThemeColor
-                                                }}
-                                            >
-                                                ⌁
-                                            </span>
-                                        )}
-                                        {(() => {
-                                            const prideColors = ['#ef4444', '#f97316', '#3b82f6', '#8b5cf6', '#ec4899'];
-                                            const pillColor = item.id === 'nycpride' ? prideColors[idx % prideColors.length] : activeThemeColor;
-                                            return (
+                            <div ref={toolsRef} className="flex flex-wrap items-center gap-2 mt-4">
+                                {item.tools.map((tool, idx) => {
+                                    const prideColors = ['#ef4444', '#f97316', '#3b82f6', '#8b5cf6', '#ec4899'];
+                                    const pillColor = item.id === 'nycpride' ? prideColors[idx % prideColors.length] : activeThemeColor;
+                                    const boltColor = item.id === 'nycpride'
+                                        ? ['#ef4444', '#3b82f6', '#a855f7'][(idx - 1) % 3]
+                                        : activeThemeColor;
+                                    return (
+                                        <React.Fragment key={tool}>
+                                            {idx !== 0 && (
                                                 <span
-                                                    className="px-3 py-1 text-[11px] uppercase font-bold tracking-wider rounded-full border transition-colors duration-300 group-hover:border-opacity-60"
-                                                    style={{
-                                                        borderColor: `${pillColor}30`,
-                                                        color: `${pillColor}cc`,
-                                                        background: `${pillColor}08`,
-                                                    }}
+                                                    className="tool-bolt text-[10px] font-bold"
+                                                    style={{ color: '#52525b' }}
+                                                    data-theme-color={boltColor}
                                                 >
-                                                    {tool}
+                                                    ⌁
                                                 </span>
-                                            );
-                                        })()}
-                                    </React.Fragment>
-                                ))}
+                                            )}
+                                            <span
+                                                className="tool-pill px-3 py-1 text-[11px] uppercase font-bold tracking-wider rounded-full border transition-colors duration-700"
+                                                style={{
+                                                    borderColor: '#52525b',
+                                                    color: '#52525b',
+                                                    background: 'transparent',
+                                                }}
+                                                data-theme-color={`${pillColor}99`}
+                                            >
+                                                {tool}
+                                            </span>
+                                        </React.Fragment>
+                                    );
+                                })}
                             </div>
                         )}
                     </div>

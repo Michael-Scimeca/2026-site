@@ -1492,7 +1492,7 @@ export function ChatWidget() {
                         fadeOutAmbient();
                     }
                 }}
-                className={`fixed z-[9998] w-16 h-16 rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 ${isOpen ? '' : ''} ${isMobile && isOpen ? 'bottom-3 right-[6px]' : 'bottom-6 right-[26px]'}`}
+                className={`fixed z-[9998] rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 bottom-6 right-[26px] ${isOpen ? 'hidden' : 'w-16 h-16'}`}
                 style={{
                     background: isOpen ? 'transparent' : '#0150fe',
                     transition: 'background 0.4s, transform 0.3s',
@@ -1587,6 +1587,7 @@ export function ChatWidget() {
                             right: 0,
                             bottom: 0,
                             width: "100%",
+                            maxWidth: "100vw",
                             height: "100%",
                             maxHeight: "100dvh",
                             overflow: "hidden",
@@ -1595,6 +1596,7 @@ export function ChatWidget() {
                             bottom: "0px",
                             right: "0px",
                             width: "min(455px, calc(100vw - 24px))",
+                            maxWidth: "100vw",
                             height: "min(620px, calc(100vh - 24px))",
                             paddingBottom: "20px",
                             paddingRight: "24px",
@@ -2042,7 +2044,7 @@ export function ChatWidget() {
                     {/* Input */}
                     <form
                         onSubmit={handleSubmit}
-                        className="relative z-10 px-4 pb-3 pr-16"
+                        className="relative z-10 px-4 pb-3"
                         style={{ boxShadow: '#0f0c2a -20px -1px 10px', ...(isMobile ? { paddingBottom: "calc(12px + env(safe-area-inset-bottom, 8px))" } : {}) }}
                     >
                         {/* Flow cancel button — appears when any flow is active */}
@@ -2078,101 +2080,129 @@ export function ChatWidget() {
                                 </button>
                             </div>
                         ) : null}
-                        <div
-                            className={`flex items-center gap-2 rounded-full h-12 pl-4 pr-1 border transition-[border-color] duration-200 hover:border-white/[0.16] ${input.trim() ? 'border-white/[0.16]' : 'border-white/[0.06]'}`}
-                        >
-                            <input
-                                ref={inputRef}
-                                type="search"
-                                value={input}
-                                onChange={(e) => setInput(e.target.value)}
-                                placeholder={isListening ? "Listening..." : getPlaceholder()}
-                                className={`flex-1 bg-transparent text-sm placeholder:text-white/30 outline-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden ${isListening ? "text-cyan-300 placeholder:text-cyan-400/50" : "text-white"}`}
-                                disabled={isLoading || isListening}
-                                id="chat-input"
-                                name="chat-search"
-                                autoComplete="off"
-                                autoCorrect="off"
-                                autoCapitalize="off"
-                                spellCheck="false"
-                                data-lpignore="true"
-                                data-1p-ignore="true"
-                                data-bwignore="true"
-                                data-form-type="other"
-                                data-protonpass-ignore="true"
-                                role="presentation"
-                            />
-                            {/* Mic button */}
+                        <div className="grid items-center" style={{ gridTemplateColumns: '1fr 40px', gap: '5px' }}>
+                            <div
+                                className={`flex items-center gap-2 rounded-full h-12 pl-4 pr-1 border transition-[border-color] duration-200 hover:border-white/[0.16] ${input.trim() ? 'border-white/[0.16]' : 'border-white/[0.06]'}`}
+                            >
+                                <input
+                                    ref={inputRef}
+                                    type="search"
+                                    value={input}
+                                    onChange={(e) => setInput(e.target.value)}
+                                    placeholder={isListening ? "Listening..." : getPlaceholder()}
+                                    className={`flex-1 bg-transparent text-sm placeholder:text-white/30 outline-none [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden ${isListening ? "text-cyan-300 placeholder:text-cyan-400/50" : "text-white"}`}
+                                    disabled={isLoading || isListening}
+                                    id="chat-input"
+                                    name="chat-search"
+                                    autoComplete="off"
+                                    autoCorrect="off"
+                                    autoCapitalize="off"
+                                    spellCheck="false"
+                                    data-lpignore="true"
+                                    data-1p-ignore="true"
+                                    data-bwignore="true"
+                                    data-form-type="other"
+                                    data-protonpass-ignore="true"
+                                    role="presentation"
+                                />
+                                {/* Mic button */}
+                                <button
+                                    type="button"
+                                    onClick={toggleMic}
+                                    disabled={isLoading}
+                                    className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200 ${isListening
+                                        ? "text-red-400 bg-red-500/15"
+                                        : "text-white/30 bg-white/[0.06] hover:text-white/60 hover:bg-white/[0.1]"
+                                        }`}
+                                    aria-label={isListening ? "Stop listening" : "Start voice input"}
+                                    title={isListening ? "Tap to stop" : "Speak to Nash"}
+                                >
+                                    <svg
+                                        width="15"
+                                        height="15"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        style={isListening ? { animation: "micPulse 1s ease-in-out infinite" } : undefined}
+                                    >
+                                        <rect x="9" y="1" width="6" height="11" rx="3" />
+                                        <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                                        <line x1="12" y1="19" x2="12" y2="23" />
+                                        <line x1="8" y1="23" x2="16" y2="23" />
+                                    </svg>
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={(!input.trim() && !isLoading) || isLoading}
+                                    className={`relative flex items-center justify-center gap-1.5 rounded-full transition-all duration-300 flex-shrink-0 overflow-hidden ${isMobile ? 'w-10 h-10' : 'h-10 px-4'}`}
+                                    style={{
+                                        background: input.trim()
+                                            ? 'linear-gradient(135deg, #544fd4 0%, #5673fa 40%, #6262bf 70%, #544fd4 100%)'
+                                            : 'rgba(84, 79, 212, 0.15)',
+                                        backgroundSize: input.trim() ? '300% 300%' : '100% 100%',
+                                        animation: input.trim() ? 'sendBtnGradient 4s ease infinite' : 'none',
+                                        boxShadow: input.trim() ? '0 0 16px rgba(86, 115, 250, 0.5)' : 'none',
+                                    }}
+                                    aria-label="Send message"
+                                    id="chat-send"
+                                >
+                                    {isLoading ? (
+                                        <img
+                                            src="/Icon/MESSAGE-THINKING-ICON.svg"
+                                            alt="Thinking"
+                                            width={20}
+                                            height={20}
+                                            style={{ animation: 'brainPulse 1.8s ease-in-out infinite' }}
+                                        />
+                                    ) : (
+                                        <>
+                                            <span className={`text-xs font-semibold transition-all duration-200 ${isMobile ? 'hidden' : ''} ${input.trim() ? 'text-white' : 'text-white/40'}`}>Send</span>
+                                            <svg
+                                                width="14"
+                                                height="14"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="2.5"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                className={`transition-all duration-200 ${input.trim() ? 'text-white' : 'text-white/40'}`}
+                                            >
+                                                <line x1="22" y1="2" x2="11" y2="13" />
+                                                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                                            </svg>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+                            {/* Inline close button — aligned with input bar */}
                             <button
                                 type="button"
-                                onClick={toggleMic}
-                                disabled={isLoading}
-                                className={`flex items-center justify-center w-8 h-8 rounded-full transition-all duration-200 ${isListening
-                                    ? "text-red-400 bg-red-500/15"
-                                    : "text-white/30 bg-white/[0.06] hover:text-white/60 hover:bg-white/[0.1]"
-                                    }`}
-                                aria-label={isListening ? "Stop listening" : "Start voice input"}
-                                title={isListening ? "Tap to stop" : "Speak to Nash"}
+                                onClick={() => {
+                                    setIsOpen(false);
+                                    fadeOutAmbient();
+                                }}
+                                className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200"
+                                style={{
+                                    background: '#0c0b31',
+                                    border: '1px solid rgba(255, 255, 255, 0.06)',
+                                }}
+                                aria-label="Close chat"
                             >
                                 <svg
-                                    width="15"
-                                    height="15"
+                                    width="18"
+                                    height="18"
                                     viewBox="0 0 24 24"
                                     fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth="2"
+                                    stroke="#57576c"
+                                    strokeWidth="2.5"
                                     strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    style={isListening ? { animation: "micPulse 1s ease-in-out infinite" } : undefined}
                                 >
-                                    <rect x="9" y="1" width="6" height="11" rx="3" />
-                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                                    <line x1="12" y1="19" x2="12" y2="23" />
-                                    <line x1="8" y1="23" x2="16" y2="23" />
+                                    <path d="M18 6L6 18M6 6l12 12" />
                                 </svg>
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={(!input.trim() && !isLoading) || isLoading}
-                                className="relative flex items-center justify-center gap-1.5 h-10 px-4 rounded-full transition-all duration-300 flex-shrink-0 overflow-hidden"
-                                style={{
-                                    background: input.trim()
-                                        ? 'linear-gradient(135deg, #544fd4 0%, #5673fa 40%, #6262bf 70%, #544fd4 100%)'
-                                        : 'rgba(84, 79, 212, 0.15)',
-                                    backgroundSize: input.trim() ? '300% 300%' : '100% 100%',
-                                    animation: input.trim() ? 'sendBtnGradient 4s ease infinite' : 'none',
-                                    boxShadow: input.trim() ? '0 0 16px rgba(86, 115, 250, 0.5)' : 'none',
-                                }}
-                                aria-label="Send message"
-                                id="chat-send"
-                            >
-                                {isLoading ? (
-                                    <img
-                                        src="/Icon/MESSAGE-THINKING-ICON.svg"
-                                        alt="Thinking"
-                                        width={20}
-                                        height={20}
-                                        style={{ animation: 'brainPulse 1.8s ease-in-out infinite' }}
-                                    />
-                                ) : (
-                                    <>
-                                        <span className={`text-xs font-semibold transition-all duration-200 ${input.trim() ? 'text-white' : 'text-white/40'}`}>Send</span>
-                                        <svg
-                                            width="14"
-                                            height="14"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2.5"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            className={`transition-all duration-200 ${input.trim() ? 'text-white' : 'text-white/40'}`}
-                                        >
-                                            <line x1="22" y1="2" x2="11" y2="13" />
-                                            <polygon points="22 2 15 22 11 13 2 9 22 2" />
-                                        </svg>
-                                    </>
-                                )}
                             </button>
                         </div>
                     </form>

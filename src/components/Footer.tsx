@@ -75,7 +75,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                 Math.pow(e.clientX - emailX, 2) + Math.pow(e.clientY - emailY, 2)
             );
 
-            const radius = 50;
+            const radius = 400;
 
             if (distance < radius) {
                 const progress = 1 - (distance / radius);

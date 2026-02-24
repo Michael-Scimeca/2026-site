@@ -54,6 +54,7 @@ function TextExperienceRow({ item, index, isFirst }: { item: ExperienceItem; ind
     const containerRef = useRef<HTMLDivElement>(null);
     const pulseRef = useRef<SVGPathElement>(null);
     const contentRef = useRef<HTMLDivElement>(null);
+    const toolsRef = useRef<HTMLDivElement>(null);
 
     const activeThemeColor = React.useMemo(() => {
         if (item.themeColor) return item.themeColor;
@@ -110,12 +111,51 @@ function TextExperienceRow({ item, index, isFirst }: { item: ExperienceItem; ind
                         trigger: containerRef.current,
                         start: "top 80%",
                         toggleActions: "play none none none",
-                        once: true
                     }
                 }
             );
         }
-    }, { scope: containerRef, dependencies: [] });
+    }, { scope: containerRef });
+
+    // Animate tool pills from grey to theme color on scroll
+    useGSAP(() => {
+        if (toolsRef.current && containerRef.current) {
+            const pills = toolsRef.current.querySelectorAll('.tool-pill');
+            const bolts = toolsRef.current.querySelectorAll('.tool-bolt');
+            const themeColor = `${activeThemeColor}99`;
+
+            gsap.fromTo(pills,
+                { borderColor: '#52525b', color: '#52525b' },
+                {
+                    borderColor: themeColor,
+                    color: themeColor,
+                    duration: 1,
+                    stagger: 0.08,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: toolsRef.current,
+                        start: 'top 90%',
+                        toggleActions: 'play none none none',
+                    }
+                }
+            );
+
+            gsap.fromTo(bolts,
+                { color: '#52525b' },
+                {
+                    color: activeThemeColor,
+                    duration: 1,
+                    stagger: 0.08,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: toolsRef.current,
+                        start: 'top 90%',
+                        toggleActions: 'play none none none',
+                    }
+                }
+            );
+        }
+    }, { scope: containerRef });
 
     const displayNumber = String(index + 1);
     const abbreviation = item.abbreviation || item.company.split(' ').map(w => w[0]).join('').toUpperCase();
@@ -123,7 +163,16 @@ function TextExperienceRow({ item, index, isFirst }: { item: ExperienceItem; ind
     return (
         <article
             ref={containerRef}
-            className="group w-full relative py-10 desktop:py-14"
+            className="group w-full relative py-10 desktop:py-14 transition-all"
+            style={{
+                borderLeft: `3px solid transparent`,
+            }}
+            onMouseOver={(e) => {
+                (e.currentTarget as HTMLElement).style.borderLeftColor = activeThemeColor;
+            }}
+            onMouseOut={(e) => {
+                (e.currentTarget as HTMLElement).style.borderLeftColor = 'transparent';
+            }}
         >
             {/* Bottom Border with Pulse */}
             <div className="absolute bottom-0 left-0 right-0 pointer-events-none z-50" style={{ overflow: 'visible' }}>
@@ -178,7 +227,7 @@ function TextExperienceRow({ item, index, isFirst }: { item: ExperienceItem; ind
                                 }}
                             />
                         ) : (
-                            <div className="text-3xl desktop:text-4xl font-black tracking-tight leading-none" style={{ color: activeThemeColor }}>
+                            <div className="text-3xl desktop:text-4xl font-black tracking-tight leading-none text-pretty" style={{ color: activeThemeColor }}>
                                 <SweetPunkText
                                     text={abbreviation}
                                     startColor="#52525b"
@@ -216,7 +265,7 @@ function TextExperienceRow({ item, index, isFirst }: { item: ExperienceItem; ind
                                 <span
                                     className="inline-flex items-center gap-1.5 px-4 py-1.5 text-[12px] font-semibold tracking-wide rounded-full border"
                                     style={{
-                                        borderColor: `${activeThemeColor}50`,
+                                        borderColor: `${activeThemeColor}`,
                                         color: activeThemeColor,
                                         background: `${activeThemeColor}12`,
                                     }}
@@ -228,12 +277,20 @@ function TextExperienceRow({ item, index, isFirst }: { item: ExperienceItem; ind
                         )}
 
                         {item.headline && (
-                            <h3 className="text-lg desktop:text-xl font-bold text-white/90 leading-snug max-w-2xl">
-                                {item.headline}
+                            <h3 className="text-lg desktop:text-xl font-bold leading-snug max-w-2xl text-pretty">
+                                <SweetPunkText
+                                    text={item.headline}
+                                    startColor="#52525b"
+                                    midColor={activeThemeColor}
+                                    endColor="#e4e4e7"
+                                    colorDuration={2.0}
+                                    stagger={0.005}
+                                    enableMotion={false}
+                                />
                             </h3>
                         )}
 
-                        <div className="text-sm desktop:text-[15px] text-zinc-400 leading-relaxed max-w-2xl font-medium">
+                        <div className="text-sm desktop:text-[15px] text-zinc-400 leading-relaxed max-w-2xl font-medium text-pretty">
                             {(() => {
                                 const ptComponents = {
                                     block: {
@@ -292,24 +349,25 @@ function TextExperienceRow({ item, index, isFirst }: { item: ExperienceItem; ind
                         </div>
 
                         {item.tools && item.tools.length > 0 && (
-                            <div className="flex flex-wrap items-center gap-2 mt-4">
+                            <div ref={toolsRef} className="flex flex-wrap items-center gap-2 mt-4">
                                 {item.tools.map((tool, idx) => (
                                     <React.Fragment key={tool}>
                                         {idx !== 0 && (
                                             <span
-                                                className="text-[10px] font-bold"
-                                                style={{ color: activeThemeColor }}
+                                                className="tool-bolt text-[10px] font-bold"
+                                                style={{ color: '#52525b' }}
                                             >
                                                 ⌁
                                             </span>
                                         )}
                                         <span
-                                            className="px-3 py-1 text-[11px] uppercase font-bold tracking-wider rounded-full border transition-colors duration-300 group-hover:border-opacity-60"
+                                            className="tool-pill px-3 py-1 text-[11px] uppercase font-bold tracking-wider rounded-full border transition-colors duration-700"
                                             style={{
-                                                borderColor: `${activeThemeColor}30`,
-                                                color: `${activeThemeColor}cc`,
-                                                background: `${activeThemeColor}08`,
+                                                borderColor: '#52525b',
+                                                color: '#52525b',
+                                                background: 'transparent',
                                             }}
+                                            data-theme-color={`${activeThemeColor}99`}
                                         >
                                             {tool}
                                         </span>
@@ -334,6 +392,7 @@ function VideoExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; i
     const thumbnailRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     const progressCircleRef = useRef<SVGCircleElement>(null);
+    const toolsRef = useRef<HTMLDivElement>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isInView, setIsInView] = useState(false);
     const [isVideoLoaded, setIsVideoLoaded] = useState(false);
@@ -388,6 +447,46 @@ function VideoExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; i
                     strokeDashoffset: -cycleLength * 0.6,
                     duration: 1.2,
                     ease: "power2.inOut"
+                }
+            );
+        }
+    }, { scope: containerRef });
+
+    // Animate tool pills from grey to theme color on scroll
+    useGSAP(() => {
+        if (toolsRef.current && containerRef.current) {
+            const pills = toolsRef.current.querySelectorAll('.tool-pill');
+            const bolts = toolsRef.current.querySelectorAll('.tool-bolt');
+            const themeColor = `${activeThemeColor}99`;
+
+            gsap.fromTo(pills,
+                { borderColor: '#52525b', color: '#52525b' },
+                {
+                    borderColor: themeColor,
+                    color: themeColor,
+                    duration: 1,
+                    stagger: 0.08,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: toolsRef.current,
+                        start: 'top 90%',
+                        toggleActions: 'play none none none',
+                    }
+                }
+            );
+
+            gsap.fromTo(bolts,
+                { color: '#52525b' },
+                {
+                    color: activeThemeColor,
+                    duration: 1,
+                    stagger: 0.08,
+                    ease: 'power2.out',
+                    scrollTrigger: {
+                        trigger: toolsRef.current,
+                        start: 'top 90%',
+                        toggleActions: 'play none none none',
+                    }
                 }
             );
         }
@@ -467,9 +566,20 @@ function VideoExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; i
     return (
         <article
             ref={containerRef}
-            className={`group w-full transition-colors relative py-0 ${item.thumbnail ? 'desktop:py-0' : 'desktop:py-[12px]'}`}
+            className={`group w-full transition-all relative py-0 ${item.thumbnail ? 'desktop:py-0' : 'desktop:py-[12px]'}`}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
+            style={{
+                borderLeft: `3px solid transparent`,
+            }}
+            onMouseOver={(e) => {
+                (e.currentTarget as HTMLElement).style.borderLeftColor = (item.company === 'NYC Pride' || item._key === 'nycpride')
+                    ? '#ef4444'
+                    : activeThemeColor;
+            }}
+            onMouseOut={(e) => {
+                (e.currentTarget as HTMLElement).style.borderLeftColor = 'transparent';
+            }}
         >
             {/* Helix-Style Dual-Layer Bottom Border - Dash Pulse Animation */}
             {(
@@ -524,25 +634,14 @@ function VideoExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; i
                 }}
             />
 
-            {/* Vertical Accent Glow Border */}
-            <div
-                className="absolute left-0 top-0 bottom-0 w-[3px] opacity-0 group-hover:opacity-100 transition-all duration-500 scale-y-90 group-hover:scale-y-100 origin-center"
-                style={{
-                    background: (item.company === 'NYC Pride' || item._key === 'nycpride')
-                        ? 'linear-gradient(to bottom, #ef4444, #3b82f6, #a855f7)'
-                        : activeThemeColor,
-                    boxShadow: (item.company === 'NYC Pride' || item._key === 'nycpride')
-                        ? `0 0 20px 2px #3b82f680`
-                        : `0 0 20px 2px ${activeThemeColor}80`
-                }}
-            />
 
             <div className="desktop:!pr-0 relative z-10">
                 <div className="flex flex-col-reverse desktop:grid desktop:grid-cols-16 desktop:items-center">
                     <div className="desktop:col-span-9 flex flex-col gap-6 desktop:py-2 desktop:pr-8 px-4 md:px-6 desktop:pl-8">
                         <div className="desktop:!p-0 desktop:!m-0 w-full">
                             <div className="flex flex-col gap-4">
-                                <div className="flex items-center gap-2">
+                                {/* Row 1: Logo + Role + Badge */}
+                                <div className="flex items-center gap-2 flex-wrap">
                                     {item.logo ? (
                                         <div className={`relative w-auto ${item._key === 'outleadership' || item.company === 'Out Leadership' ? 'h-8 desktop:h-10 max-w-[500px]' : 'h-5 desktop:h-7 max-w-[200px]'}`}>
                                             <Image
@@ -576,9 +675,23 @@ function VideoExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; i
                                             />
                                         </div>
                                     )}
+                                    {item.badge && (
+                                        <span
+                                            className="inline-flex items-center gap-1.5 px-4 py-1.5 text-[12px] font-semibold tracking-wide rounded-full border"
+                                            style={{
+                                                borderColor: `${activeThemeColor}`,
+                                                color: activeThemeColor,
+                                                background: `${activeThemeColor}12`,
+                                            }}
+                                        >
+                                            {item.badgeEmoji && <span className="text-sm">{item.badgeEmoji}</span>}
+                                            {item.badge}
+                                        </span>
+                                    )}
                                 </div>
 
-                                <div className="text-zinc-400 text-sm leading-relaxed font-medium">
+                                {/* Row 2: Description */}
+                                <div className="text-zinc-400 text-sm leading-relaxed font-medium text-pretty">
                                     {(() => {
                                         const ptComponents = {
                                             block: {
@@ -650,55 +763,39 @@ function VideoExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; i
                                         );
                                     })()}
                                 </div>
-                            </div>
 
-                            {item.badge && (
-                                <div className="flex mt-4 desktop:mt-2">
-                                    <span
-                                        className="inline-flex items-center gap-1.5 px-4 py-1.5 text-[12px] font-semibold tracking-wide rounded-full border"
-                                        style={{
-                                            borderColor: `${activeThemeColor}50`,
-                                            color: activeThemeColor,
-                                            background: `${activeThemeColor}12`,
-                                        }}
-                                    >
-                                        {item.badgeEmoji && <span className="text-sm">{item.badgeEmoji}</span>}
-                                        {item.badge}
-                                    </span>
-                                </div>
-                            )}
-
-                            {item.tools && item.tools.length > 0 && (
-                                <div className="flex flex-wrap items-center gap-2 mt-8 desktop:mt-3 pb-8 desktop:pb-2">
-                                    {item.tools.map((tool, index) => (
-                                        <React.Fragment key={tool}>
-                                            {index !== 0 && (
+                                {/* Row 3: Tool Pills */}
+                                {item.tools && item.tools.length > 0 && (
+                                    <div ref={toolsRef} className="flex flex-wrap items-center gap-2 mt-4 desktop:mt-1 pb-8 desktop:pb-2">
+                                        {item.tools.map((tool, index) => (
+                                            <React.Fragment key={tool}>
+                                                {index !== 0 && (
+                                                    <span
+                                                        className="tool-bolt text-[10px] font-bold"
+                                                        style={{ color: '#52525b' }}
+                                                    >
+                                                        ⌁
+                                                    </span>
+                                                )}
                                                 <span
-                                                    className="text-[10px] font-bold"
-                                                    style={{ color: activeThemeColor }}
+                                                    className="tool-pill px-3 py-1 text-[11px] uppercase font-bold tracking-wider rounded-full border transition-colors duration-700"
+                                                    style={{
+                                                        borderColor: '#52525b',
+                                                        color: '#52525b',
+                                                        background: 'transparent',
+                                                    }}
+                                                    data-theme-color={`${activeThemeColor}99`}
                                                 >
-                                                    ⌁
+                                                    {tool}
                                                 </span>
-                                            )}
-                                            <span
-                                                className="px-3 py-1 text-[11px] uppercase font-bold tracking-wider rounded-full border transition-colors duration-300 group-hover:border-opacity-60"
-                                                style={{
-                                                    borderColor: `${activeThemeColor}30`,
-                                                    color: `${activeThemeColor}cc`,
-                                                    background: `${activeThemeColor}08`,
-                                                }}
-                                            >
-                                                {tool}
-                                            </span>
-                                        </React.Fragment>
-                                    ))}
-                                </div>
-                            )}
+                                            </React.Fragment>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
-
-                    {/* Column 4: Thumbnail (5 cols) */}
-                    <div className="desktop:col-span-7 w-full relative max-desktop:mb-8" style={{ height: '100%', background: activeThemeColor, display: 'flex', flexDirection: 'row', alignContent: 'center', justifyContent: 'center', alignItems: 'center' }}>
+                    <div className="desktop:col-span-7 w-full relative max-desktop:mb-8" style={{ height: '100%', display: 'flex', flexDirection: 'row', alignContent: 'center', justifyContent: 'center', alignItems: 'center' }}>
 
                         <ExperienceContainer>
                             <div
@@ -740,7 +837,7 @@ function VideoExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; i
                                                     playsInline
                                                     autoPlay={window.innerWidth <= 1000}
                                                     className="w-full h-full transition-opacity duration-700 ease-out"
-                                                    style={{ opacity: isVideoLoaded ? 1 : 0 }}
+                                                    style={{ opacity: isVideoLoaded ? 1 : 0, transform: 'scale(1.2)' }}
                                                     onLoadedData={() => {
                                                         setIsVideoLoaded(true);
                                                         if (window.innerWidth <= 1000 && videoRef.current) {
