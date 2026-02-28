@@ -70,7 +70,7 @@ export function GameContainer() {
 
             {/* Game selector icons - always visible on desktop, hidden on touch/mobile */}
             <div className={`hidden md:flex items-center transition-opacity duration-300 ${showWinnerForm ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
-                <span className="text-[10px] font-bold tracking-widest text-white/30 uppercase mr-4 select-none">
+                <span className="text-[10px] font-bold tracking-widest text-[#feaf01] uppercase mr-4 select-none">
                     Playground
                 </span>
 

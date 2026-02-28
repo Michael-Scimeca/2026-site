@@ -53,6 +53,20 @@
         }
     }
 
+    @keyframes gooeyCursorPulse {
+
+        0%,
+        100% {
+            transform: scale(1);
+            opacity: 0.9;
+        }
+
+        50% {
+            transform: scale(1.4);
+            opacity: 0.5;
+        }
+    }
+
     --animate-fade-in: fade-in 0.5s ease-out forwards;
 
     @keyframes fade-in {
@@ -81,6 +95,36 @@
         50% {
             background-position: 100% 50%;
         }
+    }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+dl,
+dd,
+dt,
+li,
+blockquote,
+figcaption,
+summary,
+legend {
+    text-wrap: pretty;
+}
+
+@keyframes rwUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
     }
 }
 
@@ -596,7 +640,7 @@ body::-webkit-scrollbar {
 /* Textured Text Effect */
 .text-gradient-flow {
     color: #52525b;
-    background: linear-gradient(to right, #544fd4 0% 10%, #5673fa 20%, #6262bf 100% 190%) 0 0 / 200%;
+    background: linear-gradient(to right, #0158ff 0%, #feaf01 25%, #0158ff 50%, #feaf01 75%, #0158ff 100%) 0 0 / 200%;
     background-size: 200% auto;
     background-clip: text;
     -webkit-background-clip: text;
@@ -944,6 +988,51 @@ body::-webkit-scrollbar {
     display: none;
 }
 
+/* ── Gooey Button ── */
+.gooey-btn-wrap {
+    position: relative;
+    display: inline-block;
+    border-radius: 9999px;
+    cursor: pointer;
+}
+
+.gooey-btn-bg {
+    position: absolute;
+    inset: 0;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.gooey-btn-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.gooey-btn-content {
+    position: relative;
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 2rem;
+    border: none;
+    background: transparent;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 500;
+    font-family: inherit;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    border-radius: 9999px;
+}
+
+
+
 /* Chat Widget */
 @keyframes chatBounce {
 
@@ -1276,6 +1365,7 @@ body::-webkit-scrollbar {
     }
 }
 
+
 @keyframes brainPulse {
 
     0%,
@@ -1287,5 +1377,20 @@ body::-webkit-scrollbar {
     50% {
         opacity: 1;
         filter: drop-shadow(0 0 6px rgba(1, 80, 254, 0.6));
+    }
+}
+
+/* Book-a-call button connection spark */
+@keyframes connectPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 8px rgba(1, 88, 255, 0.8), 0 0 16px rgba(1, 88, 255, 0.4);
+    }
+
+    50% {
+        transform: scale(1.4);
+        box-shadow: 0 0 12px rgba(1, 88, 255, 1), 0 0 24px rgba(1, 88, 255, 0.6);
     }
 }

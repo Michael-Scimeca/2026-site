@@ -248,14 +248,7 @@ function TextExperienceRow({ item, index, isFirst }: { item: ExperienceItem; ind
                             {item.role}
                         </p>
 
-                        {/* Large Background Number */}
-                        <div
-                            className="hidden desktop:block absolute -bottom-6 -left-2 text-[12rem] font-black leading-none pointer-events-none select-none"
-                            style={{ color: 'transparent', WebkitTextStroke: '1px rgba(255, 255, 255, 0.04)' }}
-                            aria-hidden="true"
-                        >
-                            {displayNumber}
-                        </div>
+
                     </div>
 
                     {/* Right Column — Content */}
@@ -837,7 +830,7 @@ function VideoExperienceRow({ item, isFirst, isLast }: { item: ExperienceItem; i
                                                     playsInline
                                                     autoPlay={window.innerWidth <= 1000}
                                                     className="w-full h-full transition-opacity duration-700 ease-out"
-                                                    style={{ opacity: isVideoLoaded ? 1 : 0, transform: 'scale(1.2)' }}
+                                                    style={{ opacity: isVideoLoaded ? 1 : 0, transform: 'scale(1.25) translateY(-4%)', transformOrigin: 'top center' }}
                                                     onLoadedData={() => {
                                                         setIsVideoLoaded(true);
                                                         if (window.innerWidth <= 1000 && videoRef.current) {

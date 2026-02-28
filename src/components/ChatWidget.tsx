@@ -152,6 +152,7 @@ interface ScheduleData {
 
 export function ChatWidget() {
     const [isOpen, setIsOpen] = useState(false);
+    const [isToggleHovered, setIsToggleHovered] = useState(false);
     const [openCount, setOpenCount] = useState(0);
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState("");
@@ -279,13 +280,21 @@ export function ChatWidget() {
                 }
             };
 
-            audio.onerror = () => {
+            audio.onerror = (e) => {
+                console.error('TTS audio error:', e);
                 setIsSpeaking(false);
                 audioRef.current = null;
                 URL.revokeObjectURL(audioUrl);
             };
 
-            await audio.play();
+            try {
+                await audio.play();
+            } catch (playErr) {
+                console.error('Audio play blocked:', playErr);
+                setIsSpeaking(false);
+                audioRef.current = null;
+                URL.revokeObjectURL(audioUrl);
+            }
         } catch (err) {
             console.error('TTS playback error:', err);
             setIsSpeaking(false);
@@ -470,6 +479,8 @@ export function ChatWidget() {
     const ambientRef = useRef<Howl | null>(null);
     const ambientIdRef = useRef<number | undefined>(undefined);
     const ambientTarget = 0.03;
+
+
     const fadeInAmbient = useCallback(() => {
         if (!ambientRef.current) {
             ambientRef.current = new Howl({
@@ -1502,6 +1513,8 @@ export function ChatWidget() {
                 tabIndex={0}
                 aria-label={isOpen ? "Close chat" : "Open chat"}
                 id="chat-toggle"
+                onMouseEnter={() => setIsToggleHovered(true)}
+                onMouseLeave={() => setIsToggleHovered(false)}
             >
                 {/* Pulse ring — only when closed */}
                 {!isOpen && (
@@ -1553,15 +1566,35 @@ export function ChatWidget() {
                 </div>
             </div>
 
-            {/* "I'M NASH" label */}
+            {/* Nash label bubbles */}
             {!isOpen && (
                 <div className="fixed bottom-[86px] right-4 z-[9998] pointer-events-none">
-                    <div className="relative">
+                    {/* Default bubble */}
+                    <div
+                        className="relative transition-opacity duration-300 ease-in-out"
+                        style={{ opacity: isToggleHovered ? 0 : 1 }}
+                    >
                         <div
                             className="px-2.5 py-1 rounded-lg text-[9px] font-extrabold tracking-wide text-black whitespace-nowrap shadow-md"
                             style={{ background: "#ffffff" }}
                         >
                             HI, I&apos;M NASH
+                        </div>
+                        <div
+                            className="absolute -bottom-1 right-3 w-2 h-2 rotate-45"
+                            style={{ background: "#ffffff" }}
+                        />
+                    </div>
+                    {/* Hover bubble */}
+                    <div
+                        className="absolute top-0 right-0 transition-opacity duration-300 ease-in-out"
+                        style={{ opacity: isToggleHovered ? 1 : 0 }}
+                    >
+                        <div
+                            className="px-2.5 py-1 rounded-lg text-[9px] font-extrabold tracking-wide text-black whitespace-nowrap shadow-md"
+                            style={{ background: "#ffffff" }}
+                        >
+                            GOT QUESTIONS?
                         </div>
                         <div
                             className="absolute -bottom-1 right-3 w-2 h-2 rotate-45"

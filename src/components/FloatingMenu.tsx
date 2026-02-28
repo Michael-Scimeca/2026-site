@@ -100,14 +100,14 @@ export function FloatingMenu() {
                 <div className="w-[3px] h-[3px] rounded-full bg-zinc-500"></div>
             </div>
 
-            {/* Mobile Collapse Indicator (Two Dots) */}
+            {/* Mobile Collapse Indicator (Three Dots) - stays visible */}
             <div
                 onClick={(e) => { e.stopPropagation(); setIsExpanded(!isExpanded); }}
-                className={`flex md:hidden flex-col gap-[4px] -mt-3 cursor-pointer overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-0 opacity-0 p-0 pointer-events-none' : 'max-h-[40px] opacity-100 p-4'}`}
+                className="flex md:hidden flex-col gap-[4px] -mt-3 cursor-pointer p-4 transition-all duration-300 ease-in-out"
             >
-                <div className={`w-[3px] h-[3px] rounded-full bg-zinc-500 transition-colors duration-300 ${isExpanded ? 'bg-white' : ''}`}></div>
-                <div className={`w-[3px] h-[3px] rounded-full bg-zinc-500 transition-colors duration-300 ${isExpanded ? 'bg-white' : ''}`}></div>
-                <div className={`w-[3px] h-[3px] rounded-full bg-zinc-500 transition-colors duration-300 ${isExpanded ? 'bg-white' : ''}`}></div>
+                <div className={`w-[3px] h-[3px] rounded-full transition-colors duration-300 ${isExpanded ? 'bg-white' : 'bg-zinc-500'}`}></div>
+                <div className={`w-[3px] h-[3px] rounded-full transition-colors duration-300 ${isExpanded ? 'bg-white' : 'bg-zinc-500'}`}></div>
+                <div className={`w-[3px] h-[3px] rounded-full transition-colors duration-300 ${isExpanded ? 'bg-white' : 'bg-zinc-500'}`}></div>
             </div>
 
             {/* Collapsible Content */}

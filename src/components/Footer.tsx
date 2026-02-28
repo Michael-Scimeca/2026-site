@@ -4,6 +4,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Container } from './Container';
 import { useModal } from '@/context/ModalContext';
 import { SweetPunkText } from './SweetPunkText';
+import { TypewriterSwap } from './TypewriterSwap';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -22,9 +23,26 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
     const { openModal } = useModal();
     const videoRef = useRef<HTMLVideoElement>(null);
     const emailRef = useRef<HTMLDivElement>(null);
+    const emailLinkRef = useRef<HTMLAnchorElement>(null);
     const footerRef = useRef<HTMLElement>(null);
     const [isInView, setIsInView] = useState(false);
     const [isFooterVisible, setIsFooterVisible] = useState(false);
+    const [footerHovered, setFooterHovered] = useState(false);
+
+    // Proximity-based trigger: flip footerHovered when cursor is near the email link
+    useEffect(() => {
+        const PROXIMITY_PX = 100;
+        const handleMove = (e: MouseEvent) => {
+            if (!emailLinkRef.current) return;
+            const rect = emailLinkRef.current.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
+            const dist = Math.sqrt(Math.pow(e.clientX - cx, 2) + Math.pow(e.clientY - cy, 2));
+            setFooterHovered(dist < PROXIMITY_PX);
+        };
+        window.addEventListener('mousemove', handleMove, { passive: true });
+        return () => window.removeEventListener('mousemove', handleMove);
+    }, []);
 
     useEffect(() => {
         const observer = new IntersectionObserver(
@@ -64,22 +82,21 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
         if (!isFooterVisible) return;
 
         const handleMouseMove = (e: MouseEvent) => {
-            if (!emailRef.current || !videoRef.current) return;
+            if (!emailLinkRef.current || !videoRef.current) return;
             if (!isFinite(videoRef.current.duration)) return;
 
-            const rect = emailRef.current.getBoundingClientRect();
-            const emailX = rect.left + rect.width / 2;
-            const emailY = rect.top + rect.height / 2;
+            const rect = emailLinkRef.current.getBoundingClientRect();
+            const cx = rect.left + rect.width / 2;
+            const cy = rect.top + rect.height / 2;
 
             const distance = Math.sqrt(
-                Math.pow(e.clientX - emailX, 2) + Math.pow(e.clientY - emailY, 2)
+                Math.pow(e.clientX - cx, 2) + Math.pow(e.clientY - cy, 2)
             );
 
-            const radius = 400;
+            const radius = 100;
 
             if (distance < radius) {
-                const progress = 1 - (distance / radius);
-                targetTimeRef.current = progress * videoRef.current.duration;
+                targetTimeRef.current = videoRef.current.duration;
             } else {
                 targetTimeRef.current = 0;
             }
@@ -89,7 +106,11 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
             if (videoRef.current && isFinite(videoRef.current.duration) && videoRef.current.readyState >= 2) {
                 const diff = targetTimeRef.current - currentTimeRef.current;
                 if (Math.abs(diff) > 0.001) {
-                    currentTimeRef.current += diff * 0.15;
+                    // Slower scrub for natural head movement
+                    // Turning toward (scrub in): deliberate, 0.06
+                    // Turning back (scrub out): relaxed, 0.04
+                    const speed = diff > 0 ? 0.06 : 0.04;
+                    currentTimeRef.current += diff * speed;
                     videoRef.current.currentTime = Math.max(0, Math.min(currentTimeRef.current, videoRef.current.duration));
                 }
             }
@@ -117,17 +138,22 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
     useGSAP(() => {
         if (!footerRef.current) return;
 
+        const spacer = document.getElementById('footer-reveal-spacer');
+        if (!spacer) return;
+
         gsap.set(footerRef.current, {
-            rotateX: 120,
+            rotateX: -10,
+            opacity: 0.7,
             transformPerspective: 1200,
             transformOrigin: 'center bottom',
         });
 
         gsap.to(footerRef.current, {
             rotateX: 0,
+            opacity: 1,
             ease: 'none',
             scrollTrigger: {
-                trigger: '#footer-reveal-spacer',
+                trigger: spacer,
                 start: 'top bottom',
                 end: 'bottom bottom',
                 scrub: 0.5,
@@ -173,18 +199,12 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                     </defs>
                 </svg>
 
-                {/* Absolute Video - Now masked with Custom SVG */}
+                {/* Absolute Video - Feathered edges with CSS gradient mask */}
                 <div
-                    className="absolute -bottom-[5%] -right-[10%] lg:bottom-12 lg:right-0 w-[50vh] h-[45vh] lg:w-[40%] lg:h-[79vh] z-0 opacity-60 md:opacity-80 lg:opacity-100 overflow-hidden pointer-events-none hidden min-[700px]:block bg-transparent"
+                    className="absolute bottom-0 -right-[10%] lg:bottom-0 lg:right-0 w-[50vh] h-[45vh] lg:w-[40%] lg:h-[79vh] z-0 opacity-60 md:opacity-80 lg:opacity-100 overflow-hidden pointer-events-none hidden min-[700px]:block bg-transparent"
                     style={{
-                        maskImage: 'url(#footer-custom-mask)',
-                        WebkitMaskImage: 'url(#footer-custom-mask)',
-                        maskSize: 'cover',
-                        WebkitMaskSize: 'cover',
-                        maskPosition: 'center',
-                        WebkitMaskPosition: 'center',
-                        maskRepeat: 'no-repeat',
-                        WebkitMaskRepeat: 'no-repeat'
+                        maskImage: 'radial-gradient(56% 64% at 53% 58%, black 69%, transparent 91%)',
+                        WebkitMaskImage: 'radial-gradient(56% 64% at 53% 58%, black 69%, transparent 91%)',
                     }}
                 >
                     {isInView && (
@@ -203,15 +223,17 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                     {/* Top Header Row */}
                     <div className="flex flex-col md:flex-row justify-between items-start gap-3 mb-4">
                         <div className="flex flex-col gap-3 md:gap-6">
-                            <h2 className="font-bold tracking-tighter leading-none" style={{ fontSize: 'clamp(3rem, 10vw, 8.75rem)' }}>
-                                <SweetPunkText
-                                    text="Say Hi"
-                                    startColor="#ffffff"
-                                    animate={false}
-                                /><SweetPunkText
-                                    text=","
-                                    startColor="#0158ff"
-                                    animate={false}
+                            <h2
+                                className="font-bold tracking-tighter leading-none"
+                                style={{ fontSize: 'clamp(3rem, 10vw, 8.75rem)', color: '#ffffff' }}
+                            >
+                                <TypewriterSwap
+                                    defaultText="Say Hi"
+                                    hoverText="Let's Build"
+                                    isHovered={footerHovered}
+                                    eraseSpeed={50}
+                                    typeSpeed={70}
+                                    pauseMs={150}
                                 />
                             </h2>
                         </div>
@@ -222,10 +244,10 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                         {/* Left Side: Text and Links (Now takes full width of its half) */}
                         <div className="flex flex-col gap-4 md:gap-8">
                             <div className="flex flex-col gap-3 md:gap-5">
-                                <p className="text-base md:text-lg leading-relaxed text-gradient-flow">
+                                <p className="text-base md:text-lg leading-relaxed text-[#feaf01]">
                                     Ready to build something exceptional? Whether it's an intelligent application, an AI-powered platform, a custom web solution, or an innovative concept that needs technical execution, let's talk. We'll architect it, engineer it, and deploy it together.
                                 </p>
-                                <p className="text-base md:text-lg text-gradient-flow">
+                                <p className="text-base md:text-lg text-[#feaf01]">
                                     Let's strategize. Let's innovate. Let's scale.
                                 </p>
                             </div>
@@ -234,11 +256,12 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 min-[1160px]:grid-cols-3 gap-x-10">
                                     {/* Email */}
                                     <a
+                                        ref={emailLinkRef}
                                         href={`mailto:${defaultEmail}`}
                                         className="group flex flex-col gap-1 p-4 pl-4 sm:pl-0 border-l-2 sm:border-l-0 border-white/10 transition-all duration-300"
                                     >
                                         <span className="font-bold text-white/50 text-xs uppercase tracking-wider group-hover:text-white/70 transition-colors">Let&apos;s Work Together</span>
-                                        <span className="flex items-center gap-2 text-zinc-400 group-hover:text-white transition-colors text-sm break-all">
+                                        <span className="flex items-center gap-2 text-zinc-400 group-hover:text-white transition-colors text-sm whitespace-nowrap">
                                             <span className="shrink-0 text-base font-bold">@</span>
                                             {defaultEmail}
                                         </span>

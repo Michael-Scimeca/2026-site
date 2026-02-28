@@ -7,6 +7,9 @@ import Image from 'next/image';
 import { StatusBadge } from './StatusBadge';
 import { GameContainer } from './GameContainer';
 import { GradientBolt } from './GradientBolt';
+import { RotatingWord } from './RotatingWord';
+import { BlobButton } from './BlobButton';
+import { BookCallButton } from './BookCallButton';
 import { urlFor } from '@/sanity/lib/image';
 import { type SanityImageSource } from "@sanity/image-url/lib/types/types";
 import { gsap } from 'gsap';
@@ -247,7 +250,7 @@ export function Hero(props: HeroProps) {
                             sizes="(max-width: 768px) 100vw, 80vw"
                         />
                         <div ref={contentRef} className="absolute z-50 flex flex-col items-start gap-1 pointer-events-auto
-                            left-5 bottom-[150px] right-auto top-auto md:top-[calc(38%-50px)] md:left-[max(20px,calc(50%-220px))] lg:left-[calc(40%-100px)] xl:left-[calc(55%-100px)] md:right-auto md:bottom-auto
+                            left-5 bottom-[150px] right-auto top-auto md:top-[calc(38%-80px)] md:left-[max(20px,calc(50%-220px))] lg:left-[calc(40%-100px)] xl:left-[calc(55%-100px)] md:right-auto md:bottom-auto
                             max-w-[85vw] md:min-w-[700px] 
                             md:rotate-[-2deg]
                             transition-[left,transform] duration-500 ease-out
@@ -256,54 +259,45 @@ export function Hero(props: HeroProps) {
                             {/* Mobile Scrim for Legibility */}
                             <div className="absolute -inset-6 bg-gradient-to-r from-black/80 via-black/40 to-transparent -z-10 rounded-xl blur-xl md:hidden" />
 
-                            <h1 className="text-[clamp(26px,5vw,44px)] font-medium font-sans text-white leading-[1.2] tracking-tight whitespace-normal drop-shadow-lg md:drop-shadow-none">
-                                🌟 I build high-impact<br className="hidden md:block" />{' '}
-                                digital products & AI workflows.<br className="hidden md:block" />{' '}
-                            </h1>
-
-                            <p className="text-white/90 md:text-white/70 text-[clamp(15px,4vw,18px)] mt-4 max-w-[600px] leading-relaxed drop-shadow-md md:drop-shadow-none">
-                                Senior Web Developer & AI Automation Specialist — I help startups and brands ship intelligent solutions that save time and increase conversions.
+                            <p className="flex items-center gap-2 text-[#feaf01] text-sm font-medium uppercase tracking-[0.15em] mb-2">
+                                <span className="w-2 h-2 rounded-full bg-[#feaf01] inline-block" />
+                                Senior Web Developer &amp; AI Specialist
                             </p>
 
+
+                            <h1 className="text-[clamp(26px,5vw,44px)] font-medium font-sans text-white leading-[1.2] tracking-tight whitespace-normal drop-shadow-lg md:drop-shadow-none max-w-[18ch]">
+                                I build <RotatingWord words={['scalable', 'searchable', 'wonderful', 'intelligent', 'beautiful']} /> digital products and AI workflows.
+                            </h1>
+
+                            <p className="text-pretty text-white/80 text-[clamp(15px,4vw,18px)] mt-7 max-w-[58ch] leading-[1.7] drop-shadow-md md:drop-shadow-none">
+                                I design and engineer high-performing web products and AI workflows—so your team moves faster, with less friction.                            </p>
+
                             <div className="flex flex-col md:flex-row gap-4 mt-6 w-full md:w-auto">
-                                <a
+                                <BlobButton
                                     href="mailto:mikeyscimeca.dev@gmail.com?subject=Let's Talk Strategy"
                                     onMouseEnter={() => setHoverTarget('email')}
                                     onMouseLeave={() => setHoverTarget(null)}
-                                    className="relative inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full font-medium text-lg text-white overflow-hidden bg-transparent border border-white btn-liquid"
                                 >
-                                    {/* Liquid Fill Effect */}
-                                    <div className="liquid-fill" />
-
-                                    <span className="relative z-10">Email Me</span>
+                                    <span>Email Me</span>
                                     <Image
                                         src="/Icon/at-icon.svg"
                                         alt="Email"
                                         width={20}
                                         height={20}
-                                        className="relative z-10 invert"
+                                        className="invert"
                                     />
-                                </a>
+                                </BlobButton>
 
-                                <button
+                                <BookCallButton
                                     onClick={openModal}
                                     onMouseEnter={() => setHoverTarget('book')}
                                     onMouseLeave={() => setHoverTarget(null)}
-                                    className="relative inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full font-medium text-lg text-white overflow-hidden bg-transparent border border-white btn-liquid"
-                                >
-                                    {/* Liquid Fill Effect */}
-                                    <div className="liquid-fill" />
-
-                                    <span className="relative z-10">Book Strategy Call</span>
-                                    <Image
-                                        src="/Icon/calendar-icons.svg"
-                                        alt="Calendar"
-                                        width={24}
-                                        height={24}
-                                        className="relative z-10"
-                                    />
-                                </button>
+                                />
                             </div>
+
+                            <p className="text-white/40 text-xs tracking-wide mt-3">
+                                Avg. reply in 2 hours · Based in Chicago
+                            </p>
                         </div>
 
                     </div>

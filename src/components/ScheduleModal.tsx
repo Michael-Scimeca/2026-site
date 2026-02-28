@@ -287,7 +287,7 @@ export function ScheduleModal() {
                                 Book a  <span className="text-[#0158ff] underline">Strategy Call</span>
                             </h2>
                             <p className="text-zinc-400 mb-6 text-sm">
-                                We’ll identify automation gaps, UX friction, and growth opportunities in 30 minutes.                            </p>
+                                A quick 30-minute conversation about your project, goals, and how I can help.                            </p>
 
                             <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4">
                                 {/* Row: Name + Email */}

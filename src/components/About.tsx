@@ -2,6 +2,7 @@
 
 import React, { useRef } from 'react';
 import { Container } from './Container';
+import { BlobButton } from './BlobButton';
 import { PortableTextBlock } from 'sanity';
 import Image from 'next/image';
 import { gsap } from 'gsap';
@@ -49,17 +50,16 @@ const HELIX_SEP = 0.55;   // phase separation between items
 function AboutHelixItem({ tool, className }: { tool: typeof TECH_STACK[0]; className?: string }) {
     return (
         <div
-            className={`absolute flex items-center justify-center w-11 h-11 bg-black/60 rounded-full border border-white/10 backdrop-blur-sm ${className || ''}`}
+            className={`absolute flex items-center justify-center w-11 h-11 bg-black/80 rounded-full border border-white/10 ${className || ''}`}
             data-color={tool.color}
             data-custom-filter={tool.customFilter}
-            style={{ willChange: 'transform, opacity' }}
         >
             <Image
                 src={tool.src}
                 alt={tool.name}
                 width={48}
                 height={48}
-                className="w-3/4 h-3/4 object-contain transition-[filter] duration-500"
+                className="w-3/4 h-3/4 object-contain"
                 style={{ filter: 'brightness(0) invert(1)' }}
             />
         </div>
@@ -69,6 +69,7 @@ function AboutHelixItem({ tool, className }: { tool: typeof TECH_STACK[0]; class
 export function About({ description }: AboutProps) {
     const sectionRef = useRef<HTMLElement>(null);
     const helixContainerRef = useRef<HTMLDivElement>(null);
+    const contentBlockRef = useRef<HTMLDivElement>(null);
 
     const strand1 = TECH_STACK.slice(0, HELIX_STRAND_SIZE);
     const strand2 = TECH_STACK.slice(HELIX_STRAND_SIZE);
@@ -89,21 +90,25 @@ export function About({ description }: AboutProps) {
 
         const prevForeground1 = new Array(items1.length).fill(false);
         const prevForeground2 = new Array(items2.length).fill(false);
-        let frameCount = 0;
+        // Batch arrays for gsap.set
+        const item1Transforms: { x: number; scale: number; opacity: number; zIndex: number; force3D: boolean }[] = [];
+        const item2Transforms: { x: number; scale: number; opacity: number; zIndex: number; force3D: boolean }[] = [];
 
         const time = { value: 0 };
+
+        // Cache container dimensions (avoids layout reads every frame)
+        const containerH = helixContainerRef.current?.offsetHeight || 600;
+        const containerW = helixContainerRef.current?.offsetWidth || 200;
+        const paddingY = 40;
+        const innerHeight = containerH - paddingY * 2;
+        const itemCount = items1.length;
+        const step = innerHeight / Math.max(itemCount - 1, 1);
+        const centerX = containerW / 2;
 
         const updateStrands = () => {
 
             const points1: { x: number; y: number }[] = [];
             const points2: { x: number; y: number }[] = [];
-
-            const containerH = helixContainerRef.current?.offsetHeight || 600;
-            const paddingY = 40;
-            const innerHeight = containerH - paddingY * 2;
-            const itemCount = items1.length;
-            const step = innerHeight / Math.max(itemCount - 1, 1);
-            const centerX = (helixContainerRef.current?.offsetWidth || 200) / 2;
 
             for (let i = -2; i <= itemCount + 1; i++) {
                 const angle = time.value + i * HELIX_SEP;
@@ -120,8 +125,6 @@ export function About({ description }: AboutProps) {
 
                 if (i >= 0 && i < itemCount) {
                     const line = lines[i];
-                    const item1 = items1[i];
-                    const item2 = items2[i];
                     const img1 = strand1Images[i];
                     const img2 = strand2Images[i];
 
@@ -133,57 +136,62 @@ export function About({ description }: AboutProps) {
                         });
                     }
 
-                    if (item1) {
-                        const cos1 = Math.cos(angle);
-                        const scale1 = cos1 * 0.35 + 0.75;
-                        const zIndex1 = cos1 > 0 ? 10 : 0;
-                        const opacity1 = cos1 * 0.5 + 0.5;
-                        const isForeground1 = cos1 > -0.2;
+                    // Compute strand 1 transforms
+                    const cos1 = Math.cos(angle);
+                    const isForeground1 = cos1 > -0.2;
+                    item1Transforms[i] = {
+                        x: sin1 * HELIX_AMP,
+                        scale: cos1 * 0.35 + 0.75,
+                        opacity: 0.3 + (cos1 * 0.5 + 0.5) * 0.7,
+                        zIndex: cos1 > 0 ? 10 : 0,
+                        force3D: true,
+                    };
 
-                        gsap.set(item1, {
-                            x: sin1 * HELIX_AMP,
-                            scale: scale1,
-                            opacity: 0.3 + opacity1 * 0.7,
-                            zIndex: zIndex1,
-                        });
-
-                        if (img1 && isForeground1 !== prevForeground1[i]) {
-                            prevForeground1[i] = isForeground1;
-                            img1.style.filter = isForeground1 ? 'none' : 'brightness(0) invert(1)';
-                        }
+                    if (img1 && isForeground1 !== prevForeground1[i]) {
+                        prevForeground1[i] = isForeground1;
+                        img1.style.filter = isForeground1 ? 'none' : 'brightness(0) invert(1)';
                     }
 
-                    if (item2) {
-                        const cos2 = Math.cos(angle2);
-                        const scale2 = cos2 * 0.35 + 0.75;
-                        const zIndex2 = cos2 > 0 ? 10 : 0;
-                        const opacity2 = cos2 * 0.5 + 0.5;
-                        const isForeground2 = cos2 > -0.2;
+                    // Compute strand 2 transforms
+                    const cos2 = Math.cos(angle2);
+                    const isForeground2 = cos2 > -0.2;
+                    item2Transforms[i] = {
+                        x: sin2 * HELIX_AMP,
+                        scale: cos2 * 0.35 + 0.75,
+                        opacity: 0.3 + (cos2 * 0.5 + 0.5) * 0.7,
+                        zIndex: cos2 > 0 ? 10 : 0,
+                        force3D: true,
+                    };
 
-                        gsap.set(item2, {
-                            x: sin2 * HELIX_AMP,
-                            scale: scale2,
-                            opacity: 0.3 + opacity2 * 0.7,
-                            zIndex: zIndex2,
-                        });
-
-                        if (img2 && isForeground2 !== prevForeground2[i]) {
-                            prevForeground2[i] = isForeground2;
-                            img2.style.filter = isForeground2 ? 'none' : 'brightness(0) invert(1)';
-                        }
+                    if (img2 && isForeground2 !== prevForeground2[i]) {
+                        prevForeground2[i] = isForeground2;
+                        img2.style.filter = isForeground2 ? 'none' : 'brightness(0) invert(1)';
                     }
                 }
             }
 
+            // Batch-apply transforms to strand items
+            for (let j = 0; j < items1.length; j++) {
+                if (item1Transforms[j] && items1[j]) gsap.set(items1[j], item1Transforms[j]);
+                if (item2Transforms[j] && items2[j]) gsap.set(items2[j], item2Transforms[j]);
+            }
+
+            // Build SVG path strings
             const drawPath = (points: { x: number; y: number }[]) => {
                 if (points.length === 0) return '';
-                return `M ${points.map(p => `${p.x},${p.y}`).join(' L ')}`;
+                let d = `M ${points[0].x},${points[0].y}`;
+                for (let j = 1; j < points.length; j++) {
+                    d += ` L ${points[j].x},${points[j].y}`;
+                }
+                return d;
             };
 
-            if (path1) path1.setAttribute('d', drawPath(points1));
-            if (path2) path2.setAttribute('d', drawPath(points2));
-            if (path1Pulse) path1Pulse.setAttribute('d', drawPath(points1));
-            if (path2Pulse) path2Pulse.setAttribute('d', drawPath(points2));
+            const d1 = drawPath(points1);
+            const d2 = drawPath(points2);
+            if (path1) path1.setAttribute('d', d1);
+            if (path2) path2.setAttribute('d', d2);
+            if (path1Pulse) path1Pulse.setAttribute('d', d1);
+            if (path2Pulse) path2Pulse.setAttribute('d', d2);
         };
 
         // Initial update
@@ -211,26 +219,21 @@ export function About({ description }: AboutProps) {
             ease: 'linear',
         });
 
-        // Scroll-driven yoyo scale: oscillates between 2.5 and 1 as you scroll
-        const scaleProgress = { value: 0 };
-        gsap.to(scaleProgress, {
-            value: 1,
-            ease: 'none',
-            scrollTrigger: {
-                trigger: document.body,
-                start: 'top top',
-                end: 'bottom bottom',
-                scrub: 1.5,
-            },
-            onUpdate: () => {
-                if (!helixContainerRef.current) return;
-                // Sine wave creates the yoyo pulse: oscillates ~3 full cycles over the page scroll
-                const sine = Math.sin(scaleProgress.value * Math.PI * 6);
-                // Map sine (-1 to 1) → scale (1.0 to 2.5)
-                const scale = 1.0 + ((sine + 1) / 2) * 1.5;
-                gsap.set(helixContainerRef.current, { scale });
-            },
-        });
+        // ── Parallax for left content block ──
+        if (contentBlockRef.current) {
+            gsap.fromTo(contentBlockRef.current, {
+                y: 60,
+            }, {
+                y: -60,
+                ease: 'none',
+                scrollTrigger: {
+                    trigger: sectionRef.current,
+                    start: 'top bottom',
+                    end: 'bottom top',
+                    scrub: 1,
+                },
+            });
+        }
 
     }, { scope: sectionRef });
 
@@ -238,59 +241,68 @@ export function About({ description }: AboutProps) {
         <section
             ref={sectionRef}
             id="about"
-            className="bg-black relative overflow-hidden"
+            className="bg-black relative overflow-hidden py-16"
             aria-labelledby="about-heading"
         >
+            {/* Moving Gradient Background */}
+            <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                <video
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    className="absolute inset-0 w-full h-full object-cover opacity-55"
+                    src="/videos/footer-gradient-bg.mp4"
+                    style={{
+                        maskImage: 'radial-gradient(ellipse 80% 70% at 50% 50%, black 40%, transparent 100%)',
+                        WebkitMaskImage: 'radial-gradient(ellipse 80% 70% at 50% 50%, black 40%, transparent 100%)',
+                    }}
+                />
+            </div>
+
             <Container>
                 <div className="relative z-10 grid grid-cols-1 desktop:grid-cols-12 gap-12 desktop:gap-8">
 
                     {/* ── Left Column: Text Content ── */}
-                    <div className="desktop:col-span-7 flex flex-col justify-center">
+                    <div
+                        ref={contentBlockRef}
+                        className="desktop:col-span-7 flex flex-col justify-center"
+                    >
 
                         {/* Section label */}
                         <div className="flex items-center gap-3 mb-10">
                             <span className="text-zinc-500 text-xs uppercase tracking-[0.25em] font-semibold">About</span>
                         </div>
-
-
                         {/* Headline */}
-                        <h2
-                            id="about-heading"
+                        <h2 id="about-heading"
                             className="text-[clamp(24px,4.5vw,40px)] font-normal leading-[1.15] tracking-tight text-zinc-500 mb-10 w-[100%]"
                         >
-                            <strong className="text-white font-black">Hi.</strong> I&apos;ve been building for{' '}
-                            <span className="text-[#0158ff]">15 years. </span>
+                            <span className="text-white">Building is in my</span> <span className="text-[#feaf01] font-medium">DNA.</span> <span className='text-white'>For </span> <span className="text-[#feaf01]">15 years</span> <span className='text-white'>I've been obsessed with the <span className="text-[#0158ff]">intersection of design, code, and now AI</span> — not because I have to, but because I genuinely can't stop.</span>
 
-                            I work with{' '}
-                            <strong className="text-white font-black">exceptional creatives</strong>{' '}
-                            and <strong className="text-white font-black">major brands. </strong>
-
-                            I make things that are{' '}
-                            <span className="text-[#0158ff]">beautiful</span> and{' '}
-                            <span className="text-[#0158ff]">fast. </span>
-
-                            Now I also build with{' '}
-                            <strong className="text-white font-black">AI automation.</strong>
-
-                            <span className="text-gradient-flow"> I&apos;m available for new work.</span>
                         </h2>
 
+
                         {/* Body copy */}
-                        <p className="text-sm md:text-[15px] leading-relaxed text-zinc-400 font-medium max-w-lg mb-10">
-                            For the past <strong className="text-white font-bold">15 years</strong>, I&apos;ve worked with exceptional creatives, crafting beautiful, high-performing
-                            digital products for <strong className="text-white font-bold">major brands</strong>. I genuinely love the intersection of{' '}
-                            <strong className="text-white font-bold">design, code, and AI</strong>.
+                        <p className="text-sm md:text-[15px] leading-[1.7] text-zinc-400 font-medium max-w-lg mb-10">
+                            From <strong className="text-white font-bold">Patreon</strong> and <strong className="text-white font-bold">Flipboard</strong> to <strong className="text-white font-bold">Snickers</strong> and <strong className="text-white font-bold">Mars, Inc.</strong> — I&apos;ve shipped production work across React, Next.js, GSAP, and headless CMS platforms. Today I also build <strong className="text-white font-bold">AI workflows</strong> with n8n, custom chatbots, and automation systems that save teams hours every week.
                         </p>
 
                         {/* CTA buttons */}
                         <div className="flex items-center gap-4">
 
-                            <a
-                                href="#footer"
-                                className="inline-flex items-center gap-2 px-6 py-3 border border-zinc-700 text-white text-sm font-medium rounded-sm hover:border-zinc-500 hover:bg-white/5 transition-all duration-200"
-                            >
-                                Book a call
-                            </a>
+                            <BlobButton href="mailto:mikeyscimeca.dev@gmail.com?subject=Let's Talk Strategy">
+                                Email Me<span className="text-xl font-bold">@</span>
+                            </BlobButton>
+
+                            <BlobButton href="#footer">
+                                Book a Call
+                                <Image
+                                    src="/Icon/calendar-icons.svg"
+                                    alt="Calendar"
+                                    width={24}
+                                    height={24}
+                                />
+                            </BlobButton>
                         </div>
                     </div>
 
@@ -301,11 +313,6 @@ export function About({ description }: AboutProps) {
                             className="relative w-full"
                             style={{ height: '750px', transform: 'rotate(-12deg)', transformOrigin: 'center center' }}
                         >
-                            {/* "TECH STACK" label */}
-                            <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] uppercase tracking-[0.3em] text-zinc-600 font-semibold whitespace-nowrap">
-                                Tech Stack
-                            </span>
-
                             {/* SVG paths */}
                             <svg className="absolute inset-0 w-full h-full pointer-events-none overflow-visible">
                                 <defs>
