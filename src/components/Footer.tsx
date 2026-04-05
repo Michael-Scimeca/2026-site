@@ -173,7 +173,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
     };
 
     return (
-        <footer ref={footerRef} className="fixed bottom-0 left-0 w-full h-screen max-h-screen text-white bg-black flex flex-col overflow-hidden z-0">
+        <footer ref={footerRef} className="fixed bottom-0 left-0 w-full h-dvh max-h-dvh text-white bg-black flex flex-col overflow-hidden z-0">
 
 
             <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
