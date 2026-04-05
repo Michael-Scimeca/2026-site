@@ -126,7 +126,7 @@ export function TypewriterSwap({
         <span className={`inline ${className}`}>
             {display}
             <span
-                className="inline-block w-[3px] h-[0.9em] bg-[#0158ff] ml-[4px] align-baseline rounded-sm"
+                className="hidden md:inline-block w-[3px] h-[0.9em] bg-[#0158ff] ml-[4px] align-baseline rounded-sm"
                 style={{
                     animation: "blink 1s step-end infinite",
                 }}

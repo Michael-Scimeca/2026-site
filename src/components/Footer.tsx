@@ -245,11 +245,9 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
                         <div className="flex flex-col gap-4 md:gap-8">
                             <div className="flex flex-col gap-3 md:gap-5">
                                 <p className="text-base md:text-lg leading-relaxed text-[#feaf01]">
-                                    Ready to build something exceptional? Whether it's an intelligent application, an AI-powered platform, a custom web solution, or an innovative concept that needs technical execution, let's talk. We'll architect it, engineer it, and deploy it together.
+                                    Ready to build something exceptional? </p> <p className="text-base md:text-lg leading-relaxed text-[#feaf01]"> Whether it's an intelligent application, an AI-powered platform, a custom web solution, or an innovative concept that needs technical execution, let's talk.</p> <p className="text-base md:text-lg leading-relaxed text-[#feaf01]">We'll architect it, engineer it, and deploy it together.
                                 </p>
-                                <p className="text-base md:text-lg text-[#feaf01]">
-                                    Let's strategize. Let's innovate. Let's scale.
-                                </p>
+
                             </div>
 
                             <address className="rounded-xl  overflow-hidden max-w-2xl not-italic" ref={emailRef}>
@@ -347,7 +345,7 @@ export function Footer({ email, location, socialHandle }: FooterProps) {
             </Container>
 
             {/* Bottom Bar - Own Block Level */}
-            <div className="border-t border-white/10 pt-3 pb-4">
+            <div className="border-t border-white/10 pt-3 pb-20 md:pb-4">
                 <Container>
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 text-sm text-zinc-600">
                         <div className="flex items-center gap-2">
