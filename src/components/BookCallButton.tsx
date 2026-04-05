@@ -31,7 +31,7 @@ function parseColor(color: string): [number, number, number] {
  */
 export function BookCallButton({
     onClick,
-    label = "Book Strategy Call",
+    label = "Book a 15-min Call",
     color = "#0158ff",
     blobSize = 26,
     onMouseEnter,
@@ -201,7 +201,7 @@ export function BookCallButton({
             {/* Button content */}
             <button
                 onClick={onClick}
-                className="relative z-10 inline-flex items-center rounded-full cursor-pointer"
+                className="relative z-10 flex md:inline-flex items-center justify-center rounded-full cursor-pointer"
                 style={{
                     padding: "14px 28px",
                     gap: isHovered ? "12px" : "16px",
@@ -210,20 +210,22 @@ export function BookCallButton({
                     transition: "gap 0.5s ease-out",
                 }}
             >
-                {/* Icon area — dot morphs to avatars */}
+                {/* Icon area — avatar morphs to avatars */}
                 <div
                     className="relative flex items-center justify-center overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
                     style={{
-                        width: isHovered ? 64 : 10,
-                        height: isHovered ? 20 : 10,
+                        width: isHovered ? 64 : 24,
+                        height: isHovered ? 20 : 24,
                     }}
                 >
-                    {/* Single dot — default state */}
-                    <div
-                        className="absolute rounded-full bg-white transition-all duration-400"
+                    {/* Avatar — default state */}
+                    <img
+                        src="/button/avatr.png"
+                        alt=""
+                        className="absolute rounded-full object-cover transition-all duration-400"
                         style={{
-                            width: 10,
-                            height: 10,
+                            width: 24,
+                            height: 24,
                             opacity: isHovered ? 0 : 1,
                             transform: `scale(${isHovered ? 0.5 : 1})`,
                         }}
@@ -237,20 +239,15 @@ export function BookCallButton({
                             transform: `scale(${isHovered ? 1 : 0.6})`,
                         }}
                     >
-                        {/* Person 1 — outline/white */}
-                        <svg
-                            width="18"
-                            height="18"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="rgba(255,255,255,0.8)"
-                            strokeWidth="2.2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        >
-                            <circle cx="12" cy="8" r="3.5" />
-                            <path d="M6.5 21v-1.5a5 5 0 0 1 5-5h1a5 5 0 0 1 5 5V21" />
-                        </svg>
+                        {/* Person 1 — avatar photo */}
+                        <img
+                            src="/Icon/avatar.png"
+                            alt=""
+                            width={20}
+                            height={20}
+                            className="rounded-full object-cover"
+                            style={{ width: 20, height: 20, filter: 'brightness(0) invert(1)' }}
+                        />
 
                         {/* Plus sign */}
                         <span
@@ -274,7 +271,7 @@ export function BookCallButton({
 
                 {/* Label */}
                 <span
-                    className="text-[15px] lg:text-lg font-medium tracking-wide whitespace-nowrap text-white"
+                    className="text-lg font-medium tracking-wide whitespace-nowrap text-white"
                 >
                     {label}
                 </span>

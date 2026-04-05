@@ -3,6 +3,8 @@
 import React, { useRef } from 'react';
 import { Container } from './Container';
 import { BlobButton } from './BlobButton';
+import { BookCallButton } from './BookCallButton';
+import { useModal } from '@/context/ModalContext';
 import { PortableTextBlock } from 'sanity';
 import Image from 'next/image';
 import { gsap } from 'gsap';
@@ -70,6 +72,7 @@ export function About({ description }: AboutProps) {
     const sectionRef = useRef<HTMLElement>(null);
     const helixContainerRef = useRef<HTMLDivElement>(null);
     const contentBlockRef = useRef<HTMLDivElement>(null);
+    const { openModal } = useModal();
 
     const strand1 = TECH_STACK.slice(0, HELIX_STRAND_SIZE);
     const strand2 = TECH_STACK.slice(HELIX_STRAND_SIZE);
@@ -288,21 +291,13 @@ export function About({ description }: AboutProps) {
                         </p>
 
                         {/* CTA buttons */}
-                        <div className="flex items-center gap-4">
+                        <div className="flex flex-col md:flex-row items-start gap-4">
 
                             <BlobButton href="mailto:mikeyscimeca.dev@gmail.com?subject=Let's Talk Strategy">
                                 Email Me<span className="text-xl font-bold">@</span>
                             </BlobButton>
 
-                            <BlobButton href="#footer">
-                                Book a Call
-                                <Image
-                                    src="/Icon/calendar-icons.svg"
-                                    alt="Calendar"
-                                    width={24}
-                                    height={24}
-                                />
-                            </BlobButton>
+                            <BookCallButton onClick={openModal} />
                         </div>
                     </div>
 

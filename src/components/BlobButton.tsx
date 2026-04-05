@@ -202,7 +202,7 @@ export function BlobButton({
             {/* Button content on top */}
             <Tag
                 {...(tagProps as any)}
-                className="relative z-10 inline-flex items-center gap-2 px-8 py-3 rounded-full font-medium text-lg text-white whitespace-nowrap"
+                className="relative z-10 flex md:inline-flex items-center justify-start md:justify-center gap-2 px-8 py-3 rounded-full font-medium text-lg text-white whitespace-nowrap"
                 style={{ background: "transparent", border: "none", cursor: "pointer" }}
             >
                 {children}

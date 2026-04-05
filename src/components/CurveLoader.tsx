@@ -112,7 +112,6 @@ export function CurveLoader() {
                 {/* Video Background */}
                 <video
                     autoPlay
-                    loop
                     muted
                     playsInline
                     className="absolute top-0 left-0 w-full h-full object-cover pointer-events-none z-0 opacity-90"

@@ -23,6 +23,7 @@ const TIME_SLOTS = [
 interface FormData {
     name: string;
     email: string;
+    phone: string;
     budget: string;
     date: string;
     time: string;
@@ -32,6 +33,7 @@ interface FormData {
 const initialFormData: FormData = {
     name: '',
     email: '',
+    phone: '',
     budget: '',
     date: '',
     time: '',
@@ -120,6 +122,7 @@ export function ScheduleModal() {
         const fields = [
             formData.name,
             formData.email,
+            formData.phone,
             formData.budget,
             formData.date,
             formData.time,
@@ -160,6 +163,10 @@ export function ScheduleModal() {
             errors.email = 'Email is required';
         } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
             errors.email = 'Enter a valid email address';
+        }
+
+        if (!formData.phone.trim()) {
+            errors.phone = 'Phone number is required';
         }
 
         if (!formData.budget) {
@@ -290,8 +297,8 @@ export function ScheduleModal() {
                                 A quick 30-minute conversation about your project, goals, and how I can help.                            </p>
 
                             <form ref={formRef} onSubmit={handleSubmit} className="flex flex-col gap-4">
-                                {/* Row: Name + Email */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {/* Row: Name + Email + Phone */}
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div>
                                         <input
                                             type="text"
@@ -317,6 +324,19 @@ export function ScheduleModal() {
                                             onChange={handleChange}
                                         />
                                         {fieldErrors.email && <p className="text-red-400 text-[11px] mt-1 ml-1">{fieldErrors.email}</p>}
+                                    </div>
+                                    <div>
+                                        <input
+                                            type="tel"
+                                            id="booking-phone"
+                                            name="phone"
+                                            required
+                                            className={`w-full px-3 py-2 bg-white/5 rounded-lg text-sm placeholder:text-zinc-600 focus:outline-none focus:border-[#0158ff] focus:ring-1 focus:ring-[#0158ff]/50 transition-all ${formData.phone ? 'text-white' : 'text-zinc-600'} ${fieldErrors.phone ? 'border border-red-500/60 ring-1 ring-red-500/30' : ''}`}
+                                            placeholder="Phone Number"
+                                            value={formData.phone}
+                                            onChange={handleChange}
+                                        />
+                                        {fieldErrors.phone && <p className="text-red-400 text-[11px] mt-1 ml-1">{fieldErrors.phone}</p>}
                                     </div>
                                 </div>
 

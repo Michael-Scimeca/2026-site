@@ -250,8 +250,8 @@ export function Hero(props: HeroProps) {
                             sizes="(max-width: 768px) 100vw, 80vw"
                         />
                         <div ref={contentRef} className="absolute z-50 flex flex-col items-start gap-1 pointer-events-auto
-                            left-5 bottom-[150px] right-auto top-auto md:top-[calc(38%-80px)] md:left-[max(20px,calc(50%-220px))] lg:left-[calc(40%-100px)] xl:left-[calc(55%-100px)] md:right-auto md:bottom-auto
-                            max-w-[85vw] md:min-w-[700px] 
+                            left-5 right-5 bottom-[30px] top-auto md:top-[calc(38%-80px)] md:left-[max(20px,calc(50%-220px))] lg:left-[calc(40%-100px)] xl:left-[calc(55%-100px)] md:right-auto md:bottom-auto
+                            md:max-w-[85vw] md:min-w-[700px] 
                             md:rotate-[-2deg]
                             transition-[left,transform] duration-500 ease-out
                             will-change-transform">
@@ -259,20 +259,20 @@ export function Hero(props: HeroProps) {
                             {/* Mobile Scrim for Legibility */}
                             <div className="absolute -inset-6 bg-gradient-to-r from-black/80 via-black/40 to-transparent -z-10 rounded-xl blur-xl md:hidden" />
 
-                            <p className="flex items-center gap-2 text-[#feaf01] text-sm font-medium uppercase tracking-[0.15em] mb-2">
-                                <span className="w-2 h-2 rounded-full bg-[#feaf01] inline-block" />
+                            <p className="flex items-start gap-2 text-[#feaf01] text-sm font-medium uppercase tracking-[0.15em] mb-2">
+                                <span className="w-2 h-2 mt-1.5 rounded-full bg-[#feaf01] inline-block shrink-0" />
                                 Senior Web Developer &amp; AI Specialist
                             </p>
 
 
-                            <h1 className="text-[clamp(26px,5vw,44px)] font-medium font-sans text-white leading-[1.2] tracking-tight whitespace-normal drop-shadow-lg md:drop-shadow-none max-w-[18ch]">
+                            <h1 className="text-[clamp(26px,5vw,44px)] font-medium font-sans text-white leading-[1.2] tracking-tight whitespace-normal drop-shadow-lg md:drop-shadow-none md:max-w-[18ch]">
                                 I build <RotatingWord words={['scalable', 'searchable', 'wonderful', 'intelligent', 'beautiful']} /> digital products and AI workflows.
                             </h1>
 
-                            <p className="text-pretty text-white/80 text-[clamp(15px,4vw,18px)] mt-7 max-w-[58ch] leading-[1.7] drop-shadow-md md:drop-shadow-none">
-                                I design and engineer high-performing web products and AI workflows—so your team moves faster, with less friction.                            </p>
+                            <p className="text-pretty text-white/80 text-[clamp(15px,4vw,18px)] mt-7 max-w-[500px] leading-[1.7] drop-shadow-md md:drop-shadow-none">
+                                From pixel-perfect interfaces to AI automation, I build digital products that solve real problems and scale with your business.</p>
 
-                            <div className="flex flex-col md:flex-row gap-4 mt-6 w-full md:w-auto">
+                            <div className="flex flex-col md:flex-row items-start gap-4 mt-6">
                                 <BlobButton
                                     href="mailto:mikeyscimeca.dev@gmail.com?subject=Let's Talk Strategy"
                                     onMouseEnter={() => setHoverTarget('email')}
@@ -303,7 +303,7 @@ export function Hero(props: HeroProps) {
                     </div>
                 </div>
 
-            </div>
-        </section>
+            </div >
+        </section >
     );
 }

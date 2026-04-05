@@ -6,7 +6,7 @@ import { CurveLoader } from "@/components/CurveLoader";
 import DynamicFavicon from "@/components/DynamicFavicon";
 import { ModalProvider } from "@/context/ModalContext";
 import { ScheduleModal } from "@/components/ScheduleModal";
-import { CookieConsent } from "@/components/CookieConsent";
+
 import { OutboundLinkTracker } from "@/components/OutboundLinkTracker";
 import { ChatWidget } from "@/components/ChatWidget";
 import { ClickSounds } from "@/components/ClickSounds";
@@ -226,7 +226,7 @@ export default function RootLayout({
           <CustomCursor />
           <DynamicFavicon />
           <ScheduleModal />
-          <CookieConsent />
+
           <OutboundLinkTracker />
           <ChatWidget />
           <ClickSounds />

@@ -203,17 +203,29 @@ function SetupRow({ item, index, isLast }: { item: SetupItem; index: number; isL
             ref={containerRef}
             className="group w-full relative py-10 desktop:py-14 transition-all"
             style={{
-                borderLeft: '3px solid transparent',
+                borderLeft: item.id === 'nycpride' ? 'none' : '3px solid transparent',
             }}
             onMouseOver={(e) => {
-                (e.currentTarget as HTMLElement).style.borderLeftColor = item.id === 'nycpride'
-                    ? '#8b5cf6'
-                    : activeThemeColor;
+                if (item.id !== 'nycpride') {
+                    (e.currentTarget as HTMLElement).style.borderLeftColor = activeThemeColor;
+                }
             }}
             onMouseOut={(e) => {
-                (e.currentTarget as HTMLElement).style.borderLeftColor = 'transparent';
+                if (item.id !== 'nycpride') {
+                    (e.currentTarget as HTMLElement).style.borderLeftColor = 'transparent';
+                }
             }}
         >
+            {/* Rainbow left border for NYC Pride */}
+            {item.id === 'nycpride' && (
+                <div
+                    className="absolute top-0 left-0 bottom-0 w-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                    style={{
+                        background: 'linear-gradient(to bottom, #ef4444, #f97316, #eab308, #22c55e, #3b82f6, #8b5cf6, #ec4899)',
+                    }}
+                />
+            )}
+
             {/* Bottom Border with Pulse */}
             <div className="absolute bottom-0 left-0 right-0 pointer-events-none z-50" style={{ overflow: 'visible' }}>
                 <svg
@@ -270,7 +282,7 @@ function SetupRow({ item, index, isLast }: { item: SetupItem; index: number; isL
                     <div className="desktop:col-span-3 flex flex-col gap-2 mb-6 desktop:mb-0 relative">
                         {item.logo ? (
                             <div
-                                className="relative h-10 desktop:h-12 max-w-[180px]"
+                                className={`relative max-w-[180px] ${item.id === 'nether-realm' || item.id === 'nycpride' ? 'h-[80px]' : 'h-10 desktop:h-12'}`}
                                 style={{
                                     background: item.id === 'nycpride'
                                         ? 'linear-gradient(135deg, #3b82f6, #8b5cf6, #f59e0b)'
