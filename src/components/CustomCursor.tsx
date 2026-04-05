@@ -13,138 +13,137 @@ export default function CustomCursor() {
     const [pageLoaded, setPageLoaded] = useState(false);
 
     // Wait for the intro loader to finish before showing cursor
-    √When the route changes, particles should explode outward from the center of the screen, slow down, then float upward as if gravity is reversed before fading out.Use useLocation to detect route changes.The canvas should sit on top of all content with position: fixed and pointer - events: none, and automatically clean up after the animation completes.Particles should be glowing white / light blue spheres."useEffect(() => {
-    const onLoaderDone = () => setPageLoaded(true);
-   ç     window.addEventListener('lenis-start', onLoaderDone);
-    return () => window.removeEventListener('lenis-start', onLoaderDone);
-}, []);
+    useEffect(() => {
+        const onLoaderDone = () => setPageLoaded(true);
+        window.addEventListener('lenis-start', onLoaderDone);
+        return () => window.removeEventListener('lenis-start', onLoaderDone);
+    }, []);
 
-useEffect(() => {
-    const shouldHide = () =>
-        window.matchMedia("(pointer: coarse)").matches ||
-        window.matchMedia("(hover: none)").matches ||
-        window.innerWidth <= 1024;
+    useEffect(() => {
+        const shouldHide = () =>
+            window.matchMedia("(pointer: coarse)").matches ||
+            window.matchMedia("(hover: none)").matches ||
+            window.innerWidth <= 1024;
 
-    if (shouldHide()) {
-        setIsTouchDevice(true);
-        return;
-    }
-
-    // Also hide if window resizes to mobile/tablet range
-    const onResize = () => setIsTouchDevice(shouldHide());
-    window.addEventListener("resize", onResize);
-
-
-    const FOLLOW_SPEED = 0.3;
-    const SKEW_AMOUNT = 0.3;
-    const MAX_STRETCH = 1.5;
-
-    const onMouseMove = (e: MouseEvent) => {
-        mouse.current.x = e.clientX;
-        mouse.current.y = e.clientY;
-
-        const target = e.target as HTMLElement;
-        const isTicTacToe = target.closest('.tic-tac-toe-board');
-        isPointer.current = !isTicTacToe && (
-            window.getComputedStyle(target).cursor === 'pointer' ||
-            target.tagName === 'BUTTON' ||
-            target.tagName === 'A'
-        );
-    };
-
-    // Hover listeners for interactive elements
-    const onMouseEnter = () => { isHovered.current = true; };
-    const onMouseLeave = () => { isHovered.current = false; };
-
-    const addHoverListeners = () => {
-        document.querySelectorAll("a, button, [role='button']").forEach((el) => {
-            el.addEventListener("mouseenter", onMouseEnter);
-            el.addEventListener("mouseleave", onMouseLeave);
-        });
-    };
-
-    const removeHoverListeners = () => {
-        document.querySelectorAll("a, button, [role='button']").forEach((el) => {
-            el.removeEventListener("mouseenter", onMouseEnter);
-            el.removeEventListener("mouseleave", onMouseLeave);
-        });
-    };
-
-    window.addEventListener("mousemove", onMouseMove);
-    addHoverListeners();
-
-    let rafId: number;
-
-    const render = () => {
-        const dot = dotRef.current;
-        if (!dot) {
-            rafId = requestAnimationFrame(render);
+        if (shouldHide()) {
+            setIsTouchDevice(true);
             return;
         }
 
-        // Smooth follow
-        const prevX = pos.current.x;
-        const prevY = pos.current.y;
-        pos.current.x += (mouse.current.x - pos.current.x) * FOLLOW_SPEED;
-        pos.current.y += (mouse.current.y - pos.current.y) * FOLLOW_SPEED;
+        // Also hide if window resizes to mobile/tablet range
+        const onResize = () => setIsTouchDevice(shouldHide());
+        window.addEventListener("resize", onResize);
 
-        // Calculate velocity
-        velocity.current.x = pos.current.x - prevX;
-        velocity.current.y = pos.current.y - prevY;
+        const FOLLOW_SPEED = 0.3;
+        const SKEW_AMOUNT = 0.3;
+        const MAX_STRETCH = 1.5;
 
-        const speed = Math.sqrt(
-            velocity.current.x ** 2 + velocity.current.y ** 2
-        );
+        const onMouseMove = (e: MouseEvent) => {
+            mouse.current.x = e.clientX;
+            mouse.current.y = e.clientY;
 
-        // Stretch based on speed
-        const stretch = Math.min(1 + speed * SKEW_AMOUNT, MAX_STRETCH);
-        const squeeze = 1 / Math.sqrt(stretch); // preserve area
+            const target = e.target as HTMLElement;
+            const isTicTacToe = target.closest('.tic-tac-toe-board');
+            isPointer.current = !isTicTacToe && (
+                window.getComputedStyle(target).cursor === 'pointer' ||
+                target.tagName === 'BUTTON' ||
+                target.tagName === 'A'
+            );
+        };
 
-        // Angle of motion
-        const angle = Math.atan2(velocity.current.y, velocity.current.x) * (180 / Math.PI);
+        // Hover listeners for interactive elements
+        const onMouseEnter = () => { isHovered.current = true; };
+        const onMouseLeave = () => { isHovered.current = false; };
 
-        // Size: bigger when hovering interactive elements
-        const size = 12;
+        const addHoverListeners = () => {
+            document.querySelectorAll("a, button, [role='button']").forEach((el) => {
+                el.addEventListener("mouseenter", onMouseEnter);
+                el.addEventListener("mouseleave", onMouseLeave);
+            });
+        };
 
-        dot.style.width = `${size}px`;
-        dot.style.height = `${size}px`;
-        dot.style.transform = `
+        const removeHoverListeners = () => {
+            document.querySelectorAll("a, button, [role='button']").forEach((el) => {
+                el.removeEventListener("mouseenter", onMouseEnter);
+                el.removeEventListener("mouseleave", onMouseLeave);
+            });
+        };
+
+        window.addEventListener("mousemove", onMouseMove);
+        addHoverListeners();
+
+        let rafId: number;
+
+        const render = () => {
+            const dot = dotRef.current;
+            if (!dot) {
+                rafId = requestAnimationFrame(render);
+                return;
+            }
+
+            // Smooth follow
+            const prevX = pos.current.x;
+            const prevY = pos.current.y;
+            pos.current.x += (mouse.current.x - pos.current.x) * FOLLOW_SPEED;
+            pos.current.y += (mouse.current.y - pos.current.y) * FOLLOW_SPEED;
+
+            // Calculate velocity
+            velocity.current.x = pos.current.x - prevX;
+            velocity.current.y = pos.current.y - prevY;
+
+            const speed = Math.sqrt(
+                velocity.current.x ** 2 + velocity.current.y ** 2
+            );
+
+            // Stretch based on speed
+            const stretch = Math.min(1 + speed * SKEW_AMOUNT, MAX_STRETCH);
+            const squeeze = 1 / Math.sqrt(stretch); // preserve area
+
+            // Angle of motion
+            const angle = Math.atan2(velocity.current.y, velocity.current.x) * (180 / Math.PI);
+
+            // Size: bigger when hovering interactive elements
+            const size = 12;
+
+            dot.style.width = `${size}px`;
+            dot.style.height = `${size}px`;
+            dot.style.transform = `
                 translate(${pos.current.x - size / 2}px, ${pos.current.y - size / 2}px)
                 rotate(${angle}deg)
                 scale(${stretch}, ${squeeze})
             `;
 
-        // Subtle opacity shift at high speed
-        dot.style.opacity = speed > 0.5 ? "1" : "0.9";
+            // Subtle opacity shift at high speed
+            dot.style.opacity = speed > 0.5 ? "1" : "0.9";
+
+            rafId = requestAnimationFrame(render);
+        };
 
         rafId = requestAnimationFrame(render);
-    };
 
-    rafId = requestAnimationFrame(render);
+        return () => {
+            window.removeEventListener("mousemove", onMouseMove);
+            window.removeEventListener("resize", onResize);
+            removeHoverListeners();
+            cancelAnimationFrame(rafId);
+        };
+    }, []);
 
-    return () => {
-        window.removeEventListener("mousemove", onMouseMove);
-        window.removeEventListener("resize", onResize);
-        removeHoverListeners();
-        cancelAnimationFrame(rafId);
-    };
-}, []);
+    if (isTouchDevice) return null;
 
-if (isTouchDevice) return null;
-
-return (
-    <div
-        ref={dotRef}
-        className="fixed top-0 left-0 pointer-events-none z-[10000] rounded-full hidden lg:block"
-        style={{
-            width: 12,
-            height: 12,
-            backgroundColor: "#0158ff",
-            boxShadow: "0 0 4px 1px rgba(0, 20, 120, 0.4)",
-            willChange: "transform",
-            opacity: pageLoaded ? 1 : 0,
-            transition: "opacity 0.3s ease",
-        }}
-    />
-);
+    return (
+        <div
+            ref={dotRef}
+            className="fixed top-0 left-0 pointer-events-none z-[10000] rounded-full hidden lg:block"
+            style={{
+                width: 12,
+                height: 12,
+                backgroundColor: "#0158ff",
+                boxShadow: "0 0 4px 1px rgba(0, 20, 120, 0.4)",
+                willChange: "transform",
+                opacity: pageLoaded ? 1 : 0,
+                transition: "opacity 0.3s ease",
+            }}
+        />
+    );
 }
